@@ -1,0 +1,70 @@
+/* Estilos para o container do formulário */
+.form-container {
+  background-color: #1a202c; /* Fundo escuro */
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+/* Estilos para o rótulo do campo de formulário */
+.form-container label {
+  display: block;
+  font-size: 0.875rem; /* text-sm */
+  color: #9CA3AF; /* Cor do texto de baixo contraste */
+  margin-bottom: 0.5rem; /* Espaçamento inferior */
+  font-weight: 500; /* Fonte semibold */
+}
+
+/* Estilos para o input de formulário */
+.form-container input,
+.form-container select,
+.form-container textarea {
+  width: 100%; /* Largura completa */
+  padding: 0.75rem; /* Espaçamento interno */
+  background-color: #374151; /* Fundo de baixo contraste */
+  border: 1px solid #4B5563; /* Borda sutil */
+  border-radius: 0.375rem; /* Bordas arredondadas */
+  font-size: 0.875rem; /* text-sm */
+  color: #E5E7EB; /* Texto de baixo contraste */
+  transition: border-color 0.2s ease-in-out;
+}
+
+/* Estilo para foco no input */
+.form-container input:focus,
+.form-container select:focus,
+.form-container textarea:focus {
+  border-color: #3B82F6; /* Cor da borda ao focar no campo */
+  outline: none; /* Remover outline */
+}
+
+/* Estilo para placeholder */
+.form-container input::placeholder,
+.form-container select::placeholder,
+.form-container textarea::placeholder {
+  color: #6B7280; /* Placeholder com cor mais suave */
+}
+
+/* Estilo para o botão */
+.form-container button {
+  background-color: #3B82F6; /* Azul padrão */
+  color: #fff; /* Texto branco */
+  padding: 0.75rem 1.5rem; /* Espaçamento interno */
+  border-radius: 0.375rem; /* Bordas arredondadas */
+  font-size: 0.875rem; /* text-sm */
+  font-weight: 600; /* Fonte semibold */
+  margin-top: 1rem; /* Espaçamento superior */
+  cursor: pointer; /* Mostrar cursor de pointer */
+  transition: background-color 0.2s ease-in-out;
+}
+
+/* Estilo para o botão ao passar o mouse */
+.form-container button:hover {
+  background-color: #2563EB; /* Azul mais escuro ao passar o mouse */
+}
+
+/* Estilo para o campo com erro */
+.form-container input.error,
+.form-container select.error,
+.form-container textarea.error {
+  border-color: #EF4444; /* Cor da borda para campos com erro */
+}

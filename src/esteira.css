@@ -1,0 +1,145 @@
+/* Estilo das colunas/etapas */
+.etapa-coluna {
+  background-color: #1a202c; /* Cor do fundo escuro */
+  color: #fff; /* Cor do texto branco */
+  padding: 1rem; /* Espaçamento interno */
+  border-radius: 0.5rem; /* Bordas arredondadas */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra leve */
+  display: flex;
+  flex-direction: column;
+  width: 240px; /* Largura mínima */
+  max-width: 100%; /* Largura máxima */
+  flex-grow: 1; /* Permite que cresça conforme necessário */
+  margin-bottom: 1rem; /* Espaçamento inferior */
+}
+.select-pj{
+padding: 10px !important;
+}
+/* Título das etapas */
+.etapa-coluna h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  border-bottom: 2px solid #2d3748; /* Linha inferior */
+  padding-bottom: 0.5rem;
+}
+
+/* Estilos gerais para os cartões */
+.cartao {
+  background-color: #1f2937; /* bg-gray-800 */
+  color: white; /* text-white */
+  padding: 1rem; /* p-4 */
+  border-radius: 0.5rem; /* rounded-lg */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06); /* shadow-md */
+  margin-bottom: 1rem; /* mb-4 */
+  cursor: pointer; /* cursor-pointer */
+  transition: all 0.2s ease-in-out; /* transition-all duration-200 */
+}
+
+.cartao:hover {
+  background-color: #374151; /* bg-gray-700 */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06); /* hover:bg-gray-700 hover:shadow-lg */
+}
+
+.cartao .titulo {
+  margin-bottom: 0.5rem; /* mb-2 */
+  font-size: 1rem; /* text-lg */
+  font-weight: 600; /* font-semibold */
+}
+
+.cartao .subtitulo {
+  margin-bottom: 0.25rem; /* mb-1 */
+  font-size: 0.8rem; /* text-md */
+  font-weight: 400; /* font-medium */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cartao .texto-pequeno {
+  font-size: 0.875rem; /* text-sm */
+  color: #9ca3af; /* text-gray-400 */
+  margin-bottom: 0.25rem; /* mb-1 */
+}
+
+.cartao .texto-truncado {
+  margin-top: 0.5rem; /* mt-2 */
+  font-size: 0.875rem; /* text-sm */
+  color: #d1d5db; /* text-gray-300 */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cartao .botao {
+  background-color: #3b82f6; /* bg-blue-500 */
+  color: white;
+  padding: 0.25rem 0.5rem; /* px-4 py-2 */
+  border-radius: 0.25rem; /* rounded */
+  margin-top: 1rem; /* mt-4 */
+  width: 100%; /* w-full */
+  text-align: center;
+  transition: background-color 0.2s ease-in-out; /* transition-colors */
+}
+
+.cartao .botao:hover {
+  background-color: #2563eb; /* hover:bg-blue-600 */
+}
+
+/* Estilos para o container da "Caixa de Entrada" */
+.caixa-entrada {
+  background-color: #141923; /* Cor do fundo escuro escurecida */
+  color: #fff; /* Cor do texto branco */
+  padding: 1rem; /* Espaçamento interno */
+  border-radius: 0.5rem; /* Bordas arredondadas */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra leve */
+  display: flex;
+  flex-direction: column;
+  width: 240px; /* Largura mínima */
+  max-width: 100%; /* Largura máxima */
+  flex-grow: 1; /* Permite que cresça conforme necessário */
+  margin-bottom: 1rem; /* Espaçamento inferior */
+}
+
+/* Estilos para o container da "Caixa de Entrada" */
+.contas-pagar {
+  background-color: #141923; /* Cor do fundo escuro escurecida */
+  color: #fff; /* Cor do texto branco */
+  padding: 1rem; /* Espaçamento interno */
+  border-radius: 0.5rem; /* Bordas arredondadas */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra leve */
+  display: flex;
+  flex-direction: column;
+  width: 240px; /* Largura mínima */
+  max-width: 100%; /* Largura máxima */
+  flex-grow: 1; /* Permite que cresça conforme necessário */
+  margin-bottom: 1rem; /* Espaçamento inferior */
+}
+
+.status-texto {
+  font-size: 0.875rem; /* Tamanho do texto */
+  color: #9ca3af; /* Cor do texto */
+  margin-left: 0.5rem; /* Espaçamento esquerdo */
+}
+
+.flex.items-center {
+  display: flex;
+  align-items: center;
+}
+
+/* Adicione cores personalizadas para diferentes status se necessário */
+.bg-green-500 {
+  background-color: #34d399;
+}
+
+.bg-yellow-500 {
+  background-color: #fbbf24;
+}
+
+.bg-red-500 {
+  background-color: #ef4444;
+}
+
+.bg-blue-500 {
+  background-color: #3b82f6;
+}
