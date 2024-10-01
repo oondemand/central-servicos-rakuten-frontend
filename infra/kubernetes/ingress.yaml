@@ -1,7 +1,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: central-servicos-frontend-ingress
+  name: cst-rakuten-frontend-ingress
   namespace: default
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-nginx
@@ -12,16 +12,16 @@ spec:
   ingressClassName: nginx
   tls:
     - hosts:
-        - central-servicos.oondemand.com.br
+        - cst-rakuten.oondemand.com.br
       secretName: app-tls
   rules:
-    - host: central-servicos.oondemand.com.br
+    - host: cst-rakuten.oondemand.com.br
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                name: central-servicos-frontend-service
+                name: cst-rakuten-frontend-service
                 port:
                   number: 80

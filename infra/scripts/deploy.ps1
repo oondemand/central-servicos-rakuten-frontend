@@ -1,6 +1,6 @@
 # Definir a versão da imagem, nome da imagem e o URL do registro de container
-$VERSION = "1.0.1"
-$IMAGE_NAME = "central-servicos-frontend"
+$VERSION = "0.0.2"
+$IMAGE_NAME = "cst-rakuten-frontend"
 $REGISTRY_URL = "registry.digitalocean.com/oondemand"
 
 # Verificar se $IMAGE_NAME está em minúsculas, já que Docker exige isso
