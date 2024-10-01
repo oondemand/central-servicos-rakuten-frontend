@@ -4,20 +4,20 @@ import { Link, useNavigate } from "react-router-dom";
 
 import { useTicket } from "../../contexts/TicketContext"; // Importar o contexto de Ticket
 import { useNFSe } from "../../contexts/NfseContext"; // Importar o contexto de NFS-e
-import { useEmpresa } from "../../contexts/EmpresaContext";
+import { useBaseOmie } from "../../contexts/BaseOmieContext";
 
 const Header = () => {
-  const { listaEmpresas, selecionarEmpresa, empresaSelecionada } = useEmpresa();
+  const { listaBases, selecionarBase, baseSelecionada } = useBaseOmie();
   const { filtrarTickets } = useTicket(); // Usar a função de filtro do contexto de tickets
   const { filtrarNfses } = useNFSe(); // Usar a função de filtro do contexto de NFS-e
 
   const [termoPesquisa, setTermoPesquisa] = useState(""); // Estado para o campo de pesquisa
-  const [empresaSelecionadaDropdown, setEmpresaSelecionadaDropdown] = useState(""); // Estado para a empresa selecionada no dropdown
+  const [baseSelecionadaDropdown, setEmpresaSelecionadaDropdown] = useState(""); // Estado para a base selecionada no dropdown
 
   const navigate = useNavigate();
 
   const handleEmpresaChange = (e) => {
-    selecionarEmpresa(e.target.value); // Atualiza a empresa selecionada no contexto
+    selecionarBase(e.target.value); // Atualiza a base selecionada no contexto
   };
 
   const handlePesquisaChange = (e) => {
@@ -31,14 +31,14 @@ const Header = () => {
     navigate("/configuracoes");
   };
 
-  // Efeito para atualizar o valor do dropdown sempre que a empresa selecionada mudar
+  // Efeito para atualizar o valor do dropdown sempre que a base selecionada mudar
   useEffect(() => {
-    if (empresaSelecionada) {
-      setEmpresaSelecionadaDropdown(empresaSelecionada.cnpj); // Sincroniza o valor do dropdown
+    if (baseSelecionada) {
+      setEmpresaSelecionadaDropdown(baseSelecionada.cnpj); // Sincroniza o valor do dropdown
     } else {
-      setEmpresaSelecionadaDropdown(""); // Limpa o valor do dropdown se não houver empresa selecionada
+      setEmpresaSelecionadaDropdown(""); // Limpa o valor do dropdown se não houver base selecionada
     }
-  }, [empresaSelecionada]);
+  }, [baseSelecionada]);
 
   return (
     <header className="bg-gray-900 text-gray-100 shadow-md p-4 flex items-center justify-between">
@@ -48,16 +48,16 @@ const Header = () => {
         </Link>
       </div>
       <div>
-        {/* Dropdown para seleção da empresa */}
+        {/* Dropdown para seleção da base */}
         <select
-          value={empresaSelecionadaDropdown} // Valor controlado pelo estado do dropdown
+          value={baseSelecionadaDropdown} // Valor controlado pelo estado do dropdown
           onChange={handleEmpresaChange}
           className="border border-gray-700 rounded p-2 bg-gray-800 text-gray-100"
         >
           <option value="">Selecione uma Empresa</option>
-          {listaEmpresas.map((empresa) => (
-            <option key={empresa._id} value={empresa.cnpj}>
-              {empresa.nome}
+          {listaBases.map((base) => (
+            <option key={base._id} value={base.cnpj}>
+              {base.nome}
             </option>
           ))}
         </select>

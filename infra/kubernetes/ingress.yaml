@@ -1,0 +1,27 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: central-servicos-frontend-ingress
+  namespace: default
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-nginx
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/rewrite-target: /  # Garante que todas as rotas apontem para index.html
+    nginx.ingress.kubernetes.io/use-regex: "true"  # Permite expressões regulares no caminho (se necessário)
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - central-servicos.oondemand.com.br
+      secretName: app-tls
+  rules:
+    - host: central-servicos.oondemand.com.br
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: central-servicos-frontend-service
+                port:
+                  number: 80

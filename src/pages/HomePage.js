@@ -1,6 +1,6 @@
 import React from "react";
 
-import { EmpresaProvider } from "../contexts/EmpresaContext";
+import { BaseOmieProvider } from "../contexts/BaseOmieContext";
 import { TicketProvider } from "../contexts/TicketContext";
 import { NFSeProvider } from "../contexts/NfseContext";
 
@@ -12,7 +12,7 @@ import { EtapaProvider } from "../contexts/EtapaContext";
 const HomePage = () => {
   return (
     <div className="flex flex-col min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
-      <EmpresaProvider>
+      <BaseOmieProvider>
         <EtapaProvider>
           <TicketProvider>
             <NFSeProvider>
@@ -24,7 +24,7 @@ const HomePage = () => {
             </NFSeProvider>
           </TicketProvider>
         </EtapaProvider>
-      </EmpresaProvider>
+      </BaseOmieProvider>
     </div>
   );
 };

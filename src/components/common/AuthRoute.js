@@ -1,7 +1,7 @@
 import React from "react";
 import { Outlet, Navigate } from "react-router-dom";
 
-import { EmpresaProvider } from "../../contexts/EmpresaContext";
+import { BaseOmieProvider } from "../../contexts/BaseOmieContext";
 import { TicketProvider } from "../../contexts/TicketContext";
 import { NFSeProvider } from "../../contexts/NfseContext";
 import { useAuth } from "../../contexts/AuthContext"; // Importa o contexto de autenticação
@@ -21,13 +21,13 @@ const AuthRoute = () => {
 
   // Renderiza os Providers e o Outlet (para as rotas internas)
   return (
-    <EmpresaProvider>
+    <BaseOmieProvider>
       <TicketProvider>
         <NFSeProvider>
           <Outlet /> {/* Renderiza as rotas filhas */}
         </NFSeProvider>
       </TicketProvider>
-    </EmpresaProvider>
+    </BaseOmieProvider>
   );
 };
 

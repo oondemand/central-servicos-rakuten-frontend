@@ -1,7 +1,7 @@
 import React, { createContext, useState, useContext, useCallback, useEffect } from "react";
 import api from "../api/apiService";
 
-import { useEmpresa } from "./EmpresaContext";
+import { useBaseOmie } from "./BaseOmieContext";
 import { useNotificacao } from "./NotificacaoContext";
 
 const NfseContext = createContext();
@@ -12,14 +12,14 @@ export const NFSeProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const { adicionarNotificacao } = useNotificacao();
-  const { empresaSelecionada } = useEmpresa();
+  const { baseSelecionada } = useBaseOmie();
 
   // Função para carregar todas as NFS-e
   const carregarNfse = useCallback(async () => {
     setLoading(true);
     try {
       let url = "/nfse/sem-ticket";
-      if (empresaSelecionada) url += `?infoNfse.tomador.documento=${empresaSelecionada.cnpj}`;
+      if (baseSelecionada) url += `?infoNfse.tomador.documento=${baseSelecionada.cnpj}`;
 
       const response = await api.get(url);
       setListaTodasNfses(response.data); // Armazena todas as NFS-e
@@ -33,7 +33,7 @@ export const NFSeProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  }, [adicionarNotificacao, empresaSelecionada]);
+  }, [adicionarNotificacao, baseSelecionada]);
 
   // Função para filtrar NFS-e com base na pesquisa
   const filtrarNfses = (termo) => {

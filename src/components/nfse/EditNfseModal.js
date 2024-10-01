@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { IoClose } from "react-icons/io5";
 import Acordeao from "../common/Acordeao";
 import { useNFSe } from "../../contexts/NfseContext";
-import PessoaForm from "../common/PessoaForm";
-import { useEmpresa } from "../../contexts/EmpresaContext";
+import { useBaseOmie } from "../../contexts/BaseOmieContext";
 import { Formik, Field, Form, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import InputMask from "react-input-mask";
@@ -11,7 +10,7 @@ import { FaSpinner } from "react-icons/fa";
 
 const EditNfseModal = ({ nfse, closeModal }) => {
   console.log("nfse", nfse);
-  const { listaEmpresas, empresaSelecionada } = useEmpresa();
+  const { listaBases, baseSelecionada } = useBaseOmie();
   const { adicionarNfse, editarNfse } = useNFSe();
   const [loading, setLoading] = useState({
     save: false,
@@ -146,25 +145,25 @@ const EditNfseModal = ({ nfse, closeModal }) => {
                         as="select"
                         name="documentoTomador"
                         className="mt-1 w-full"
-                        disabled={!!empresaSelecionada}
+                        disabled={!!baseSelecionada}
                         onChange={(e) => {
                           const cnpjSelecionado = e.target.value;
-                          const empresa = listaEmpresas.find(
-                            (emp) => emp.cnpj === cnpjSelecionado
+                          const base = listaBases.find(
+                            (base) => base.cnpj === cnpjSelecionado
                           );
-                          if (empresa) {
-                            setFieldValue("documentoTomador", empresa.cnpj);
-                            setFieldValue("nomeTomador", empresa.nome);
+                          if (base) {
+                            setFieldValue("documentoTomador", base.cnpj);
+                            setFieldValue("nomeTomador", base.nome);
                           } else {
                             setFieldValue("documentoTomador", "");
                             setFieldValue("nomeTomador", "");
                           }
                         }}
                       >
-                        <option value="">Selecione uma empresa</option>
-                        {listaEmpresas.map((empresa) => (
-                          <option key={empresa.cnpj} value={empresa.cnpj}>
-                            {empresa.nome}
+                        <option value="">Selecione uma base</option>
+                        {listaBases.map((base) => (
+                          <option key={base.cnpj} value={base.cnpj}>
+                            {base.nome}
                           </option>
                         ))}
                       </Field>
@@ -177,7 +176,7 @@ const EditNfseModal = ({ nfse, closeModal }) => {
                         as={InputMask}
                         mask="99.999.999/9999-99"
                         className="mt-1 w-full"
-                        disabled={!!empresaSelecionada}
+                        disabled={!!baseSelecionada}
                       />
                       <ErrorMessage name="documentoTomador" component="div" />
                     </div>

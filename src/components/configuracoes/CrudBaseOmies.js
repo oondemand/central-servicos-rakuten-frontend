@@ -3,8 +3,8 @@ import api from '../../api/apiService';
 import CrudModal from './CrudModal';
 import DeleteConfirmationModal from '../common/DeleteConfirmationModal';
 
-const CrudEmpresas = () => {
-    const [empresas, setEmpresas] = useState([]);
+const CrudBaseOmies = () => {
+    const [baseomies, setBaseOmies] = useState([]);
     const [nome, setNome] = useState('');
     const [cnpj, setCnpj] = useState('');
     const [appKeyOmie, setAppKeyOmie] = useState('');
@@ -16,28 +16,28 @@ const CrudEmpresas = () => {
     const [itemToDelete, setItemToDelete] = useState(null);
 
     useEffect(() => {
-        fetchEmpresas();
+        fetchBaseOmies();
     }, []);
 
-    const fetchEmpresas = async () => {
+    const fetchBaseOmies = async () => {
         try {
-            const response = await api.get('/empresas');
-            setEmpresas(response.data);
+            const response = await api.get('/baseomies');
+            setBaseOmies(response.data);
         } catch (error) {
-            console.error('Erro ao buscar empresas:', error.message);
+            console.error('Erro ao buscar baseomies:', error.message);
         }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const empresaData = { nome, cnpj, appKeyOmie, appSecretOmie, status };
+        const baseData = { nome, cnpj, appKeyOmie, appSecretOmie, status };
 
         try {
             if (editId) {
-                await api.put(`/empresas/${editId}`, empresaData);
+                await api.put(`/baseomies/${editId}`, baseData);
             } else {
-                await api.post('/empresas', empresaData);
+                await api.post('/baseomies', baseData);
             }
 
             setNome('');
@@ -47,65 +47,65 @@ const CrudEmpresas = () => {
             setStatus('ativo');
             setEditId(null);
             setIsModalOpen(false);
-            fetchEmpresas();
+            fetchBaseOmies();
         } catch (error) {
-            console.error('Erro ao salvar empresa:', error.message);
+            console.error('Erro ao salvar base:', error.message);
         }
     };
 
-    const handleEdit = (empresa) => {
-        setNome(empresa.nome);
-        setCnpj(empresa.cnpj);
-        setAppKeyOmie(empresa.appKeyOmie);
-        setAppSecretOmie(empresa.appSecretOmie);
-        setStatus(empresa.status);
-        setEditId(empresa._id);
+    const handleEdit = (base) => {
+        setNome(base.nome);
+        setCnpj(base.cnpj);
+        setAppKeyOmie(base.appKeyOmie);
+        setAppSecretOmie(base.appSecretOmie);
+        setStatus(base.status);
+        setEditId(base._id);
         setIsModalOpen(true);
     };
 
     const handleDelete = async (id) => {
         try {
-            await api.delete(`/empresas/${id}`);
-            fetchEmpresas();
+            await api.delete(`/baseomies/${id}`);
+            fetchBaseOmies();
             setIsDeleteModalOpen(false);
         } catch (error) {
-            console.error('Erro ao excluir empresa:', error.message);
+            console.error('Erro ao excluir base:', error.message);
         }
     };
 
-    const confirmDelete = (empresa) => {
-        setItemToDelete(empresa);
+    const confirmDelete = (base) => {
+        setItemToDelete(base);
         setIsDeleteModalOpen(true);
     };
 
     return (
         <div className="p-4 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 rounded-lg shadow">
-            <h2 className="text-2xl font-bold mb-4">Gerenciamento de Empresas</h2>
+            <h2 className="text-2xl font-bold mb-4">Gerenciamento de Bases Omie</h2>
 
             <button
                 onClick={() => setIsModalOpen(true)}
                 className="mb-4 bg-blue-500 text-white px-4 py-2 rounded"
             >
-                Criar Nova Empresa
+                Criar Nova Base Omie
             </button>
 
             <ul className="space-y-4">
-                {empresas.map((empresa) => (
-                    <li key={empresa._id} className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg flex justify-between">
+                {baseomies.map((base) => (
+                    <li key={base._id} className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg flex justify-between">
                         <div>
-                            <h3 className="font-bold">{empresa.nome}</h3>
-                            <p>CNPJ: {empresa.cnpj}</p>
-                            <p>Status: {empresa.status}</p>
+                            <h3 className="font-bold">{base.nome}</h3>
+                            <p>CNPJ: {base.cnpj}</p>
+                            <p>Status: {base.status}</p>
                         </div>
                         <div className="flex space-x-2">
                             <button
-                                onClick={() => handleEdit(empresa)}
+                                onClick={() => handleEdit(base)}
                                 className="bg-yellow-500 text-white px-4 py-2 rounded"
                             >
                                 Editar
                             </button>
                             <button
-                                onClick={() => confirmDelete(empresa)}
+                                onClick={() => confirmDelete(base)}
                                 className="bg-red-500 text-white px-4 py-2 rounded"
                             >
                                 Excluir
@@ -118,7 +118,7 @@ const CrudEmpresas = () => {
             <CrudModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
-                title={editId ? 'Editar Empresa' : 'Criar Empresa'}
+                title={editId ? 'Editar Base Omie' : 'Criar Base Omie'}
             >
                 <form id="modal-form" onSubmit={handleSubmit}>
                     <div className="mb-2">
@@ -185,4 +185,4 @@ const CrudEmpresas = () => {
     );
 };
 
-export default CrudEmpresas;
+export default CrudBaseOmies;

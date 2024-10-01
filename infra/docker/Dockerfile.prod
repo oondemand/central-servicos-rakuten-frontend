@@ -1,0 +1,35 @@
+# Etapa 1: Construir o projeto
+FROM node:18-alpine AS build
+
+# Define o diretório de trabalho dentro do container
+WORKDIR /app
+
+# Copia os arquivos package.json e package-lock.json para o diretório de trabalho
+COPY package.json package-lock.json ./
+
+# Instala as dependências
+RUN npm install
+
+# Copia o restante dos arquivos do projeto para o diretório de trabalho
+COPY . .
+
+# Executa o build da aplicação React
+RUN npm run build
+
+# Etapa 2: Usar uma imagem leve para o resultado
+FROM node:18-alpine
+
+# Define o diretório de trabalho onde os arquivos estáticos ficarão
+WORKDIR /app
+
+# Copia os arquivos de build da etapa anterior
+COPY --from=build /app/build ./build
+
+# Expõe a porta em que o container vai rodar
+EXPOSE 3000
+
+# Instala o pacote `serve` para servir os arquivos estáticos
+RUN npm install -g serve
+
+# Comando para iniciar a aplicação
+CMD ["serve", "-s", "build"]

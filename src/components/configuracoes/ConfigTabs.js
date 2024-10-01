@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import CrudUsuarios from './CrudUsuarios';
-import CrudEmpresas from './CrudEmpresas';
+import CrudBaseOmies from './CrudBaseOmies';
 
 const ConfigTabs = () => {
     const [activeTab, setActiveTab] = useState('usuarios');
@@ -9,8 +9,8 @@ const ConfigTabs = () => {
         switch (activeTab) {
             case 'usuarios':
                 return <CrudUsuarios />;
-            case 'empresas':
-                return <CrudEmpresas />;
+            case 'bases omie':
+                return <CrudBaseOmies />;
             default:
                 return null;
         }
@@ -30,14 +30,14 @@ const ConfigTabs = () => {
                     Usuários
                 </button>
                 <button
-                    onClick={() => setActiveTab('empresas')}
+                    onClick={() => setActiveTab('baseomies')}
                     className={`px-4 py-2 rounded ${
-                        activeTab === 'empresas' 
+                        activeTab === 'baseomies' 
                             ? 'bg-blue-500 text-white' 
                             : 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300'
                     }`}
                 >
-                    Empresas
+                    Bases Omie
                 </button>
             </div>
             <div className="bg-white dark:bg-gray-800 p-4 rounded shadow">

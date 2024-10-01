@@ -1,7 +1,7 @@
 import React, { createContext, useState, useEffect, useCallback, useContext } from "react";
 import api from "../api/apiService";
 import { useNotificacao } from "./NotificacaoContext";
-import { useEmpresa } from "./EmpresaContext";
+import { useBaseOmie } from "./BaseOmieContext";
 
 // Cria o contexto para Ticket
 const TicketContext = createContext();
@@ -13,7 +13,7 @@ export const TicketProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const { adicionarNotificacao } = useNotificacao();
-  const { empresaSelecionada } = useEmpresa();
+  const { baseSelecionada } = useBaseOmie();
 
   // Função para normalizar strings, removendo acentos e convertendo para minúsculas
   const normalizarTexto = (texto) => {
@@ -54,7 +54,7 @@ export const TicketProvider = ({ children }) => {
     async (id, novoStatus) => {
       setLoading(true);
       try {
-        const response = await api.put(`/tickets/${id}/status`, { status: novoStatus });
+        await api.put(`/tickets/${id}/status`, { status: novoStatus });
         setListaTickets((prevTickets) =>
           prevTickets.map((ticket) =>
             ticket._id === id ? { ...ticket, status: novoStatus } : ticket
@@ -81,7 +81,7 @@ export const TicketProvider = ({ children }) => {
     setLoading(true);
     try {
       let url = "/tickets";
-      if (empresaSelecionada) url += `?cnpjTomador=${empresaSelecionada.cnpj}`;
+      if (baseSelecionada) url += `?cnpjTomador=${baseSelecionada.cnpj}`;
 
       const response = await api.get(url);
 
@@ -96,7 +96,7 @@ export const TicketProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  }, [adicionarNotificacao, empresaSelecionada]);
+  }, [adicionarNotificacao, baseSelecionada]);
 
   // Função para adicionar um novo ticket
   const adicionarTicket = useCallback(
