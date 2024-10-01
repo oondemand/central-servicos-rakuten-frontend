@@ -10,10 +10,10 @@ export const BaseOmieProvider = ({ children }) => {
   useEffect(() => {
     const carregarBases = async () => {
       try {
-        const response = await api.get("/empresas");
+        const response = await api.get("/baseomies");
         setListaBases(response.data);
       } catch (error) {
-        console.error("Erro ao carregar empresas:", error);
+        console.error("Erro ao carregar Bases Omie:", error);
       }
     };
 

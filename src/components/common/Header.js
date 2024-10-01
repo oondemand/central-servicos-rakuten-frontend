@@ -12,11 +12,11 @@ const Header = () => {
   const { filtrarNfses } = useNFSe(); // Usar a função de filtro do contexto de NFS-e
 
   const [termoPesquisa, setTermoPesquisa] = useState(""); // Estado para o campo de pesquisa
-  const [baseSelecionadaDropdown, setEmpresaSelecionadaDropdown] = useState(""); // Estado para a base selecionada no dropdown
+  const [baseSelecionadaDropdown, setBaseOmieSelecionadaDropdown] = useState(""); // Estado para a base selecionada no dropdown
 
   const navigate = useNavigate();
 
-  const handleEmpresaChange = (e) => {
+  const handleBaseOmieChange = (e) => {
     selecionarBase(e.target.value); // Atualiza a base selecionada no contexto
   };
 
@@ -34,9 +34,9 @@ const Header = () => {
   // Efeito para atualizar o valor do dropdown sempre que a base selecionada mudar
   useEffect(() => {
     if (baseSelecionada) {
-      setEmpresaSelecionadaDropdown(baseSelecionada.cnpj); // Sincroniza o valor do dropdown
+      setBaseOmieSelecionadaDropdown(baseSelecionada.cnpj); // Sincroniza o valor do dropdown
     } else {
-      setEmpresaSelecionadaDropdown(""); // Limpa o valor do dropdown se não houver base selecionada
+      setBaseOmieSelecionadaDropdown(""); // Limpa o valor do dropdown se não houver base selecionada
     }
   }, [baseSelecionada]);
 
@@ -51,10 +51,10 @@ const Header = () => {
         {/* Dropdown para seleção da base */}
         <select
           value={baseSelecionadaDropdown} // Valor controlado pelo estado do dropdown
-          onChange={handleEmpresaChange}
+          onChange={handleBaseOmieChange}
           className="border border-gray-700 rounded p-2 bg-gray-800 text-gray-100"
         >
-          <option value="">Selecione uma Empresa</option>
+          <option value="">Selecione uma Base Omie</option>
           {listaBases.map((base) => (
             <option key={base._id} value={base.cnpj}>
               {base.nome}
