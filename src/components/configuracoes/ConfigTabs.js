@@ -12,7 +12,7 @@ const ConfigTabs = () => {
             case 'baseomies':
                 return <CrudBaseOmies />;
             default:
-                return null;
+                return "Configuração não encontrada";
         }
     };
 
