@@ -9,7 +9,7 @@ const ConfigTabs = () => {
         switch (activeTab) {
             case 'usuarios':
                 return <CrudUsuarios />;
-            case 'bases omie':
+            case 'baseomies':
                 return <CrudBaseOmies />;
             default:
                 return null;
