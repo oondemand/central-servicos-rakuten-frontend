@@ -2,7 +2,6 @@ import React from "react";
 
 import { BaseOmieProvider } from "../contexts/BaseOmieContext";
 import { TicketProvider } from "../contexts/TicketContext";
-import { NFSeProvider } from "../contexts/NfseContext";
 
 import Header from "../components/common/Header";
 import Esteira from "../components/Esteira";
@@ -15,13 +14,11 @@ const HomePage = () => {
       <BaseOmieProvider>
         <EtapaProvider>
           <TicketProvider>
-            <NFSeProvider>
               <Header />
               <main className="flex-grow p-4 flex">
                 <Esteira />
               </main>
               <Footer />
-            </NFSeProvider>
           </TicketProvider>
         </EtapaProvider>
       </BaseOmieProvider>

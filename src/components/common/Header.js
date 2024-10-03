@@ -3,13 +3,11 @@ import { FaSearch, FaCog } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 
 import { useTicket } from "../../contexts/TicketContext"; // Importar o contexto de Ticket
-import { useNFSe } from "../../contexts/NfseContext"; // Importar o contexto de NFS-e
 import { useBaseOmie } from "../../contexts/BaseOmieContext";
 
 const Header = () => {
   const { listaBases, selecionarBase, baseSelecionada } = useBaseOmie();
   const { filtrarTickets } = useTicket(); // Usar a função de filtro do contexto de tickets
-  const { filtrarNfses } = useNFSe(); // Usar a função de filtro do contexto de NFS-e
 
   const [termoPesquisa, setTermoPesquisa] = useState(""); // Estado para o campo de pesquisa
   const [baseSelecionadaDropdown, setBaseOmieSelecionadaDropdown] = useState(""); // Estado para a base selecionada no dropdown
@@ -24,7 +22,6 @@ const Header = () => {
     const termo = e.target.value;
     setTermoPesquisa(termo);
     filtrarTickets(termo); // Filtrar tickets conforme o usuário digita
-    filtrarNfses(termo); // Filtrar NFS-e conforme o usuário digita
   };
 
   const handleConfigClick = () => {

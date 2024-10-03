@@ -31,17 +31,14 @@ export const TicketProvider = ({ children }) => {
       const termoNormalizado = normalizarTexto(termo);
 
       const ticketsFiltrados = listaTodosTickets.filter((ticket) => {
-        const { prestador, tomador } = ticket.nfse.infoNfse;
-        const discriminacao = ticket.nfse.infoNfse.declaracaoPrestacaoServico.servico.discriminacao;
+        const { baseOmie } = ticket.baseOmie;
 
         // Filtrar por número da NFS-e, documentos, nomes e discriminação do serviço
         return (
-          ticket.nfse.infoNfse.numero.toString().includes(termoNormalizado) ||
-          prestador.documento.includes(termoNormalizado) ||
-          normalizarTexto(prestador.nome).includes(termoNormalizado) || // Normalização do nome do prestador
-          tomador.documento.includes(termoNormalizado) ||
-          normalizarTexto(tomador.nome).includes(termoNormalizado) || // Normalização do nome do tomador
-          normalizarTexto(discriminacao).includes(termoNormalizado)
+          ticket.titulo.toString().includes(termoNormalizado) ||
+          ticket.observacao.toString().includes(termoNormalizado) ||
+          normalizarTexto(baseOmie.nome).includes(termoNormalizado) ||
+          normalizarTexto(baseOmie.documento).includes(termoNormalizado)
         );
       });
 
@@ -81,7 +78,7 @@ export const TicketProvider = ({ children }) => {
     setLoading(true);
     try {
       let url = "/tickets";
-      if (baseSelecionada) url += `?cnpjTomador=${baseSelecionada.cnpj}`;
+      if (baseSelecionada) url += `base-omie/${baseSelecionada.cnpj}`;
 
       const response = await api.get(url);
 
@@ -96,7 +93,7 @@ export const TicketProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  }, [adicionarNotificacao, baseSelecionada]);
+  }, [baseSelecionada, adicionarNotificacao]);
 
   // Função para adicionar um novo ticket
   const adicionarTicket = useCallback(

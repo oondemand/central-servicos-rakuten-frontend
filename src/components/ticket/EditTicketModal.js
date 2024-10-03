@@ -2,8 +2,7 @@ import React, { useState } from "react";
 import { useTicket } from "../../contexts/TicketContext";
 import { FaCheck, FaTimes } from "react-icons/fa";
 import { IoClose } from "react-icons/io5";
-import { FaSpinner } from "react-icons/fa"; // Importa o ícone de carregamento
-import ResumoNfse from "../nfse/ResumoNfse";
+import { FaSpinner } from "react-icons/fa";
 
 const EditTicketModal = ({ ticket, closeModal }) => {
   const { alterarStatusTicket, editarTicket, aprovarTicket, recusarTicket } = useTicket();
@@ -121,11 +120,6 @@ const EditTicketModal = ({ ticket, closeModal }) => {
                 Revisão
               </button>
             </div>
-          </div>
-
-          {/* Resumo da NFSe */}
-          <div className="col-span-5">
-            <ResumoNfse nfse={ticket.nfse} />
           </div>
         </div>
 

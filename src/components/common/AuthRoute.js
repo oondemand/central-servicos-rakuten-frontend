@@ -3,7 +3,6 @@ import { Outlet, Navigate } from "react-router-dom";
 
 import { BaseOmieProvider } from "../../contexts/BaseOmieContext";
 import { TicketProvider } from "../../contexts/TicketContext";
-import { NFSeProvider } from "../../contexts/NfseContext";
 import { useAuth } from "../../contexts/AuthContext"; // Importa o contexto de autenticação
 
 const AuthRoute = () => {
@@ -23,9 +22,7 @@ const AuthRoute = () => {
   return (
     <BaseOmieProvider>
       <TicketProvider>
-        <NFSeProvider>
           <Outlet /> {/* Renderiza as rotas filhas */}
-        </NFSeProvider>
       </TicketProvider>
     </BaseOmieProvider>
   );
