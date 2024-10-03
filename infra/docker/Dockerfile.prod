@@ -7,6 +7,9 @@ WORKDIR /app
 # Copia os arquivos package.json e package-lock.json para o diretório de trabalho
 COPY package.json package-lock.json ./
 
+# Copia o arquivo .env.prod para o diretório de trabalho e renomeia para .env
+COPY .env.prod .env
+
 # Instala as dependências
 RUN npm install
 
