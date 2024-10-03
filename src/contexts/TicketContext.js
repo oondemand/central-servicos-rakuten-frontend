@@ -78,7 +78,7 @@ export const TicketProvider = ({ children }) => {
     setLoading(true);
     try {
       let url = "/tickets";
-      if (baseSelecionada) url += `base-omie/${baseSelecionada.cnpj}`;
+      if (baseSelecionada) url += `/base-omie/${baseSelecionada._id}`;
 
       const response = await api.get(url);
 

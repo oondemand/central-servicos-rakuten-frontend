@@ -11,13 +11,12 @@ const Etapa = ({ index, etapa }) => {
   const [selectedTicket, setSelectedTicket] = useState(null);
 
   const handleCadastrarTicket = () => {
-    setSelectedTicket(null); // Resetar para garantir que o modal está em modo de criação
+    setSelectedTicket({}); // Resetar para garantir que o modal está em modo de criação
   };
 
   const handleEditTicket = (index, ticket) => {
     setSelectedTicket(ticket);
   };
-
   return (
     <div className="etapa-coluna">
       <div>
