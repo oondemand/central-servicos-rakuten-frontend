@@ -7,8 +7,8 @@ const CrudBaseOmies = () => {
     const [baseomies, setBaseOmies] = useState([]);
     const [nome, setNome] = useState('');
     const [cnpj, setCnpj] = useState('');
-    const [appKeyOmie, setAppKeyOmie] = useState('');
-    const [appSecretOmie, setAppSecretOmie] = useState('');
+    const [appKey, setAppKey] = useState('');
+    const [appSecret, setAppSecret] = useState('');
     const [status, setStatus] = useState('ativo');
     const [editId, setEditId] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -31,7 +31,7 @@ const CrudBaseOmies = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const baseData = { nome, cnpj, appKeyOmie, appSecretOmie, status };
+        const baseData = { nome, cnpj, appKey, appSecret, status };
 
         try {
             if (editId) {
@@ -42,8 +42,8 @@ const CrudBaseOmies = () => {
 
             setNome('');
             setCnpj('');
-            setAppKeyOmie('');
-            setAppSecretOmie('');
+            setAppKey('');
+            setAppSecret('');
             setStatus('ativo');
             setEditId(null);
             setIsModalOpen(false);
@@ -56,8 +56,8 @@ const CrudBaseOmies = () => {
     const handleEdit = (base) => {
         setNome(base.nome);
         setCnpj(base.cnpj);
-        setAppKeyOmie(base.appKeyOmie);
-        setAppSecretOmie(base.appSecretOmie);
+        setAppKey(base.appKey);
+        setAppSecret(base.appSecret);
         setStatus(base.status);
         setEditId(base._id);
         setIsModalOpen(true);
@@ -145,8 +145,8 @@ const CrudBaseOmies = () => {
                         <label className="block text-gray-700 dark:text-gray-300">App Key Omie:</label>
                         <input
                             type="text"
-                            value={appKeyOmie}
-                            onChange={(e) => setAppKeyOmie(e.target.value)}
+                            value={appKey}
+                            onChange={(e) => setAppKey(e.target.value)}
                             className="p-2 w-full bg-gray-200 dark:bg-gray-800 dark:text-gray-300 focus:outline-none"
                             required
                         />
@@ -155,8 +155,8 @@ const CrudBaseOmies = () => {
                         <label className="block text-gray-700 dark:text-gray-300">App Secret Omie:</label>
                         <input
                             type="text"
-                            value={appSecretOmie}
-                            onChange={(e) => setAppSecretOmie(e.target.value)}
+                            value={appSecret}
+                            onChange={(e) => setAppSecret(e.target.value)}
                             className="p-2 w-full bg-gray-200 dark:bg-gray-800 dark:text-gray-300 focus:outline-none"
                             required
                         />
