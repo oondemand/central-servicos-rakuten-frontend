@@ -1,10 +1,9 @@
+// src/components/Etapa.jsx
 import React, { useState } from "react";
 import { useTicket } from "../contexts/TicketContext";
 import CartaoTicket from "./ticket/CartaoTicket";
-
-import EditTicketModal from "./ticket/EditTicketModal";
+import TicketModal from "./ticket/TicketModal"; // Importando o novo TicketModal
 import "../esteira.css";
-import AddTicketModal from "./ticket/AdicionarTicketModal";
 
 const Etapa = ({ index, etapa }) => {
   const { listaTickets } = useTicket();
@@ -17,6 +16,11 @@ const Etapa = ({ index, etapa }) => {
 
   const handleEditTicket = (ticket) => {
     setSelectedTicket(ticket); // Abrir para edição
+  };
+
+  const closeModal = () => {
+    setIsAddModalOpen(false);
+    setSelectedTicket(null);
   };
 
   return (
@@ -51,11 +55,29 @@ const Etapa = ({ index, etapa }) => {
       {listaTickets
         .filter((ticket) => ticket.etapa === etapa.codigo)
         .map((ticket) => (
-          <CartaoTicket key={ticket._id} ticket={ticket} onClick={() => handleEditTicket(ticket)} />
+          <CartaoTicket
+            key={ticket._id}
+            ticket={ticket}
+            onClick={() => handleEditTicket(ticket)}
+          />
         ))}
 
-      {isAddModalOpen && <AddTicketModal closeModal={() => setIsAddModalOpen(false)} />}
-      {selectedTicket && <EditTicketModal ticket={selectedTicket} closeModal={() => setSelectedTicket(null)} />}
+      {/* Modal para adicionar novo ticket */}
+      {isAddModalOpen && (
+        <TicketModal
+          isOpen={isAddModalOpen}
+          closeModal={closeModal}
+        />
+      )}
+
+      {/* Modal para editar ticket existente */}
+      {selectedTicket && (
+        <TicketModal
+          isOpen={Boolean(selectedTicket)}
+          closeModal={closeModal}
+          ticket={selectedTicket}
+        />
+      )}
     </div>
   );
 };
