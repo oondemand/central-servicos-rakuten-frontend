@@ -21,6 +21,7 @@ import * as Yup from "yup";
 import { FaCheck, FaTimes, FaTrash } from "react-icons/fa";
 import { useTicket } from "../../contexts/TicketContext";
 import { useBaseOmie } from "../../contexts/BaseOmieContext";
+import { useEtapa } from "../../contexts/EtapaContext";
 
 
 const validationSchema = Yup.object({
@@ -33,6 +34,8 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
   const { salvarTicket, alterarStatusTicket, aprovacaoTicket, deletarTicket, listaTickets } = useTicket();
   const { baseSelecionada } = useBaseOmie();
   const toast = useToast();
+  const { listaEtapas } = useEtapa();
+
 
   const formik = useFormik({
     initialValues: {
@@ -62,7 +65,7 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
       } else {     
         const newTicket = {
           baseOmie: baseSelecionada._id,
-          etapa: listaTickets[0]?.etapa || "",
+          etapa: listaEtapas[0].codigo ,
           titulo: values.titulo,
           observacao: values.observacao,
           status: "aguardando-inicio",
