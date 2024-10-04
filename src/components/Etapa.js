@@ -5,18 +5,17 @@ import EditTicketModal from "./ticket/EditTicketModal";
 import "../esteira.css";
 
 const Etapa = ({ index, etapa }) => {
-  // console.log(etapa);
-
   const { listaTickets } = useTicket();
   const [selectedTicket, setSelectedTicket] = useState(null);
 
   const handleCadastrarTicket = () => {
-    setSelectedTicket({}); // Resetar para garantir que o modal está em modo de criação
+    setSelectedTicket({}); // Reset para novo ticket
   };
 
-  const handleEditTicket = (index, ticket) => {
-    setSelectedTicket(ticket);
+  const handleEditTicket = (ticket) => {
+    setSelectedTicket(ticket); // Abrir para edição
   };
+
   return (
     <div className="etapa-coluna">
       <div>
