@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { useTicket } from "../../contexts/TicketContext";
-import { FaCheck, FaTimes, FaSpinner } from "react-icons/fa";
-
+import { useToast } from "@chakra-ui/react";
+import { FaCheck, FaTimes } from "react-icons/fa";
+import * as Yup from "yup";
 import {
   Modal,
   ModalOverlay,
@@ -20,50 +21,59 @@ import {
 import { useBaseOmie } from "../../contexts/BaseOmieContext";
 
 const EditTicketModal = ({ ticket, closeModal }) => {
-  const { alterarStatusTicket, editarTicket, aprovarTicket, recusarTicket, adicionarTicket } = useTicket();
-  const { listaBases, baseSelecionada } = useBaseOmie();
+  const { alterarStatusTicket, editarTicket, adicionarTicket } = useTicket();
+  const { baseSelecionada } = useBaseOmie();
+  const toast = useToast();
 
-  const [titulo, setTitulo] = useState(ticket.titulo);
-  const [observacao, setObservacao] = useState(ticket.observacao);
-  const [status, setStatus] = useState(ticket.status);
-  const [loading, setLoading] = useState({
-    save: false,
-    approve: false,
-    reject: false,
+  const [titulo, setTitulo] = useState(ticket?.titulo || "");
+  const [observacao, setObservacao] = useState(ticket?.observacao || "");
+  const [status, setStatus] = useState(ticket?.status || "aguardando-inicio");
+  const [loading, setLoading] = useState(false);
+
+  const prepareTicketData = () => ({
+    baseOmie: baseSelecionada._id,
+    ...ticket,
+    titulo,
+    observacao,
+    status,
+    etapa: 0,
   });
-console.log(baseSelecionada,"baseSelecionada")
+
   const handleSave = async () => {
-    setLoading(prev => ({ ...prev, save: true }));
-    const updatedTicket = prepareTicketData({ baseOmie: baseSelecionada, ...ticket, titulo, observacao, status });
-    const sucesso = await editarTicket(ticket._id, updatedTicket);
-    setLoading(prev => ({ ...prev, save: false }));
-    if (sucesso) closeModal();
-  };
+    setLoading(true);
+    const updatedTicket = prepareTicketData();
+    
+    const ticketSchema = Yup.object().shape({
+      titulo: Yup.string().required("Título é obrigatório"),
+      observacao: Yup.string().required("Observação é obrigatória"),
+    });
 
-  const handleApprove = async () => {
-    setLoading(prev => ({ ...prev, approve: true }));
-    const sucesso = await aprovarTicket(ticket._id);
-    setLoading(prev => ({ ...prev, approve: false }));
-    if (sucesso) closeModal();
-  };
-
-  const handleReject = async () => {
-    setLoading(prev => ({ ...prev, reject: true }));
-    const sucesso = await recusarTicket(ticket._id);
-    setLoading(prev => ({ ...prev, reject: false }));
-    if (sucesso) closeModal();
-  };
-
-  const prepareTicketData = (ticket) => {
-    const { _id, createdAt, updatedAt, __v, ...cleanedTicket } = ticket;
-    return {
-      ...cleanedTicket,
-    };
-  };
-
-  const handleStatusChange = async (newStatus) => {
-    setStatus(newStatus);
-    await alterarStatusTicket(ticket._id, newStatus);
+    try {
+      await ticketSchema.validate(updatedTicket);
+      const sucesso = ticket._id
+        ? await editarTicket(ticket._id, updatedTicket)
+        : await adicionarTicket(updatedTicket);
+      if (sucesso) {
+        toast({
+          title: "Sucesso",
+          description: "Ticket salvo com sucesso!",
+          status: "success",
+          duration: 5000,
+          isClosable: true,
+        });
+        closeModal();
+      }
+    } catch (error) {
+      toast({
+        title: "Erro",
+        description: error.errors ? error.errors[0] : error.message,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -75,67 +85,17 @@ console.log(baseSelecionada,"baseSelecionada")
         <ModalBody>
           <FormControl mb={4}>
             <FormLabel>Título do ticket</FormLabel>
-            <Input
-              type="text"
-              value={titulo}
-              onChange={(e) => setTitulo(e.target.value)}
-            />
+            <Input value={titulo} onChange={(e) => setTitulo(e.target.value)} />
           </FormControl>
           <FormControl mb={4}>
             <FormLabel>Observação</FormLabel>
-            <Textarea
-              value={observacao}
-              onChange={(e) => setObservacao(e.target.value)}
-              rows={3}
-            />
+            <Textarea value={observacao} onChange={(e) => setObservacao(e.target.value)} rows={3} />
           </FormControl>
-          <ButtonGroup spacing={4} mb={4}>
-            <Button
-              onClick={() => handleStatusChange("aguardando-inicio")}
-              colorScheme={status === "aguardando-inicio" ? "yellow" : "gray"}
-            >
-              Aguardando Início
-            </Button>
-            <Button
-              onClick={() => handleStatusChange("trabalhando")}
-              colorScheme={status === "trabalhando" ? "green" : "gray"}
-            >
-              Trabalhando
-            </Button>
-            <Button
-              onClick={() => handleStatusChange("revisao")}
-              colorScheme={status === "revisao" ? "red" : "gray"}
-            >
-              Revisão
-            </Button>
-          </ButtonGroup>
         </ModalBody>
         <ModalFooter>
-          <Button onClick={closeModal} colorScheme="gray" mr={3}>
-            Cancelar
-          </Button>
-          <Button
-            onClick={handleSave}
-            colorScheme="blue"
-            isLoading={loading.save}
-          >
+          <Button onClick={closeModal} colorScheme="gray" mr={3}>Cancelar</Button>
+          <Button onClick={handleSave} colorScheme="blue" isLoading={loading}>
             Salvar
-          </Button>
-          <Button
-            onClick={handleApprove}
-            colorScheme="green"
-            isLoading={loading.approve}
-            leftIcon={<FaCheck />}
-          >
-            Aprovar Ticket
-          </Button>
-          <Button
-            onClick={handleReject}
-            colorScheme="red"
-            isLoading={loading.reject}
-            leftIcon={<FaTimes />}
-          >
-            Recusar Ticket
           </Button>
         </ModalFooter>
       </ModalContent>
@@ -144,3 +104,4 @@ console.log(baseSelecionada,"baseSelecionada")
 };
 
 export default EditTicketModal;
+
