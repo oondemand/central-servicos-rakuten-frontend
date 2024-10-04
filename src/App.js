@@ -10,12 +10,14 @@ import AuthRoute from "./components/common/AuthRoute"; // Usando o AuthRoute
 import LoginPage from "./pages/LoginPage";
 import HomePage from "./pages/HomePage";
 import ConfigPage from "./pages/ConfigPage";
+import { ChakraProvider } from "@chakra-ui/react";
 
 function App() {
   document.documentElement.classList.add("dark");
 
   return (
     <AuthContextProvider>
+      <ChakraProvider>
       <NotificacaoProvider>
         <BrowserRouter>
           <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
@@ -34,6 +36,7 @@ function App() {
           </div>
         </BrowserRouter>
       </NotificacaoProvider>
+      </ChakraProvider>
     </AuthContextProvider>
   );
 }

@@ -20,7 +20,7 @@ export const TicketProvider = ({ children }) => {
     return texto
       .toLowerCase()
       .normalize("NFD") // Decompor caracteres especiais (como acentos)
-      .replace(/[\u0300-\u036f]/g, ""); // Remover sinais diacríticos (acentos)
+      .replace(/[̀-ͯ]/g, ""); // Remover sinais diacríticos (acentos)
   };
 
   // Função para filtrar tickets com base na pesquisa
@@ -45,6 +45,38 @@ export const TicketProvider = ({ children }) => {
       setListaTickets(ticketsFiltrados);
     }
   };
+
+  // Função para salvar ticket (adicionar ou editar)
+  const salvarTicket = useCallback(
+    async (ticket) => {
+      setLoading(true);
+      try {
+        let response;
+        if (ticket._id) {
+          response = await api.put(`/tickets/${ticket._id}`, ticket);
+          setListaTickets((prevTickets) =>
+            prevTickets.map((t) => (t._id === ticket._id ? response.data : t))
+          );
+          adicionarNotificacao("info", "Ticket atualizado com sucesso!", true);
+        } else {
+          response = await api.post("/tickets", ticket);
+          setListaTickets((prevTickets) => [...prevTickets, response.data]);
+          adicionarNotificacao("info", "Ticket adicionado com sucesso!", true);
+        }
+        setError(null);
+        return true; // Indica sucesso
+      } catch (err) {
+        console.error("Erro ao salvar ticket:", err);
+        const detalhes = err.response?.data?.detalhes || err.message;
+        setError(ticket._id ? "Erro ao editar ticket." : "Erro ao adicionar ticket.");
+        adicionarNotificacao("erro", ticket._id ? "Erro ao editar ticket." : "Erro ao adicionar ticket.", detalhes);
+        return false; // Indica falha
+      } finally {
+        setLoading(false);
+      }
+    },
+    [adicionarNotificacao]
+  );
 
   // Função para alterar o status do ticket
   const alterarStatusTicket = useCallback(
@@ -78,7 +110,7 @@ export const TicketProvider = ({ children }) => {
     setLoading(true);
     try {
       let url = "/tickets";
-      if (baseSelecionada) url += `base-omie/${baseSelecionada.cnpj}`;
+      if (baseSelecionada) url += `/base-omie/${baseSelecionada._id}`;
 
       const response = await api.get(url);
 
@@ -94,58 +126,6 @@ export const TicketProvider = ({ children }) => {
       setLoading(false);
     }
   }, [baseSelecionada, adicionarNotificacao]);
-
-  // Função para adicionar um novo ticket
-  const adicionarTicket = useCallback(
-    async (novoTicket) => {
-      setLoading(true);
-      try {
-        const response = await api.post("/tickets", novoTicket);
-        setListaTickets((prevTickets) => [...prevTickets, response.data]);
-        setError(null);
-        adicionarNotificacao("info", "Ticket adicionado com sucesso!", true);
-        return true; // Indica sucesso
-      } catch (err) {
-        console.error("Erro ao adicionar ticket:", err);
-        const detalhes = err.response?.data?.detalhes || err.message;
-        if (err.response && err.response.status === 400) {
-          adicionarNotificacao("erro", "Erro de validação ao adicionar ticket.", detalhes);
-        } else {
-          setError("Erro ao adicionar ticket.");
-          adicionarNotificacao("erro", "Erro ao adicionar ticket.", detalhes);
-        }
-        return false; // Indica falha
-      } finally {
-        setLoading(false);
-      }
-    },
-    [adicionarNotificacao]
-  );
-
-  // Função para editar um ticket existente
-  const editarTicket = useCallback(
-    async (id, ticketData) => {
-      setLoading(true);
-      try {
-        const response = await api.put(`/tickets/${id}`, ticketData);
-        setListaTickets((prevTickets) =>
-          prevTickets.map((ticket) => (ticket._id === id ? response.data : ticket))
-        );
-        setError(null);
-        adicionarNotificacao("info", "Ticket atualizado com sucesso!", true);
-        return true; // Indica sucesso
-      } catch (err) {
-        console.error("Erro ao editar ticket:", err);
-        const detalhes = err.response?.data?.detalhes || err.message;
-        setError("Erro ao editar ticket.");
-        adicionarNotificacao("erro", "Erro ao editar ticket.", detalhes);
-        return false; // Indica falha
-      } finally {
-        setLoading(false);
-      }
-    },
-    [adicionarNotificacao]
-  );
 
   // Função para deletar um ticket
   const deletarTicket = useCallback(
@@ -170,48 +150,28 @@ export const TicketProvider = ({ children }) => {
     [adicionarNotificacao]
   );
 
-  // Função para aprovar um ticket
-  const aprovarTicket = useCallback(
-    async (id) => {
+  // Função para aprovar ou recusar um ticket
+  const aprovacaoTicket = useCallback(
+    async (id, aprovar) => {
       setLoading(true);
       try {
-        const response = await api.post(`/aprovacoes/${id}/aprovar`);
+        const url = aprovar ? `/aprovacoes/${id}/aprovar` : `/aprovacoes/${id}/recusar`;
+        const response = await api.post(url);
         setListaTickets((prevTickets) =>
           prevTickets.map((ticket) => (ticket._id === id ? response.data : ticket))
         );
         setError(null);
-        adicionarNotificacao("info", "Ticket aprovado com sucesso!", true);
+        adicionarNotificacao(
+          "info",
+          aprovar ? "Ticket aprovado com sucesso!" : "Ticket recusado com sucesso!",
+          true
+        );
         return true; // Indica sucesso
       } catch (err) {
-        const mensagem = err.response?.data?.message || "Erro ao aprovar ticket";
+        const mensagem = err.response?.data?.message || (aprovar ? "Erro ao aprovar ticket" : "Erro ao recusar ticket");
         const detalhes = err.response?.data?.detalhes || err.message;
         adicionarNotificacao("erro", mensagem, detalhes, false);
         setError(mensagem);
-        return false; // Indica falha
-      } finally {
-        setLoading(false);
-      }
-    },
-    [adicionarNotificacao]
-  );
-
-  // Função para recusar um ticket
-  const recusarTicket = useCallback(
-    async (id) => {
-      setLoading(true);
-      try {
-        const response = await api.post(`/aprovacoes/${id}/recusar`);
-        setListaTickets((prevTickets) =>
-          prevTickets.map((ticket) => (ticket._id === id ? response.data : ticket))
-        );
-        setError(null);
-        adicionarNotificacao("info", "Ticket recusado com sucesso!", true);
-        return true; // Indica sucesso
-      } catch (err) {
-        console.error("Erro ao recusar ticket:", err);
-        const detalhes = err.response?.data?.detalhes || err.message;
-        setError("Erro ao recusar ticket.");
-        adicionarNotificacao("erro", "Erro ao recusar ticket.", detalhes);
         return false; // Indica falha
       } finally {
         setLoading(false);
@@ -232,11 +192,9 @@ export const TicketProvider = ({ children }) => {
         loading,
         error,
         carregarTickets,
-        adicionarTicket,
-        editarTicket,
+        salvarTicket,
         deletarTicket,
-        aprovarTicket,
-        recusarTicket,
+        aprovacaoTicket,
         alterarStatusTicket,
         filtrarTickets,
       }}
@@ -249,4 +207,4 @@ export const TicketProvider = ({ children }) => {
 // Hook para usar o contexto de Ticket
 export const useTicket = () => useContext(TicketContext);
 
-export default TicketContext;
+export default TicketContext;
