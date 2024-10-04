@@ -32,10 +32,12 @@ const Header = () => {
   useEffect(() => {
     if (baseSelecionada) {
       setBaseOmieSelecionadaDropdown(baseSelecionada.cnpj); // Sincroniza o valor do dropdown
+    } else if (listaBases.length > 0) {
+      selecionarBase(listaBases[0].cnpj); // Seleciona a primeira base como padrão
     } else {
       setBaseOmieSelecionadaDropdown(""); // Limpa o valor do dropdown se não houver base selecionada
     }
-  }, [baseSelecionada]);
+  }, [baseSelecionada, listaBases, selecionarBase]);
 
   return (
     <header className="bg-gray-900 text-gray-100 shadow-md p-4 flex items-center justify-between">

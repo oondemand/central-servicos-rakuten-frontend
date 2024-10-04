@@ -1,15 +1,18 @@
 import React, { useState } from "react";
 import { useTicket } from "../contexts/TicketContext";
 import CartaoTicket from "./ticket/CartaoTicket";
+
 import EditTicketModal from "./ticket/EditTicketModal";
 import "../esteira.css";
+import AddTicketModal from "./ticket/AdicionarTicketModal";
 
 const Etapa = ({ index, etapa }) => {
   const { listaTickets } = useTicket();
   const [selectedTicket, setSelectedTicket] = useState(null);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   const handleCadastrarTicket = () => {
-    setSelectedTicket({}); // Reset para novo ticket
+    setIsAddModalOpen(true);
   };
 
   const handleEditTicket = (ticket) => {
@@ -51,9 +54,8 @@ const Etapa = ({ index, etapa }) => {
           <CartaoTicket key={ticket._id} ticket={ticket} onClick={() => handleEditTicket(ticket)} />
         ))}
 
-      {selectedTicket && (
-        <EditTicketModal ticket={selectedTicket} closeModal={() => setSelectedTicket(null)} />
-      )}
+      {isAddModalOpen && <AddTicketModal closeModal={() => setIsAddModalOpen(false)} />}
+      {selectedTicket && <EditTicketModal ticket={selectedTicket} closeModal={() => setSelectedTicket(null)} />}
     </div>
   );
 };
