@@ -13,7 +13,7 @@ export const TicketProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const { adicionarNotificacao } = useNotificacao();
-  const { baseSelecionada } = useBaseOmie();
+  const { baseOmie } = useBaseOmie();
 
   // Função para normalizar strings, removendo acentos e convertendo para minúsculas
   const normalizarTexto = (texto) => {
@@ -110,7 +110,7 @@ export const TicketProvider = ({ children }) => {
     setLoading(true);
     try {
       let url = "/tickets";
-      if (baseSelecionada) url += `/base-omie/${baseSelecionada._id}`;
+      if (baseOmie) url += `/base-omie/${baseOmie._id}`;
 
       const response = await api.get(url);
 
@@ -125,7 +125,7 @@ export const TicketProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  }, [baseSelecionada, adicionarNotificacao]);
+  }, [baseOmie, adicionarNotificacao]);
 
   // Função para deletar um ticket
   const deletarTicket = useCallback(

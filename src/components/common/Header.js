@@ -6,11 +6,11 @@ import { useTicket } from "../../contexts/TicketContext"; // Importar o contexto
 import { useBaseOmie } from "../../contexts/BaseOmieContext";
 
 const Header = () => {
-  const { listaBases, selecionarBase, baseSelecionada } = useBaseOmie();
+  const { listaBases, baseOmie, selecionarBase } = useBaseOmie();
   const { filtrarTickets } = useTicket(); // Usar a função de filtro do contexto de tickets
 
   const [termoPesquisa, setTermoPesquisa] = useState(""); // Estado para o campo de pesquisa
-  const [baseSelecionadaDropdown, setBaseOmieSelecionadaDropdown] = useState(""); // Estado para a base selecionada no dropdown
+  const [baseOmieDropdown, setBaseOmieSelecionadaDropdown] = useState(""); // Estado para a base selecionada no dropdown
 
   const navigate = useNavigate();
 
@@ -30,14 +30,12 @@ const Header = () => {
 
   // Efeito para atualizar o valor do dropdown sempre que a base selecionada mudar
   useEffect(() => {
-    if (baseSelecionada) {
-      setBaseOmieSelecionadaDropdown(baseSelecionada.cnpj); // Sincroniza o valor do dropdown
-    } else if (listaBases.length > 0) {
-      selecionarBase(listaBases[0].cnpj); // Seleciona a primeira base como padrão
+    if (baseOmie) {
+      setBaseOmieSelecionadaDropdown(baseOmie._id); // Sincroniza o valor do dropdown
     } else {
       setBaseOmieSelecionadaDropdown(""); // Limpa o valor do dropdown se não houver base selecionada
     }
-  }, [baseSelecionada, listaBases, selecionarBase]);
+  }, [baseOmie, listaBases, selecionarBase]);
 
   return (
     <header className="bg-gray-900 text-gray-100 shadow-md p-4 flex items-center justify-between">
@@ -49,13 +47,13 @@ const Header = () => {
       <div>
         {/* Dropdown para seleção da base */}
         <select
-          value={baseSelecionadaDropdown} // Valor controlado pelo estado do dropdown
+          value={baseOmieDropdown} // Valor controlado pelo estado do dropdown
           onChange={handleBaseOmieChange}
           className="border border-gray-700 rounded p-2 bg-gray-800 text-gray-100"
         >
           <option value="">Selecione uma Base Omie</option>
           {listaBases.map((base) => (
-            <option key={base._id} value={base.cnpj}>
+            <option key={base._id} value={base._id}>
               {base.nome}
             </option>
           ))}
