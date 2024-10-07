@@ -1,5 +1,4 @@
-// src/components/ticket/TicketModal.jsx
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Modal,
   ModalOverlay,
@@ -43,6 +42,9 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
   const toast = useToast();
   const { listaEtapas } = useEtapa();
 
+  // Estado para o status do ticket
+  const [status, setStatus] = useState(isEditMode ? ticket.status : "aguardando-inicio");
+
   const formik = useFormik({
     initialValues: {
       titulo: isEditMode ? ticket.titulo : "",
@@ -56,6 +58,7 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
           ...ticket,
           titulo: values.titulo,
           observacao: values.observacao,
+          status, // Atualiza o status do ticket
         };
         const sucesso = await salvarTicket(updatedTicket);
         setSubmitting(false);
@@ -82,7 +85,7 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
       }
     },
   });
-
+  
   const handleApprove = async () => {
     if (!isEditMode) return;
     toast.closeAll();
@@ -136,11 +139,12 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
 
   const handleStatusChange = async (newStatus) => {
     if (!isEditMode) return;
+    setStatus(newStatus); // Atualiza o status localmente
     await alterarStatusTicket(ticket._id, newStatus);
   };
+
   const { colorMode, toggleColorMode } = useColorMode();
 
-  // Força o modo escuro quando o modal é aberto
   useEffect(() => {
     if (isOpen && colorMode !== "dark") {
       toggleColorMode();
@@ -148,133 +152,120 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
   }, [isOpen, colorMode, toggleColorMode]);
   return (
     <Modal isOpen={isOpen} onClose={closeModal} size="6xl">
-    <ModalOverlay />
-    <ModalContent>
-      <ModalHeader>
-        {isEditMode ? "Editar Ticket" : "Adicionar Novo Ticket"}
-      </ModalHeader>
-      <ModalCloseButton />
-      <ModalBody>
-        <form onSubmit={formik.handleSubmit}>
-          <Flex justifyContent="space-between" width="100%">
-          <Flex flex={isEditMode ? "0 0 70%" : "100%"} flexDirection="column">
+      <ModalOverlay />
+      <ModalContent>
+        <ModalHeader>
+          {isEditMode ? "Editar Ticket" : "Adicionar Novo Ticket"}
+        </ModalHeader>
+        <ModalCloseButton />
+        <ModalBody>
+          <form onSubmit={formik.handleSubmit}>
+            <Flex justifyContent="space-between" width="100%">
+              <Flex flex={isEditMode ? "0 0 70%" : "100%"} flexDirection="column">
+                <FormControl mb={4} isInvalid={formik.errors.titulo && formik.touched.titulo}>
+                  <FormLabel>Título do ticket</FormLabel>
+                  <Input
+                    type="text"
+                    id="titulo"
+                    name="titulo"
+                    value={formik.values.titulo}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                  />
+                  {formik.touched.titulo && formik.errors.titulo ? (
+                    <div style={{ color: "red" }}>{formik.errors.titulo}</div>
+                  ) : null}
+                </FormControl>
+                <FormControl mb={4} isInvalid={formik.errors.observacao && formik.touched.observacao}>
+                  <FormLabel>Observação</FormLabel>
+                  <Textarea
+                    id="observacao"
+                    name="observacao"
+                    value={formik.values.observacao}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    rows={3}
+                  />
+                  {formik.touched.observacao && formik.errors.observacao ? (
+                    <div style={{ color: "red" }}>{formik.errors.observacao}</div>
+                  ) : null}
+                </FormControl>
+              </Flex>
 
-              <FormControl
-                mb={4}
-                isInvalid={formik.errors.titulo && formik.touched.titulo}
-              >
-                <FormLabel>Título do ticket</FormLabel>
-                <Input
-                  type="text"
-                  id="titulo"
-                  name="titulo"
-                  value={formik.values.titulo}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                />
-                {formik.touched.titulo && formik.errors.titulo ? (
-                  <div style={{ color: "red" }}>{formik.errors.titulo}</div>
-                ) : null}
-              </FormControl>
-              <FormControl
-                mb={4}
-                isInvalid={
-                  formik.errors.observacao && formik.touched.observacao
-                }
-              >
-                <FormLabel>Observação</FormLabel>
-                <Textarea
-                  id="observacao"
-                  name="observacao"
-                  value={formik.values.observacao}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  rows={3}
-                />
-                {formik.touched.observacao && formik.errors.observacao ? (
-                  <div style={{ color: "red" }}>{formik.errors.observacao}</div>
-                ) : null}
-              </FormControl>
+              {isEditMode && (
+                <FormControl mb={3} flex="0 0 25%">
+                  <FormLabel>Status</FormLabel>
+                  <Flex flexDirection={"column"} spacing={4}>
+                    <Button
+                      onClick={() => handleStatusChange("aguardando-inicio")}
+                      colorScheme={status === "aguardando-inicio" ? "yellow" : "gray"}
+                      mb={2}
+                    >
+                      Aguardando Início
+                    </Button>
+                    <Button
+                      onClick={() => handleStatusChange("trabalhando")}
+                      colorScheme={status === "trabalhando" ? "green" : "gray"}
+                      mb={2}
+                    >
+                      Trabalhando
+                    </Button>
+                    <Button
+                      onClick={() => handleStatusChange("revisao")}
+                      colorScheme={status === "revisao" ? "red" : "gray"}
+                    >
+                      Revisão
+                    </Button>
+                  </Flex>
+                </FormControl>
+              )}
             </Flex>
-  
-            {isEditMode && (
-              <FormControl mb={3} flex="0 0 25%">
-                <FormLabel>Status</FormLabel>
-                <Flex flexDirection={"column"} spacing={4}>
+
+            <ModalFooter display={"flex"} justifyContent={"space-between"} pt={20}>
+              {isEditMode && (
+                <ButtonGroup spacing={4}>
                   <Button
-                    onClick={() => handleStatusChange("aguardando-inicio")}
-                    colorScheme={
-                      ticket.status === "aguardando-inicio" ? "yellow" : "gray"
-                    }
-                    mb={2}
+                    onClick={handleApprove}
+                    colorScheme="green"
+                    leftIcon={<FaCheck />}
                   >
-                    Aguardando Início
+                    Aprovar Ticket
                   </Button>
                   <Button
-                    onClick={() => handleStatusChange("trabalhando")}
-                    colorScheme={
-                      ticket.status === "trabalhando" ? "green" : "gray"
-                    }
-                    mb={2}
+                    onClick={handleReject}
+                    colorScheme="red"
+                    leftIcon={<FaTimes />}
                   >
-                    Trabalhando
+                    Recusar Ticket
                   </Button>
                   <Button
-                    onClick={() => handleStatusChange("revisao")}
-                    colorScheme={ticket.status === "revisao" ? "red" : "gray"}
+                    onClick={handleArquivar}
+                    colorScheme="red"
+                    variant="outline"
+                    leftIcon={<FaTrash />}
                   >
-                    Revisão
+                    Deletar Ticket
                   </Button>
-                </Flex>
-              </FormControl>
-            )}
-          </Flex>
-  
-          <ModalFooter display={"flex"} justifyContent={"space-between"} pt={20}>
-            {isEditMode && (
-              <ButtonGroup spacing={4}>
-                <Button
-                  onClick={handleApprove}
-                  colorScheme="green"
-                  leftIcon={<FaCheck />}
-                >
-                  Aprovar Ticket
+                </ButtonGroup>
+              )}
+              <ButtonGroup>
+                <Button onClick={closeModal} colorScheme="gray">
+                  Cancelar
                 </Button>
                 <Button
-                  onClick={handleReject}
-                  colorScheme="red"
-                  leftIcon={<FaTimes />}
+                  type="submit"
+                  colorScheme="blue"
+                  isLoading={formik.isSubmitting}
                 >
-                  Recusar Ticket
-                </Button>
-                <Button
-                  onClick={handleArquivar}
-                  colorScheme="red"
-                  variant="outline"
-                  leftIcon={<FaTrash />}
-                >
-                  Deletar Ticket
+                  {isEditMode ? "Salvar Alterações" : "Salvar"}
                 </Button>
               </ButtonGroup>
-            )}
-            <ButtonGroup>
-              <Button onClick={closeModal} colorScheme="gray">
-                Cancelar
-              </Button>
-              <Button
-                type="submit"
-                colorScheme="blue"
-                isLoading={formik.isSubmitting}
-              >
-                {isEditMode ? "Salvar Alterações" : "Salvar"}
-              </Button>
-            </ButtonGroup>
-          </ModalFooter>
-        </form>
-      </ModalBody>
-    </ModalContent>
-  </Modal>
-  
+            </ModalFooter>
+          </form>
+        </ModalBody>
+      </ModalContent>
+    </Modal>
+    
   );
 };
 
