@@ -1,3 +1,5 @@
+// src/components/TicketModal/TicketModal.js
+
 import React, { useState, useEffect } from "react";
 import {
   Modal,
@@ -12,9 +14,11 @@ import {
   FormLabel,
   Input,
   Textarea,
-  ButtonGroup,
+  Select,
   useToast,
   Flex,
+  Box,
+  ButtonGroup,
   useColorMode,
 } from "@chakra-ui/react";
 import { useFormik } from "formik";
@@ -23,10 +27,42 @@ import { FaCheck, FaTimes, FaTrash } from "react-icons/fa";
 import { useTicket } from "../../contexts/TicketContext";
 import { useBaseOmie } from "../../contexts/BaseOmieContext";
 import { useEtapa } from "../../contexts/EtapaContext";
+import PrestadorForm from "../PrestadorForm";
+import ServicoForm from "../ServicoForm";
+
 
 const validationSchema = Yup.object({
   titulo: Yup.string().required("Título é obrigatório"),
   observacao: Yup.string().required("Observação é obrigatória"),
+  prestador: Yup.object({
+    nome: Yup.string().required("Nome do prestador é obrigatório"),
+    tipo: Yup.string()
+      .oneOf(["pj", "pf"], "Tipo inválido")
+      .required("Tipo é obrigatório"),
+    documento: Yup.string()
+      .required("Documento é obrigatório"),
+    email: Yup.string()
+      .email("E-mail inválido")
+      .required("E-mail é obrigatório"),
+    status: Yup.string()
+      .oneOf(
+        ["ativo", "em-analise", "pendente-de-revisao", "inativo", "arquivado"],
+        "Status inválido"
+      )
+      .required("Status é obrigatório"),
+  }),
+
+  servico: Yup.object({
+    descricao: Yup.string().required("Descrição do serviço é obrigatória"),
+    valor: Yup.number()
+      .typeError("Valor deve ser um número")
+      .positive("Valor deve ser positivo")
+      .required("Valor é obrigatório"),
+    data: Yup.date().required("Data é obrigatória"),
+    status: Yup.string()
+      .oneOf(["ativo", "arquivado"], "Status inválido")
+      .required("Status é obrigatório"),
+  }),
 });
 
 const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
@@ -37,6 +73,8 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
     aprovacaoTicket,
     deletarTicket,
     listaTickets,
+    SalvarPrestador,
+    SalvarServico
   } = useTicket();
   const { baseSelecionada } = useBaseOmie();
   const toast = useToast();
@@ -45,10 +83,25 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
   // Estado para o status do ticket
   const [status, setStatus] = useState(isEditMode ? ticket.status : "aguardando-inicio");
 
+  // Configuração do Formik
   const formik = useFormik({
     initialValues: {
       titulo: isEditMode ? ticket.titulo : "",
       observacao: isEditMode ? ticket.observacao : "",
+      prestador: {
+        nome: isEditMode ? ticket.prestador.nome : "",
+        tipo: isEditMode ? ticket.prestador.tipo : "",
+        documento: isEditMode ? ticket.prestador.documento : "",
+        email: isEditMode ? ticket.prestador.email : "",
+        status: isEditMode ? ticket.prestador.status : "ativo",
+      },
+
+      servico: {
+        descricao: isEditMode ? ticket.servico.descricao : "",
+        valor: isEditMode ? ticket.servico.valor : "",
+        data: isEditMode ? ticket.servico.data : "",
+        status: isEditMode ? ticket.servico.status : "ativo",
+      },
     },
     validationSchema,
     onSubmit: async (values, { setSubmitting }) => {
@@ -59,6 +112,9 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
           titulo: values.titulo,
           observacao: values.observacao,
           status, // Atualiza o status do ticket
+          prestador: values.prestador,
+   
+          servico: values.servico,
         };
         const sucesso = await salvarTicket(updatedTicket);
         setSubmitting(false);
@@ -78,14 +134,23 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
           titulo: values.titulo,
           observacao: values.observacao,
           status: "aguardando-inicio",
+          // servico: values.servico,
+          // prestador: values.prestador,
+
         };
-        const sucesso = await salvarTicket(newTicket);
+      //  const sucesso = await salvarTicket(newTicket);
+        const sucesso2 = await SalvarServico(values.servico);
+        
+      //  const sucesso1 = await SalvarPrestador(values.prestador);
+
+        //console.log(sucesso2,sucesso1)
+
         setSubmitting(false);
-        if (sucesso) closeModal();
+        if (sucesso2) closeModal();
       }
     },
   });
-  
+
   const handleApprove = async () => {
     if (!isEditMode) return;
     toast.closeAll();
@@ -119,7 +184,7 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
   const handleArquivar = async () => {
     if (!isEditMode) return;
     const confirmDelete = window.confirm(
-      "Tem certeza que deseja deletar este ticket?"
+      "Tem certeza que deseja arquivar este ticket?"
     );
     if (!confirmDelete) return;
 
@@ -128,7 +193,7 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
 
     if (sucesso) {
       toast({
-        title: "Ticket deletado com sucesso!",
+        title: "Ticket arquivado com sucesso!",
         status: "error",
         duration: 3000,
         isClosable: true,
@@ -150,6 +215,7 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
       toggleColorMode();
     }
   }, [isOpen, colorMode, toggleColorMode]);
+
   return (
     <Modal isOpen={isOpen} onClose={closeModal} size="6xl">
       <ModalOverlay />
@@ -159,11 +225,15 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
         </ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <form onSubmit={formik.handleSubmit}>
+          <form onSubmit={formik.handleSubmit} style={{ height: '720px', overflowY: 'scroll', overflowX: 'hidden' }}>
             <Flex justifyContent="space-between" width="100%">
               <Flex flex={isEditMode ? "0 0 70%" : "100%"} flexDirection="column">
-                <FormControl mb={4} isInvalid={formik.errors.titulo && formik.touched.titulo}>
-                  <FormLabel>Título do ticket</FormLabel>
+                {/* Campos Título e Observação */}
+                <FormControl
+                  mb={4}
+                  isInvalid={formik.errors.titulo && formik.touched.titulo}
+                >
+                  <FormLabel>Título do Ticket</FormLabel>
                   <Input
                     type="text"
                     id="titulo"
@@ -171,12 +241,18 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
                     value={formik.values.titulo}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
+                    placeholder="Título do Ticket"
                   />
                   {formik.touched.titulo && formik.errors.titulo ? (
-                    <div style={{ color: "red" }}>{formik.errors.titulo}</div>
+                    <Box color="red.500" mt={1}>
+                      {formik.errors.titulo}
+                    </Box>
                   ) : null}
                 </FormControl>
-                <FormControl mb={4} isInvalid={formik.errors.observacao && formik.touched.observacao}>
+                <FormControl
+                  mb={4}
+                  isInvalid={formik.errors.observacao && formik.touched.observacao}
+                >
                   <FormLabel>Observação</FormLabel>
                   <Textarea
                     id="observacao"
@@ -185,17 +261,25 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                     rows={3}
+                    placeholder="Observação do Ticket"
                   />
                   {formik.touched.observacao && formik.errors.observacao ? (
-                    <div style={{ color: "red" }}>{formik.errors.observacao}</div>
+                    <Box color="red.500" mt={1}>
+                      {formik.errors.observacao}
+                    </Box>
                   ) : null}
                 </FormControl>
+
+                {/* Accordions para Prestador e Serviço */}
+                <PrestadorForm formik={formik} />
+                <ServicoForm formik={formik} />
               </Flex>
 
+              {/* Se for modo de edição, exibir os botões de status à direita */}
               {isEditMode && (
                 <FormControl mb={3} flex="0 0 25%">
                   <FormLabel>Status</FormLabel>
-                  <Flex flexDirection={"column"} spacing={4}>
+                  <Flex flexDirection={"column"} gap={2}>
                     <Button
                       onClick={() => handleStatusChange("aguardando-inicio")}
                       colorScheme={status === "aguardando-inicio" ? "yellow" : "gray"}
@@ -221,6 +305,7 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
               )}
             </Flex>
 
+            {/* Botões de Aprovação/Rejeição/Arquivamento */}
             <ModalFooter display={"flex"} justifyContent={"space-between"} pt={20}>
               {isEditMode && (
                 <ButtonGroup spacing={4}>
@@ -244,7 +329,7 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
                     variant="outline"
                     leftIcon={<FaTrash />}
                   >
-                    Deletar Ticket
+                    Arquivar Ticket
                   </Button>
                 </ButtonGroup>
               )}
@@ -265,7 +350,6 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
         </ModalBody>
       </ModalContent>
     </Modal>
-    
   );
 };
 

@@ -179,6 +179,27 @@ export const TicketProvider = ({ children }) => {
     },
     [adicionarNotificacao]
   );
+// Função específica para salvar prestadores com manuseio de erros
+const SalvarPrestador = async (prestadores) => {
+  try {
+    const response = await api.post('prestadores', prestadores);
+    return response.data; // Retorna os dados da resposta
+  } catch (error) {
+    console.error('Erro ao salvar prestador:', error);
+    throw error; // Repassa o erro para que o chamador possa tratá-lo
+  }
+};
+
+// Função específica para salvar serviços com manuseio de erros
+const SalvarServico = async (servicos) => {
+  try {
+    const response = await api.post('servicos', servicos);
+    return response.data; // Retorna os dados da resposta
+  } catch (error) {
+    console.error('Erro ao salvar serviço:', error);
+    throw error; // Repassa o erro para que o chamador possa tratá-lo
+  }
+};
 
   // Carregar os tickets quando o componente for montado
   useEffect(() => {
@@ -197,6 +218,8 @@ export const TicketProvider = ({ children }) => {
         aprovacaoTicket,
         alterarStatusTicket,
         filtrarTickets,
+        SalvarPrestador,
+        SalvarServico
       }}
     >
       {children}
