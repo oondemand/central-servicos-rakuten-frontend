@@ -154,15 +154,6 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
           closeModal();
         }
       } else {
-        const newTicket = {
-          baseOmie: baseSelecionada?._id || "",
-          etapa: listaEtapas[0]?.codigo || "",
-          titulo: values.titulo,
-          observacao: values.observacao,
-          status: "aguardando-inicio",
-          prestador: {}, // Inicializa como objeto vazio
-          servico: {}, // Inicializa como objeto vazio
-        };
 
         // Salva prestador e serviço separadamente
         const sucessoPrestador = await SalvarPrestador(values.prestador);
@@ -172,9 +163,17 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
 
         if (sucessoPrestador && sucessoServico) {
  
-          newTicket.prestador = sucessoPrestador._id; // Supondo que retorna o objeto salvo
-          newTicket.servico = sucessoServico.servico._id; // Supondo que retorna o objeto salvo
-       console.log(newTicket,"newTicket")
+        
+          const newTicket = {
+            baseOmieId: baseSelecionada?._id || "66fecc5b0c2acb31fa820b16",
+            etapa: listaEtapas[0]?.codigo || "",
+            titulo: values.titulo,
+            observacao: values.observacao,
+            status: "aguardando-inicio",
+            prestadorId: sucessoPrestador.prestador._id, // Inicializa como objeto vazio
+            servicoId: sucessoServico.servico._id, // Inicializa como objeto vazio
+          };
+
           const sucessoTicket = await salvarTicket(newTicket);
           if (sucessoTicket) {
             toast({

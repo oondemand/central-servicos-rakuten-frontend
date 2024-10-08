@@ -19,7 +19,7 @@ export const BaseOmieProvider = ({ children }) => {
 
     carregarBases();
   }, []);
-
+  
   const selecionarBase = (id) => {
     const base = listaBases.find((base) => base._id === id);
     setBaseOmie(base);
