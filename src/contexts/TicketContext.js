@@ -180,6 +180,26 @@ export const TicketProvider = ({ children }) => {
     [adicionarNotificacao]
   );
 
+const buscarTicketPorId = useCallback(
+  async (id) => {
+    setLoading(true);
+    try {
+      const response = await api.get(`/tickets/${id}`);
+      setError(null);
+      return response.data; // Retorna o ticket encontrado
+    } catch (err) {
+      console.error("Erro ao buscar ticket pelo ID:", err);
+      const detalhes = err.response?.data?.detalhes || err.message;
+      setError("Erro ao buscar ticket.");
+      adicionarNotificacao("erro", "Erro ao buscar ticket.", detalhes);
+      return null; // Retorna null se falhar
+    } finally {
+      setLoading(false);
+    }
+  },
+  [adicionarNotificacao]
+);
+
   // Carregar os tickets quando o componente for montado
   useEffect(() => {
     carregarTickets();
@@ -196,7 +216,8 @@ export const TicketProvider = ({ children }) => {
         deletarTicket,
         aprovacaoTicket,
         alterarStatusTicket,
-        filtrarTickets,
+        filtrarTickets,       
+        buscarTicketPorId
       }}
     >
       {children}
