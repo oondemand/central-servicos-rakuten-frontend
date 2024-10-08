@@ -35,6 +35,8 @@ import { useBaseOmie } from "../../contexts/BaseOmieContext";
 import { useEtapa } from "../../contexts/EtapaContext";
 import PrestadorForm from "../PrestadorForm";
 import ServicoForm from "../ServicoForm";
+import { SalvarPrestador } from "../../services/PrestadorService";
+import { SalvarServico } from "../../services/ServicesService";
 
 const validationSchema = Yup.object({
   titulo: Yup.string().required("Título é obrigatório"),
@@ -76,8 +78,8 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
     alterarStatusTicket,
     aprovacaoTicket,
     deletarTicket,
-    SalvarPrestador,
-    SalvarServico,
+  
+    
   } = useTicket();
   const { baseSelecionada } = useBaseOmie();
   const toast = useToast();
@@ -165,12 +167,14 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
         // Salva prestador e serviço separadamente
         const sucessoPrestador = await SalvarPrestador(values.prestador);
         const sucessoServico = await SalvarServico(values.servico);
+        
+  
 
         if (sucessoPrestador && sucessoServico) {
-          // Associa os IDs retornados ao novo ticket
-          newTicket.prestador = sucessoPrestador; // Supondo que retorna o objeto salvo
-          newTicket.servico = sucessoServico; // Supondo que retorna o objeto salvo
-
+ 
+          newTicket.prestador = sucessoPrestador._id; // Supondo que retorna o objeto salvo
+          newTicket.servico = sucessoServico.servico._id; // Supondo que retorna o objeto salvo
+       console.log(newTicket,"newTicket")
           const sucessoTicket = await salvarTicket(newTicket);
           if (sucessoTicket) {
             toast({

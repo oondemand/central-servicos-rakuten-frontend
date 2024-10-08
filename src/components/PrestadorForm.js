@@ -48,7 +48,7 @@ const PrestadorForm = ({ formik, accordionStyles }) => {
             {/* Nome do Prestador */}
             <FormControl
               isRequired
-              isInvalid={!!formik.errors.prestador?.nome}
+              isInvalid={!!formik.errors.prestador?.nome && formik.touched.prestador?.nome}
               flex="1"
             >
               <FormLabel>Nome</FormLabel>
@@ -56,10 +56,11 @@ const PrestadorForm = ({ formik, accordionStyles }) => {
                 name="prestador.nome"
                 value={formik.values.prestador.nome}
                 onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
                 placeholder="Nome do Prestador"
                 bg={inputBg}
               />
-              {formik.errors.prestador?.nome && (
+              {formik.errors.prestador?.nome && formik.touched.prestador?.nome && (
                 <Box color="red.500" mt={1}>
                   {formik.errors.prestador.nome}
                 </Box>
@@ -69,7 +70,7 @@ const PrestadorForm = ({ formik, accordionStyles }) => {
             {/* Tipo do Prestador */}
             <FormControl
               isRequired
-              isInvalid={!!formik.errors.prestador?.tipo}
+              isInvalid={!!formik.errors.prestador?.tipo && formik.touched.prestador?.tipo}
               flex="1"
             >
               <FormLabel>Tipo</FormLabel>
@@ -78,12 +79,13 @@ const PrestadorForm = ({ formik, accordionStyles }) => {
                 placeholder="Selecione o tipo"
                 value={formik.values.prestador.tipo}
                 onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
                 bg={inputBg}
               >
                 <option value="pj">Pessoa Jurídica</option>
                 <option value="pf">Pessoa Física</option>
               </Select>
-              {formik.errors.prestador?.tipo && (
+              {formik.errors.prestador?.tipo && formik.touched.prestador?.tipo && (
                 <Box color="red.500" mt={1}>
                   {formik.errors.prestador.tipo}
                 </Box>
@@ -96,7 +98,9 @@ const PrestadorForm = ({ formik, accordionStyles }) => {
             {/* Documento do Prestador */}
             <FormControl
               isRequired
-              isInvalid={!!formik.errors.prestador?.documento}
+              isInvalid={
+                !!formik.errors.prestador?.documento && formik.touched.prestador?.documento
+              }
               flex="1"
             >
               <FormLabel>Documento</FormLabel>
@@ -110,12 +114,13 @@ const PrestadorForm = ({ formik, accordionStyles }) => {
                 name="prestador.documento"
                 value={formik.values.prestador.documento}
                 onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
                 placeholder={
                   formik.values.prestador.tipo === "pj" ? "CNPJ" : "CPF"
                 }
                 bg={inputBg}
               />
-              {formik.errors.prestador?.documento && (
+              {formik.errors.prestador?.documento && formik.touched.prestador?.documento && (
                 <Box color="red.500" mt={1}>
                   {formik.errors.prestador.documento}
                 </Box>
@@ -125,7 +130,7 @@ const PrestadorForm = ({ formik, accordionStyles }) => {
             {/* Email do Prestador */}
             <FormControl
               isRequired
-              isInvalid={!!formik.errors.prestador?.email}
+              isInvalid={!!formik.errors.prestador?.email && formik.touched.prestador?.email}
               flex="1"
             >
               <FormLabel>Email</FormLabel>
@@ -134,10 +139,11 @@ const PrestadorForm = ({ formik, accordionStyles }) => {
                 type="email"
                 value={formik.values.prestador.email}
                 onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
                 placeholder="Email do Prestador"
                 bg={inputBg}
               />
-              {formik.errors.prestador?.email && (
+              {formik.errors.prestador?.email && formik.touched.prestador?.email && (
                 <Box color="red.500" mt={1}>
                   {formik.errors.prestador.email}
                 </Box>
@@ -148,7 +154,7 @@ const PrestadorForm = ({ formik, accordionStyles }) => {
           {/* Status do Prestador */}
           <FormControl
             isRequired
-            isInvalid={!!formik.errors.prestador?.status}
+            isInvalid={!!formik.errors.prestador?.status && formik.touched.prestador?.status}
           >
             <FormLabel>Status</FormLabel>
             <Select
@@ -156,17 +162,16 @@ const PrestadorForm = ({ formik, accordionStyles }) => {
               placeholder="Selecione o status"
               value={formik.values.prestador.status}
               onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
               bg={inputBg}
             >
               <option value="ativo">Ativo</option>
               <option value="em-analise">Em Análise</option>
-              <option value="pendente-de-revisao">
-                Pendente de Revisão
-              </option>
+              <option value="pendente-de-revisao">Pendente de Revisão</option>
               <option value="inativo">Inativo</option>
               <option value="arquivado">Arquivado</option>
             </Select>
-            {formik.errors.prestador?.status && (
+            {formik.errors.prestador?.status && formik.touched.prestador?.status && (
               <Box color="red.500" mt={1}>
                 {formik.errors.prestador.status}
               </Box>
@@ -180,6 +185,7 @@ const PrestadorForm = ({ formik, accordionStyles }) => {
               name="prestador.comentariosRevisao"
               value={formik.values.prestador.comentariosRevisao}
               onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
               placeholder="Comentários de Revisão"
               bg={inputBg}
             />

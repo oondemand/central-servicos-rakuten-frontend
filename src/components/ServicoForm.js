@@ -14,7 +14,6 @@ import {
   Select,
   useColorModeValue,
 } from "@chakra-ui/react";
-import InputMask from "react-input-mask";
 
 const ServicoForm = ({ formik, accordionStyles }) => {
   const { accordionBg, accordionHoverBg, accordionBorderColor, inputBg } =
@@ -45,17 +44,20 @@ const ServicoForm = ({ formik, accordionStyles }) => {
           {/* Descrição do Serviço */}
           <FormControl
             isRequired
-            isInvalid={!!formik.errors.servico?.descricao}
+            isInvalid={
+              !!formik.errors.servico?.descricao && formik.touched.servico?.descricao
+            }
           >
             <FormLabel>Descrição</FormLabel>
             <Input
               name="servico.descricao"
               value={formik.values.servico.descricao}
               onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
               placeholder="Descrição do Serviço"
               bg={inputBg}
             />
-            {formik.errors.servico?.descricao && (
+            {formik.errors.servico?.descricao && formik.touched.servico?.descricao && (
               <Box color="red.500" mt={1}>
                 {formik.errors.servico.descricao}
               </Box>
@@ -66,7 +68,9 @@ const ServicoForm = ({ formik, accordionStyles }) => {
             {/* Valor do Serviço */}
             <FormControl
               isRequired
-              isInvalid={!!formik.errors.servico?.valor}
+              isInvalid={
+                !!formik.errors.servico?.valor && formik.touched.servico?.valor
+              }
               flex="1"
             >
               <FormLabel>Valor</FormLabel>
@@ -75,10 +79,11 @@ const ServicoForm = ({ formik, accordionStyles }) => {
                 type="number"
                 value={formik.values.servico.valor}
                 onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
                 placeholder="Valor do Serviço"
                 bg={inputBg}
               />
-              {formik.errors.servico?.valor && (
+              {formik.errors.servico?.valor && formik.touched.servico?.valor && (
                 <Box color="red.500" mt={1}>
                   {formik.errors.servico.valor}
                 </Box>
@@ -88,7 +93,7 @@ const ServicoForm = ({ formik, accordionStyles }) => {
             {/* Data do Serviço */}
             <FormControl
               isRequired
-              isInvalid={!!formik.errors.servico?.data}
+              isInvalid={!!formik.errors.servico?.data && formik.touched.servico?.data}
               flex="1"
             >
               <FormLabel>Data</FormLabel>
@@ -97,10 +102,11 @@ const ServicoForm = ({ formik, accordionStyles }) => {
                 type="date"
                 value={formik.values.servico.data}
                 onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
                 placeholder="Data do Serviço"
                 bg={inputBg}
               />
-              {formik.errors.servico?.data && (
+              {formik.errors.servico?.data && formik.touched.servico?.data && (
                 <Box color="red.500" mt={1}>
                   {formik.errors.servico.data}
                 </Box>
@@ -111,7 +117,9 @@ const ServicoForm = ({ formik, accordionStyles }) => {
           {/* Status do Serviço */}
           <FormControl
             isRequired
-            isInvalid={!!formik.errors.servico?.status}
+            isInvalid={
+              !!formik.errors.servico?.status && formik.touched.servico?.status
+            }
           >
             <FormLabel>Status</FormLabel>
             <Select
@@ -119,12 +127,13 @@ const ServicoForm = ({ formik, accordionStyles }) => {
               placeholder="Selecione o status"
               value={formik.values.servico.status}
               onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
               bg={inputBg}
             >
               <option value="ativo">Ativo</option>
               <option value="arquivado">Arquivado</option>
             </Select>
-            {formik.errors.servico?.status && (
+            {formik.errors.servico?.status && formik.touched.servico?.status && (
               <Box color="red.500" mt={1}>
                 {formik.errors.servico.status}
               </Box>

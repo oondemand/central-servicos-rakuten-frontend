@@ -179,27 +179,26 @@ export const TicketProvider = ({ children }) => {
     },
     [adicionarNotificacao]
   );
-// Função específica para salvar prestadores com manuseio de erros
-const SalvarPrestador = async (prestadores) => {
-  try {
-    const response = await api.post('prestadores', prestadores);
-    return response.data; // Retorna os dados da resposta
-  } catch (error) {
-    console.error('Erro ao salvar prestador:', error);
-    throw error; // Repassa o erro para que o chamador possa tratá-lo
-  }
-};
 
-// Função específica para salvar serviços com manuseio de erros
-const SalvarServico = async (servicos) => {
-  try {
-    const response = await api.post('servicos', servicos);
-    return response.data; // Retorna os dados da resposta
-  } catch (error) {
-    console.error('Erro ao salvar serviço:', error);
-    throw error; // Repassa o erro para que o chamador possa tratá-lo
-  }
-};
+const buscarTicketPorId = useCallback(
+  async (id) => {
+    setLoading(true);
+    try {
+      const response = await api.get(`/tickets/${id}`);
+      setError(null);
+      return response.data; // Retorna o ticket encontrado
+    } catch (err) {
+      console.error("Erro ao buscar ticket pelo ID:", err);
+      const detalhes = err.response?.data?.detalhes || err.message;
+      setError("Erro ao buscar ticket.");
+      adicionarNotificacao("erro", "Erro ao buscar ticket.", detalhes);
+      return null; // Retorna null se falhar
+    } finally {
+      setLoading(false);
+    }
+  },
+  [adicionarNotificacao]
+);
 
   // Carregar os tickets quando o componente for montado
   useEffect(() => {
@@ -217,9 +216,8 @@ const SalvarServico = async (servicos) => {
         deletarTicket,
         aprovacaoTicket,
         alterarStatusTicket,
-        filtrarTickets,
-        SalvarPrestador,
-        SalvarServico
+        filtrarTickets,       
+        buscarTicketPorId
       }}
     >
       {children}

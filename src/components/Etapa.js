@@ -1,4 +1,3 @@
-// src/components/Etapa.jsx
 import React, { useState } from "react";
 import { useTicket } from "../contexts/TicketContext";
 import CartaoTicket from "./ticket/CartaoTicket";
@@ -6,16 +5,29 @@ import TicketModal from "./ticket/TicketModal"; // Importando o novo TicketModal
 import "../esteira.css";
 
 const Etapa = ({ index, etapa }) => {
-  const { listaTickets } = useTicket();
+  const { listaTickets, buscarTicketPorId } = useTicket();
   const [selectedTicket, setSelectedTicket] = useState(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [loadingTicket, setLoadingTicket] = useState(false); // Estado para exibir o carregamento do ticket
 
   const handleCadastrarTicket = () => {
     setIsAddModalOpen(true);
   };
 
-  const handleEditTicket = (ticket) => {
-    setSelectedTicket(ticket); // Abrir para edição
+  const handleEditTicket = async (ticket) => {
+    setLoadingTicket(true); // Inicia o estado de carregamento
+    try {
+      const fetchedTicket = await buscarTicketPorId(ticket._id); // Faz a requisição para buscar o ticket completo
+     console.log(fetchedTicket,"fetchedTicket")
+     
+      if (fetchedTicket) {
+        setSelectedTicket(fetchedTicket); // Abre o modal para edição com os dados completos do ticket
+      }
+    } catch (error) {
+      console.error("Erro ao buscar ticket:", error);
+    } finally {
+      setLoadingTicket(false); // Finaliza o estado de carregamento
+    }
   };
 
   const closeModal = () => {
@@ -64,10 +76,7 @@ const Etapa = ({ index, etapa }) => {
 
       {/* Modal para adicionar novo ticket */}
       {isAddModalOpen && (
-        <TicketModal
-          isOpen={isAddModalOpen}
-          closeModal={closeModal}
-        />
+        <TicketModal isOpen={isAddModalOpen} closeModal={closeModal} />
       )}
 
       {/* Modal para editar ticket existente */}
@@ -78,6 +87,9 @@ const Etapa = ({ index, etapa }) => {
           ticket={selectedTicket}
         />
       )}
+
+      {/* Exibe um indicativo de carregamento se o ticket estiver sendo buscado */}
+      {loadingTicket && <p>Carregando ticket...</p>}
     </div>
   );
 };
