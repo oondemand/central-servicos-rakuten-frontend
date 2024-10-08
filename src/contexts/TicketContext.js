@@ -1,5 +1,12 @@
 import React, { createContext, useState, useEffect, useCallback, useContext } from "react";
-import api from "../api/apiService";
+import {
+  salvarTicket as salvarTicketService,
+  alterarTicket,
+  aprovarTicket as aprovarTicketService,
+  reprovarTicket as reprovarTicketService,
+  carregarTicket,
+  listarTickets,
+} from "../services/TicketService";
 import { useNotificacao } from "./NotificacaoContext";
 import { useBaseOmie } from "./BaseOmieContext";
 
@@ -51,16 +58,14 @@ export const TicketProvider = ({ children }) => {
     async (ticket) => {
       setLoading(true);
       try {
-        let response;
+        const response = await salvarTicketService(ticket);
         if (ticket._id) {
-          response = await api.put(`/tickets/${ticket._id}`, ticket);
           setListaTickets((prevTickets) =>
-            prevTickets.map((t) => (t._id === ticket._id ? response.data : t))
+            prevTickets.map((t) => (t._id === ticket._id ? response : t))
           );
           adicionarNotificacao("info", "Ticket atualizado com sucesso!", true);
         } else {
-          response = await api.post("/tickets", ticket);
-          setListaTickets((prevTickets) => [...prevTickets, response.data]);
+          setListaTickets((prevTickets) => [...prevTickets, response]);
           adicionarNotificacao("info", "Ticket adicionado com sucesso!", true);
         }
         setError(null);
@@ -69,7 +74,11 @@ export const TicketProvider = ({ children }) => {
         console.error("Erro ao salvar ticket:", err);
         const detalhes = err.response?.data?.detalhes || err.message;
         setError(ticket._id ? "Erro ao editar ticket." : "Erro ao adicionar ticket.");
-        adicionarNotificacao("erro", ticket._id ? "Erro ao editar ticket." : "Erro ao adicionar ticket.", detalhes);
+        adicionarNotificacao(
+          "erro",
+          ticket._id ? "Erro ao editar ticket." : "Erro ao adicionar ticket.",
+          detalhes
+        );
         return false; // Indica falha
       } finally {
         setLoading(false);
@@ -83,7 +92,7 @@ export const TicketProvider = ({ children }) => {
     async (id, novoStatus) => {
       setLoading(true);
       try {
-        await api.put(`/tickets/${id}/status`, { status: novoStatus });
+        await alterarTicket(id, { status: novoStatus });
         setListaTickets((prevTickets) =>
           prevTickets.map((ticket) =>
             ticket._id === id ? { ...ticket, status: novoStatus } : ticket
@@ -109,13 +118,11 @@ export const TicketProvider = ({ children }) => {
   const carregarTickets = useCallback(async () => {
     setLoading(true);
     try {
-      let url = "/tickets";
-      if (baseOmie) url += `/base-omie/${baseOmie._id}`;
+      const filtro = baseOmie ? { baseOmieId: baseOmie._id } : {};
+      const response = await listarTickets(filtro);
 
-      const response = await api.get(url);
-
-      setListaTodosTickets(response.data); // Armazena todos os tickets
-      setListaTickets(response.data); // Inicializa listaTickets com todos os tickets
+      setListaTodosTickets(response); // Armazena todos os tickets
+      setListaTickets(response); // Inicializa listaTickets com todos os tickets
       setError(null);
     } catch (err) {
       console.error("Erro ao buscar tickets:", err);
@@ -127,21 +134,23 @@ export const TicketProvider = ({ children }) => {
     }
   }, [baseOmie, adicionarNotificacao]);
 
-  // Função para deletar um ticket
+  // Função para deletar (arquivar) um ticket
   const deletarTicket = useCallback(
     async (id) => {
       setLoading(true);
       try {
-        await api.delete(`/tickets/${id}`);
-        setListaTickets((prevTickets) => prevTickets.filter((ticket) => ticket._id !== id));
+        const response = await alterarTicket(id, { status: "arquivado" });
+        setListaTickets((prevTickets) =>
+          prevTickets.map((ticket) => (ticket._id === id ? response : ticket))
+        );
         setError(null);
-        adicionarNotificacao("info", "Ticket removido com sucesso!", true);
+        adicionarNotificacao("info", "Ticket arquivado com sucesso!", true);
         return true; // Indica sucesso
       } catch (err) {
-        console.error("Erro ao excluir ticket:", err);
+        console.error("Erro ao arquivar ticket:", err);
         const detalhes = err.response?.data?.detalhes || err.message;
-        setError("Erro ao excluir ticket.");
-        adicionarNotificacao("erro", "Erro ao excluir ticket.", detalhes);
+        setError("Erro ao arquivar ticket.");
+        adicionarNotificacao("erro", "Erro ao arquivar ticket.", detalhes);
         return false; // Indica falha
       } finally {
         setLoading(false);
@@ -150,25 +159,20 @@ export const TicketProvider = ({ children }) => {
     [adicionarNotificacao]
   );
 
-  // Função para aprovar ou recusar um ticket
-  const aprovacaoTicket = useCallback(
-    async (id, aprovar) => {
+  // Função para aprovar um ticket
+  const aprovarTicket = useCallback(
+    async (id) => {
       setLoading(true);
       try {
-        const url = aprovar ? `/aprovacoes/${id}/aprovar` : `/aprovacoes/${id}/recusar`;
-        const response = await api.post(url);
+        const response = await aprovarTicketService(id);
         setListaTickets((prevTickets) =>
-          prevTickets.map((ticket) => (ticket._id === id ? response.data : ticket))
+          prevTickets.map((ticket) => (ticket._id === id ? response : ticket))
         );
         setError(null);
-        adicionarNotificacao(
-          "info",
-          aprovar ? "Ticket aprovado com sucesso!" : "Ticket recusado com sucesso!",
-          true
-        );
+        adicionarNotificacao("info", "Ticket aprovado com sucesso!", true);
         return true; // Indica sucesso
       } catch (err) {
-        const mensagem = err.response?.data?.message || (aprovar ? "Erro ao aprovar ticket" : "Erro ao recusar ticket");
+        const mensagem = err.response?.data?.message || "Erro ao aprovar ticket";
         const detalhes = err.response?.data?.detalhes || err.message;
         adicionarNotificacao("erro", mensagem, detalhes, false);
         setError(mensagem);
@@ -180,25 +184,50 @@ export const TicketProvider = ({ children }) => {
     [adicionarNotificacao]
   );
 
-const buscarTicketPorId = useCallback(
-  async (id) => {
-    setLoading(true);
-    try {
-      const response = await api.get(`/tickets/${id}`);
-      setError(null);
-      return response.data; // Retorna o ticket encontrado
-    } catch (err) {
-      console.error("Erro ao buscar ticket pelo ID:", err);
-      const detalhes = err.response?.data?.detalhes || err.message;
-      setError("Erro ao buscar ticket.");
-      adicionarNotificacao("erro", "Erro ao buscar ticket.", detalhes);
-      return null; // Retorna null se falhar
-    } finally {
-      setLoading(false);
-    }
-  },
-  [adicionarNotificacao]
-);
+  // Função para reprovar um ticket
+  const reprovarTicket = useCallback(
+    async (id) => {
+      setLoading(true);
+      try {
+        const response = await reprovarTicketService(id);
+        setListaTickets((prevTickets) =>
+          prevTickets.map((ticket) => (ticket._id === id ? response : ticket))
+        );
+        setError(null);
+        adicionarNotificacao("info", "Ticket recusado com sucesso!", true);
+        return true; // Indica sucesso
+      } catch (err) {
+        const mensagem = err.response?.data?.message || "Erro ao recusar ticket";
+        const detalhes = err.response?.data?.detalhes || err.message;
+        adicionarNotificacao("erro", mensagem, detalhes, false);
+        setError(mensagem);
+        return false; // Indica falha
+      } finally {
+        setLoading(false);
+      }
+    },
+    [adicionarNotificacao]
+  );
+
+  const buscarTicketPorId = useCallback(
+    async (id) => {
+      setLoading(true);
+      try {
+        const response = await carregarTicket(id);
+        setError(null);
+        return response; // Retorna o ticket encontrado
+      } catch (err) {
+        console.error("Erro ao buscar ticket pelo ID:", err);
+        const detalhes = err.response?.data?.detalhes || err.message;
+        setError("Erro ao buscar ticket.");
+        adicionarNotificacao("erro", "Erro ao buscar ticket.", detalhes);
+        return null; // Retorna null se falhar
+      } finally {
+        setLoading(false);
+      }
+    },
+    [adicionarNotificacao]
+  );
 
   // Carregar os tickets quando o componente for montado
   useEffect(() => {
@@ -214,10 +243,11 @@ const buscarTicketPorId = useCallback(
         carregarTickets,
         salvarTicket,
         deletarTicket,
-        aprovacaoTicket,
+        aprovarTicket,
+        reprovarTicket,
         alterarStatusTicket,
-        filtrarTickets,       
-        buscarTicketPorId
+        filtrarTickets,
+        buscarTicketPorId,
       }}
     >
       {children}
@@ -228,4 +258,4 @@ const buscarTicketPorId = useCallback(
 // Hook para usar o contexto de Ticket
 export const useTicket = () => useContext(TicketContext);
 
-export default TicketContext;
+export default TicketContext;

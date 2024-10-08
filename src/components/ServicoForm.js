@@ -12,12 +12,10 @@ import {
   FormLabel,
   Input,
   Select,
-  useColorModeValue,
 } from "@chakra-ui/react";
 
 const ServicoForm = ({ formik, accordionStyles }) => {
-  const { accordionBg, accordionHoverBg, accordionBorderColor, inputBg } =
-    accordionStyles;
+  const { accordionBg, accordionHoverBg, accordionBorderColor, inputBg } = accordionStyles;
 
   return (
     <AccordionItem
@@ -51,7 +49,7 @@ const ServicoForm = ({ formik, accordionStyles }) => {
             <FormLabel>Descrição</FormLabel>
             <Input
               name="servico.descricao"
-              value={formik.values.servico.descricao}
+              value={formik.values.servico.descricao || ""}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
               placeholder="Descrição do Serviço"
@@ -77,7 +75,7 @@ const ServicoForm = ({ formik, accordionStyles }) => {
               <Input
                 name="servico.valor"
                 type="number"
-                value={formik.values.servico.valor}
+                value={formik.values.servico.valor || ""}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
                 placeholder="Valor do Serviço"
@@ -100,7 +98,7 @@ const ServicoForm = ({ formik, accordionStyles }) => {
               <Input
                 name="servico.data"
                 type="date"
-                value={formik.values.servico.data}
+                value={formik.values.servico.data || ""}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
                 placeholder="Data do Serviço"
@@ -125,7 +123,7 @@ const ServicoForm = ({ formik, accordionStyles }) => {
             <Select
               name="servico.status"
               placeholder="Selecione o status"
-              value={formik.values.servico.status}
+              value={formik.values.servico.status || "ativo"}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
               bg={inputBg}

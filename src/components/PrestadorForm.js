@@ -13,13 +13,11 @@ import {
   Input,
   Select,
   Textarea,
-  useColorModeValue,
 } from "@chakra-ui/react";
 import InputMask from "react-input-mask";
 
 const PrestadorForm = ({ formik, accordionStyles }) => {
-  const { accordionBg, accordionHoverBg, accordionBorderColor, inputBg } =
-    accordionStyles;
+  const { accordionBg, accordionHoverBg, accordionBorderColor, inputBg } = accordionStyles;
 
   return (
     <AccordionItem
@@ -54,7 +52,7 @@ const PrestadorForm = ({ formik, accordionStyles }) => {
               <FormLabel>Nome</FormLabel>
               <Input
                 name="prestador.nome"
-                value={formik.values.prestador.nome}
+                value={formik.values.prestador.nome || ""}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
                 placeholder="Nome do Prestador"
@@ -77,7 +75,7 @@ const PrestadorForm = ({ formik, accordionStyles }) => {
               <Select
                 name="prestador.tipo"
                 placeholder="Selecione o tipo"
-                value={formik.values.prestador.tipo}
+                value={formik.values.prestador.tipo || ""}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
                 bg={inputBg}
@@ -112,7 +110,7 @@ const PrestadorForm = ({ formik, accordionStyles }) => {
                     : "999.999.999-99"
                 }
                 name="prestador.documento"
-                value={formik.values.prestador.documento}
+                value={formik.values.prestador.documento || ""}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
                 placeholder={
@@ -137,7 +135,7 @@ const PrestadorForm = ({ formik, accordionStyles }) => {
               <Input
                 name="prestador.email"
                 type="email"
-                value={formik.values.prestador.email}
+                value={formik.values.prestador.email || ""}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
                 placeholder="Email do Prestador"
@@ -160,7 +158,7 @@ const PrestadorForm = ({ formik, accordionStyles }) => {
             <Select
               name="prestador.status"
               placeholder="Selecione o status"
-              value={formik.values.prestador.status}
+              value={formik.values.prestador.status || "ativo"}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
               bg={inputBg}
@@ -183,7 +181,7 @@ const PrestadorForm = ({ formik, accordionStyles }) => {
             <FormLabel>Comentários de Revisão</FormLabel>
             <Textarea
               name="prestador.comentariosRevisao"
-              value={formik.values.prestador.comentariosRevisao}
+              value={formik.values.prestador.comentariosRevisao || ""}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
               placeholder="Comentários de Revisão"
