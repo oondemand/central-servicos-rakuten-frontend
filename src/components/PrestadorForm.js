@@ -1,3 +1,6 @@
+
+// src/components/PrestadorForm.js
+
 import React from "react";
 import {
   Accordion,
@@ -11,14 +14,13 @@ import {
   FormLabel,
   Input,
   Select,
+  Textarea,
 } from "@chakra-ui/react";
 import InputMask from "react-input-mask";
-import ServicoForm from "./ServicoForm";
 
 const PrestadorForm = ({ formik }) => {
   return (
     <Accordion defaultIndex={[0]} allowMultiple>
-      {/* Accordion para Prestador */}
       <AccordionItem>
         <h2>
           <AccordionButton>
@@ -70,17 +72,11 @@ const PrestadorForm = ({ formik }) => {
               <FormLabel>Documento</FormLabel>
               <Input
                 as={InputMask}
-                mask={
-                  formik.values.prestador.tipo === "pj"
-                    ? "99.999.999/9999-99"
-                    : "999.999.999-99"
-                }
+                mask={formik.values.prestador.tipo === "pj" ? "99.999.999/9999-99" : "999.999.999-99"}
                 name="prestador.documento"
                 value={formik.values.prestador.documento}
                 onChange={formik.handleChange}
-                placeholder={
-                  formik.values.prestador.tipo === "pj" ? "CNPJ" : "CPF"
-                }
+                placeholder={formik.values.prestador.tipo === "pj" ? "CNPJ" : "CPF"}
               />
               {formik.errors.prestador?.documento && (
                 <Box color="red.500" mt={1}>
@@ -127,14 +123,20 @@ const PrestadorForm = ({ formik }) => {
                 </Box>
               )}
             </FormControl>
+
+            {/* Comentários de Revisão */}
+            <FormControl>
+              <FormLabel>Comentários de Revisão</FormLabel>
+              <Textarea
+                name="prestador.comentariosRevisao"
+                value={formik.values.prestador.comentariosRevisao}
+                onChange={formik.handleChange}
+                placeholder="Comentários de Revisão"
+              />
+            </FormControl>
           </Flex>
         </AccordionPanel>
       </AccordionItem>
-
-
-
-      {/* Accordion para Serviço */}
-    {/* <ServicoForm></ServicoForm> */}
     </Accordion>
   );
 };

@@ -105,6 +105,7 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
     validationSchema,
     onSubmit: async (values, { setSubmitting }) => {
       setSubmitting(true);
+      values.prestador.documento = values.prestador.documento.replace(/[^\d]/g, "");
       if (isEditMode) {
         const updatedTicket = {
           ...ticket,
