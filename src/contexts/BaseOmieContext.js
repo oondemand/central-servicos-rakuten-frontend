@@ -5,7 +5,7 @@ const BaseOmieContext = createContext();
 
 export const BaseOmieProvider = ({ children }) => {
   const [listaBases, setListaBases] = useState([]);
-  const [baseSelecionada, setBaseSelecionada] = useState(null);
+  const [baseOmie, setBaseOmie] = useState(null);
 
   useEffect(() => {
     const carregarBases = async () => {
@@ -20,13 +20,13 @@ export const BaseOmieProvider = ({ children }) => {
     carregarBases();
   }, []);
 
-  const selecionarBase = (cnpj) => {
-    const base = listaBases.find((emp) => emp.cnpj === cnpj);
-    setBaseSelecionada(base);
+  const selecionarBase = (id) => {
+    const base = listaBases.find((base) => base._id === id);
+    setBaseOmie(base);
   };
 
   return (
-    <BaseOmieContext.Provider value={{ listaBases, baseSelecionada, selecionarBase }}>
+    <BaseOmieContext.Provider value={{ listaBases, baseOmie, selecionarBase }}>
       {children}
     </BaseOmieContext.Provider>
   );
