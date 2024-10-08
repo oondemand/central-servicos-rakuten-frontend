@@ -30,7 +30,6 @@ import { useEtapa } from "../../contexts/EtapaContext";
 import PrestadorForm from "../PrestadorForm";
 import ServicoForm from "../ServicoForm";
 
-
 const validationSchema = Yup.object({
   titulo: Yup.string().required("Título é obrigatório"),
   observacao: Yup.string().required("Observação é obrigatória"),
@@ -39,8 +38,7 @@ const validationSchema = Yup.object({
     tipo: Yup.string()
       .oneOf(["pj", "pf"], "Tipo inválido")
       .required("Tipo é obrigatório"),
-    documento: Yup.string()
-      .required("Documento é obrigatório"),
+    documento: Yup.string().required("Documento é obrigatório"),
     email: Yup.string()
       .email("E-mail inválido")
       .required("E-mail é obrigatório"),
@@ -74,7 +72,7 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
     deletarTicket,
     listaTickets,
     SalvarPrestador,
-    SalvarServico
+    SalvarServico,
   } = useTicket();
   const { baseSelecionada } = useBaseOmie();
   const toast = useToast();
@@ -86,21 +84,22 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
   // Configuração do Formik
   const formik = useFormik({
     initialValues: {
-      titulo: isEditMode ? ticket.titulo : "",
-      observacao: isEditMode ? ticket.observacao : "",
+      titulo: isEditMode ? (ticket?.titulo || "") : "",
+      observacao: isEditMode ? (ticket?.observacao || "") : "",
       prestador: {
-        nome: isEditMode ? ticket.prestador.nome : "",
-        tipo: isEditMode ? ticket.prestador.tipo : "",
-        documento: isEditMode ? ticket.prestador.documento : "",
-        email: isEditMode ? ticket.prestador.email : "",
-        status: isEditMode ? ticket.prestador.status : "ativo",
-      },
+        nome: isEditMode && ticket?.prestador ? (ticket.prestador.nome || "") : "",
+        tipo: isEditMode && ticket?.prestador ? (ticket.prestador.tipo || "") : "",
+        documento: isEditMode && ticket?.prestador ? (ticket.prestador.documento || "") : "",
+        email: isEditMode && ticket?.prestador ? (ticket.prestador.email || "") : "",
+        status: isEditMode && ticket?.prestador ? (ticket.prestador.status || "ativo") : "ativo",
+        comentariosRevisao: isEditMode && ticket?.prestador ? (ticket.prestador.email || "") : "",
 
+      },
       servico: {
-        descricao: isEditMode ? ticket.servico.descricao : "",
-        valor: isEditMode ? ticket.servico.valor : "",
-        data: isEditMode ? ticket.servico.data : "",
-        status: isEditMode ? ticket.servico.status : "ativo",
+        descricao: isEditMode && ticket?.servico ? (ticket.servico.descricao || "") : "",
+        valor: isEditMode && ticket?.servico ? (ticket.servico.valor || "") : "",
+        data: isEditMode && ticket?.servico ? (ticket.servico.data || "") : "",
+        status: isEditMode && ticket?.servico ? (ticket.servico.status || "ativo") : "ativo",
       },
     },
     validationSchema,
@@ -113,7 +112,6 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
           observacao: values.observacao,
           status, // Atualiza o status do ticket
           prestador: values.prestador,
-   
           servico: values.servico,
         };
         const sucesso = await salvarTicket(updatedTicket);
@@ -129,24 +127,51 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
         }
       } else {
         const newTicket = {
-          baseOmie: baseSelecionada._id,
-          etapa: listaEtapas[0].codigo,
+          baseOmie: baseSelecionada?._id || "",
+          etapa: listaEtapas[0]?.codigo || "",
           titulo: values.titulo,
           observacao: values.observacao,
           status: "aguardando-inicio",
-          // servico: values.servico,
-          // prestador: values.prestador,
-
+          prestador: {}, // Inicializa como objeto vazio
+          servico: {}, // Inicializa como objeto vazio
         };
-      //  const sucesso = await salvarTicket(newTicket);
-        const sucesso2 = await SalvarServico(values.servico);
-        
-      //  const sucesso1 = await SalvarPrestador(values.prestador);
 
-        //console.log(sucesso2,sucesso1)
+        // Salva prestador e serviço separadamente
+        const sucessoPrestador = await SalvarPrestador(values.prestador);
+        const sucessoServico = await SalvarServico(values.servico);
+
+        if (sucessoPrestador && sucessoServico) {
+          // Associa os IDs retornados ao novo ticket
+          newTicket.prestador = sucessoPrestador; // Supondo que retorna o objeto salvo
+          newTicket.servico = sucessoServico; // Supondo que retorna o objeto salvo
+
+          const sucessoTicket = await salvarTicket(newTicket);
+          if (sucessoPrestador) {
+            toast({
+              title: "Ticket criado com sucesso!",
+              status: "success",
+              duration: 3000,
+              isClosable: true,
+            });
+            closeModal();
+          } else {
+            toast({
+              title: "Erro ao criar ticket.",
+              status: "error",
+              duration: 3000,
+              isClosable: true,
+            });
+          }
+        } else {
+          toast({
+            title: "Erro ao salvar prestador ou serviço.",
+            status: "error",
+            duration: 3000,
+            isClosable: true,
+          });
+        }
 
         setSubmitting(false);
-        if (sucesso2) closeModal();
       }
     },
   });
@@ -194,7 +219,7 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
     if (sucesso) {
       toast({
         title: "Ticket arquivado com sucesso!",
-        status: "error",
+        status: "info",
         duration: 3000,
         isClosable: true,
       });
@@ -205,7 +230,22 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
   const handleStatusChange = async (newStatus) => {
     if (!isEditMode) return;
     setStatus(newStatus); // Atualiza o status localmente
-    await alterarStatusTicket(ticket._id, newStatus);
+    const sucesso = await alterarStatusTicket(ticket._id, newStatus);
+    if (sucesso) {
+      toast({
+        title: `Status alterado para "${newStatus}"`,
+        status: "success",
+        duration: 2000,
+        isClosable: true,
+      });
+    } else {
+      toast({
+        title: "Erro ao alterar status.",
+        status: "error",
+        duration: 2000,
+        isClosable: true,
+      });
+    }
   };
 
   const { colorMode, toggleColorMode } = useColorMode();
@@ -214,7 +254,8 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
     if (isOpen && colorMode !== "dark") {
       toggleColorMode();
     }
-  }, [isOpen, colorMode, toggleColorMode]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]);
 
   return (
     <Modal isOpen={isOpen} onClose={closeModal} size="6xl">

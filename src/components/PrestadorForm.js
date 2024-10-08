@@ -1,5 +1,3 @@
-// src/components/TicketModal/PrestadorForm.js
-
 import React from "react";
 import {
   Accordion,
