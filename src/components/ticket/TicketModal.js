@@ -20,10 +20,16 @@ import {
   Box,
   ButtonGroup,
   useColorMode,
+  Accordion,
+  AccordionItem,
+  AccordionButton,
+  AccordionPanel,
+  AccordionIcon,
+  useColorModeValue,
 } from "@chakra-ui/react";
+import { FaCheck, FaTimes, FaTrash } from "react-icons/fa";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { FaCheck, FaTimes, FaTrash } from "react-icons/fa";
 import { useTicket } from "../../contexts/TicketContext";
 import { useBaseOmie } from "../../contexts/BaseOmieContext";
 import { useEtapa } from "../../contexts/EtapaContext";
@@ -70,7 +76,6 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
     alterarStatusTicket,
     aprovacaoTicket,
     deletarTicket,
-    listaTickets,
     SalvarPrestador,
     SalvarServico,
   } = useTicket();
@@ -79,33 +84,53 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
   const { listaEtapas } = useEtapa();
 
   // Estado para o status do ticket
-  const [status, setStatus] = useState(isEditMode ? ticket.status : "aguardando-inicio");
+  const [status, setStatus] = useState(
+    isEditMode ? ticket.status : "aguardando-inicio"
+  );
 
   // Configuração do Formik
   const formik = useFormik({
     initialValues: {
-      titulo: isEditMode ? (ticket?.titulo || "") : "",
-      observacao: isEditMode ? (ticket?.observacao || "") : "",
+      titulo: isEditMode ? ticket?.titulo || "" : "",
+      observacao: isEditMode ? ticket?.observacao || "" : "",
       prestador: {
-        nome: isEditMode && ticket?.prestador ? (ticket.prestador.nome || "") : "",
-        tipo: isEditMode && ticket?.prestador ? (ticket.prestador.tipo || "") : "",
-        documento: isEditMode && ticket?.prestador ? (ticket.prestador.documento || "") : "",
-        email: isEditMode && ticket?.prestador ? (ticket.prestador.email || "") : "",
-        status: isEditMode && ticket?.prestador ? (ticket.prestador.status || "ativo") : "ativo",
-        comentariosRevisao: isEditMode && ticket?.prestador ? (ticket.prestador.email || "") : "",
-
+        nome:
+          isEditMode && ticket?.prestador ? ticket.prestador.nome || "" : "",
+        tipo:
+          isEditMode && ticket?.prestador ? ticket.prestador.tipo || "" : "",
+        documento:
+          isEditMode && ticket?.prestador
+            ? ticket.prestador.documento || ""
+            : "",
+        email:
+          isEditMode && ticket?.prestador ? ticket.prestador.email || "" : "",
+        status:
+          isEditMode && ticket?.prestador
+            ? ticket.prestador.status || "ativo"
+            : "ativo",
+        comentariosRevisao:
+          isEditMode && ticket?.prestador
+            ? ticket.prestador.comentariosRevisao || ""
+            : "",
       },
       servico: {
-        descricao: isEditMode && ticket?.servico ? (ticket.servico.descricao || "") : "",
-        valor: isEditMode && ticket?.servico ? (ticket.servico.valor || "") : "",
-        data: isEditMode && ticket?.servico ? (ticket.servico.data || "") : "",
-        status: isEditMode && ticket?.servico ? (ticket.servico.status || "ativo") : "ativo",
+        descricao:
+          isEditMode && ticket?.servico ? ticket.servico.descricao || "" : "",
+        valor: isEditMode && ticket?.servico ? ticket.servico.valor || "" : "",
+        data: isEditMode && ticket?.servico ? ticket.servico.data || "" : "",
+        status:
+          isEditMode && ticket?.servico
+            ? ticket.servico.status || "ativo"
+            : "ativo",
       },
     },
     validationSchema,
     onSubmit: async (values, { setSubmitting }) => {
       setSubmitting(true);
-      values.prestador.documento = values.prestador.documento.replace(/[^\d]/g, "");
+      values.prestador.documento = values.prestador.documento.replace(
+        /[^\d]/g,
+        ""
+      );
       if (isEditMode) {
         const updatedTicket = {
           ...ticket,
@@ -147,7 +172,7 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
           newTicket.servico = sucessoServico; // Supondo que retorna o objeto salvo
 
           const sucessoTicket = await salvarTicket(newTicket);
-          if (sucessoPrestador) {
+          if (sucessoTicket) {
             toast({
               title: "Ticket criado com sucesso!",
               status: "success",
@@ -258,18 +283,35 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
 
+  // CSS styles to match EditNfseModal.js
+  const accordionBg = useColorModeValue("gray.100", "gray.700");
+  const accordionHoverBg = useColorModeValue("gray.200", "gray.600");
+  const accordionBorderColor = useColorModeValue("gray.300", "gray.600");
+  const modalBg = useColorModeValue("white", "gray.800");
+  const inputBg = useColorModeValue("white", "gray.600");
+
   return (
     <Modal isOpen={isOpen} onClose={closeModal} size="6xl">
       <ModalOverlay />
-      <ModalContent>
+      <ModalContent bg={modalBg}>
         <ModalHeader>
           {isEditMode ? "Editar Ticket" : "Adicionar Novo Ticket"}
         </ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <form onSubmit={formik.handleSubmit} style={{ height: '720px', overflowY: 'scroll', overflowX: 'hidden' }}>
+          <form
+            onSubmit={formik.handleSubmit}
+            style={{
+              height: "720px",
+              overflowY: "scroll",
+              overflowX: "hidden",
+            }}
+          >
             <Flex justifyContent="space-between" width="100%">
-              <Flex flex={isEditMode ? "0 0 70%" : "100%"} flexDirection="column">
+              <Flex
+                flex={isEditMode ? "0 0 70%" : "100%"}
+                flexDirection="column"
+              >
                 {/* Campos Título e Observação */}
                 <FormControl
                   mb={4}
@@ -284,6 +326,7 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                     placeholder="Título do Ticket"
+                    bg={inputBg}
                   />
                   {formik.touched.titulo && formik.errors.titulo ? (
                     <Box color="red.500" mt={1}>
@@ -293,7 +336,9 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
                 </FormControl>
                 <FormControl
                   mb={4}
-                  isInvalid={formik.errors.observacao && formik.touched.observacao}
+                  isInvalid={
+                    formik.errors.observacao && formik.touched.observacao
+                  }
                 >
                   <FormLabel>Observação</FormLabel>
                   <Textarea
@@ -304,6 +349,7 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
                     onBlur={formik.handleBlur}
                     rows={3}
                     placeholder="Observação do Ticket"
+                    bg={inputBg}
                   />
                   {formik.touched.observacao && formik.errors.observacao ? (
                     <Box color="red.500" mt={1}>
@@ -313,18 +359,39 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
                 </FormControl>
 
                 {/* Accordions para Prestador e Serviço */}
-                <PrestadorForm formik={formik} />
-                <ServicoForm formik={formik} />
+                <Accordion defaultIndex={[0]} allowMultiple>
+                  <PrestadorForm
+                    formik={formik}
+                    accordionStyles={{
+                      accordionBg,
+                      accordionHoverBg,
+                      accordionBorderColor,
+                      inputBg,
+                    }}
+                  />
+             <ServicoForm
+  formik={formik}
+  accordionStyles={{
+    accordionBg,
+    accordionHoverBg,
+    accordionBorderColor,
+    inputBg,
+  }}
+/>
+
+                </Accordion>
               </Flex>
 
               {/* Se for modo de edição, exibir os botões de status à direita */}
               {isEditMode && (
-                <FormControl mb={3} flex="0 0 25%">
+                <FormControl mb={3} flex="0 0 25%" ml={4}>
                   <FormLabel>Status</FormLabel>
                   <Flex flexDirection={"column"} gap={2}>
                     <Button
                       onClick={() => handleStatusChange("aguardando-inicio")}
-                      colorScheme={status === "aguardando-inicio" ? "yellow" : "gray"}
+                      colorScheme={
+                        status === "aguardando-inicio" ? "yellow" : "gray"
+                      }
                       mb={2}
                     >
                       Aguardando Início
@@ -348,7 +415,11 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
             </Flex>
 
             {/* Botões de Aprovação/Rejeição/Arquivamento */}
-            <ModalFooter display={"flex"} justifyContent={"space-between"} pt={20}>
+            <ModalFooter
+              display={"flex"}
+              justifyContent={"space-between"}
+              pt={4}
+            >
               {isEditMode && (
                 <ButtonGroup spacing={4}>
                   <Button
