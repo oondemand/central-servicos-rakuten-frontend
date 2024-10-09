@@ -6,13 +6,7 @@ const CartaoTicket = ({ ticket, onClick }) => {
   const statusColor = getStatusColor(ticket.status);
 
   return (
-    <Box
-      p={4}
-      rounded="md"
-      shadow="sm"
-      cursor="pointer"
-      onClick={onClick}
-    >
+    <Box p={4} rounded="md" shadow="sm" cursor="pointer" onClick={onClick}>
       <Text fontWeight="bold">{ticket.titulo}</Text>
       <Text>{ticket.descricao}</Text>
       <Flex align="center" mt={4}>

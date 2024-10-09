@@ -1,7 +1,7 @@
 // src/components/ticket/TicketForm.js
 import React from "react";
 import { Formik, Form } from "formik";
-import { Toast, useToast } from "@chakra-ui/react";
+import { useToast } from "@chakra-ui/react";
 
 import { ticketValidationSchema } from "../../validation/ticketValidationSchema";
 import { ticketInitValues } from "../../initValues/ticketInitValues";
@@ -21,7 +21,7 @@ const TicketForm = ({ isEditMode, ticket, closeModal }) => {
   const { salvarTicket } = useTicket();
   const { baseSelecionada } = useBaseOmie();
   const { listaEtapas } = useEtapa();
-  const { Toast } = useToast();
+  const toast = useToast();
 
   const handleSubmit = async (values, { setSubmitting }) => {
     setSubmitting(true);
@@ -38,12 +38,6 @@ const TicketForm = ({ isEditMode, ticket, closeModal }) => {
       const sucesso = await salvarTicket(updatedTicket);
       setSubmitting(false);
       if (sucesso) {
-        Toast({
-          title: "Ticket atualizado com sucesso!",
-          status: "info",
-          duration: 5000,
-          isClosable: true,
-        });
         closeModal();
       }
     } else {
@@ -51,33 +45,27 @@ const TicketForm = ({ isEditMode, ticket, closeModal }) => {
       // const sucessoServico = await salvarServico(values?.servico);
 
       // if (sucessoPrestador && sucessoServico) {
-        const newTicket = {
-          baseOmieId: baseSelecionada?._id || "66fecc5b0c2acb31fa820b16",
-          etapa: listaEtapas[0]?.codigo || "",
-          titulo: values.titulo,
-          observacao: values.observacao,
-          status: "aguardando-inicio",
-          // prestadorId: sucessoPrestador.prestador._id,
-          // servicoId: sucessoServico.servico._id,
-        };
+      const newTicket = {
+        baseOmieId: baseSelecionada?._id || "66fecc5b0c2acb31fa820b16",
+        etapa: listaEtapas[0]?.codigo || "",
+        titulo: values.titulo,
+        observacao: values.observacao,
+        status: "aguardando-inicio",
+        // prestadorId: sucessoPrestador.prestador._id,
+        // servicoId: sucessoServico.servico._id,
+      };
 
-        const sucessoTicket = await salvarTicket(newTicket);
-        if (sucessoTicket) {
-          Toast({
-            title: "Ticket criado com sucesso!",
-            status: "info",
-            duration: 5000,
-            isClosable: true,
-          });
-          closeModal();
-        } else {
-          Toast({
-            title: "Erro ao criar ticket.",
-            status: "error",
-            duration: 5000,
-            isClosable: true,
-          });
-        }
+      const sucessoTicket = await salvarTicket(newTicket);
+      if (sucessoTicket) {
+        closeModal();
+      } else {
+        toast({
+          title: "Erro ao criar ticket.",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
+      }
       // } else {
       //   toast({
       //     title: "Erro ao salvar prestador ou serviço.",

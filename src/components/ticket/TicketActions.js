@@ -14,15 +14,17 @@ import {
 } from "@chakra-ui/react";
 import { FaCheck, FaTimes, FaTrash } from "react-icons/fa";
 import { useToast } from "@chakra-ui/react";
+import { useTicket } from "../../contexts/TicketContext";
 
 const TicketActions = ({ formik, isEditMode, closeModal }) => {
   const toast = useToast();
+  const { salvarTicket, aprovarTicket, reprovarTicket } = useTicket();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = useRef();
 
   const handleApprove = async () => {
     if (!isEditMode) return;
-    const sucesso = await formik.aprovacaoTicket(formik.values._id, true);
+    const sucesso = await aprovarTicket(formik.values._id);
     if (sucesso) {
       toast({
         title: "Ticket aprovado com sucesso!",
@@ -36,7 +38,7 @@ const TicketActions = ({ formik, isEditMode, closeModal }) => {
 
   const handleReject = async () => {
     if (!isEditMode) return;
-    const sucesso = await formik.aprovacaoTicket(formik.values._id, false);
+    const sucesso = await reprovarTicket(formik.values._id);
     if (sucesso) {
       toast({
         title: "Ticket recusado com sucesso!",
@@ -55,7 +57,7 @@ const TicketActions = ({ formik, isEditMode, closeModal }) => {
 
   const confirmArquivar = async () => {
     const ticketUpdate = { _id: formik.values._id, status: "arquivado" };
-    const sucesso = await formik.salvarTicket(ticketUpdate);
+    const sucesso = await salvarTicket(ticketUpdate);
 
     if (sucesso) {
       toast({
