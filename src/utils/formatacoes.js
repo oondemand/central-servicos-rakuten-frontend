@@ -1,6 +1,7 @@
-function formatarDocumento(documento) {
+// src/utils/formatacoes.js
+export const formatarDocumento = (documento) => {
   if (!documento) return '';
-  const cleaned = documento.replace(/\D/g, ''); // Remove todos os caracteres não numéricos
+  const cleaned = documento.replace(/\D/g, '');
 
   if (cleaned.length === 13) {
     const match = cleaned.match(/^(\d{1})(\d{3})(\d{3})(\d{4})(\d{2})$/);
@@ -14,7 +15,5 @@ function formatarDocumento(documento) {
     }
   }
 
-  return documento; // Retorna o documento original se não corresponder ao formato esperado
-}
-
-module.exports = { formatarDocumento };
+  return documento;
+};

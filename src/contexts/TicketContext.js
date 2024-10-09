@@ -1,7 +1,15 @@
+// src/contexts/TicketContext.js
 import React, { createContext, useState, useEffect, useCallback, useContext } from "react";
-import api from "../api/apiService";
-import { useNotificacao } from "./NotificacaoContext";
+import {
+  salvarTicket as salvarTicketService,
+  alterarTicket,
+  aprovarTicket as aprovarTicketService,
+  reprovarTicket as reprovarTicketService,
+  carregarTicket,
+  listarTickets,
+} from "../services/ticketService";
 import { useBaseOmie } from "./BaseOmieContext";
+import { useToast } from "@chakra-ui/react";
 
 // Cria o contexto para Ticket
 const TicketContext = createContext();
@@ -12,8 +20,8 @@ export const TicketProvider = ({ children }) => {
   const [listaTickets, setListaTickets] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const { adicionarNotificacao } = useNotificacao();
   const { baseOmie } = useBaseOmie();
+  const toast = useToast();
 
   // Função para normalizar strings, removendo acentos e convertendo para minúsculas
   const normalizarTexto = (texto) => {
@@ -26,19 +34,19 @@ export const TicketProvider = ({ children }) => {
   // Função para filtrar tickets com base na pesquisa
   const filtrarTickets = (termo) => {
     if (!termo) {
-      setListaTickets(listaTodosTickets); // Se não houver termo, mostrar todos os tickets
+      setListaTickets(listaTodosTickets);
     } else {
       const termoNormalizado = normalizarTexto(termo);
 
       const ticketsFiltrados = listaTodosTickets.filter((ticket) => {
-        const { baseOmie } = ticket.baseOmie;
+        const base = baseOmie ? baseOmie : {};
+        const { nome, documento } = base;
 
-        // Filtrar por número da NFS-e, documentos, nomes e discriminação do serviço
         return (
-          ticket.titulo.toString().includes(termoNormalizado) ||
-          ticket.observacao.toString().includes(termoNormalizado) ||
-          normalizarTexto(baseOmie.nome).includes(termoNormalizado) ||
-          normalizarTexto(baseOmie.documento).includes(termoNormalizado)
+          normalizarTexto(ticket.titulo).includes(termoNormalizado) ||
+          normalizarTexto(ticket.observacao).includes(termoNormalizado) ||
+          normalizarTexto(nome).includes(termoNormalizado) ||
+          normalizarTexto(documento).includes(termoNormalizado)
         );
       });
 
@@ -51,31 +59,109 @@ export const TicketProvider = ({ children }) => {
     async (ticket) => {
       setLoading(true);
       try {
-        let response;
+        const sucesso = await salvarTicketService(ticket);
         if (ticket._id) {
-          response = await api.put(`/tickets/${ticket._id}`, ticket);
-          setListaTickets((prevTickets) =>
-            prevTickets.map((t) => (t._id === ticket._id ? response.data : t))
-          );
-          adicionarNotificacao("info", "Ticket atualizado com sucesso!", true);
+          toast({
+            title: "Ticket atualizado com sucesso!",
+            status: "info",
+            duration: 5000,
+            isClosable: true,
+          });
         } else {
-          response = await api.post("/tickets", ticket);
-          setListaTickets((prevTickets) => [...prevTickets, response.data]);
-          adicionarNotificacao("info", "Ticket adicionado com sucesso!", true);
+          toast({
+            title: "Ticket adicionado com sucesso!",
+            status: "success",
+            duration: 5000,
+            isClosable: true,
+          });
         }
-        setError(null);
-        return true; // Indica sucesso
+        carregarTickets();
+        return sucesso;
       } catch (err) {
         console.error("Erro ao salvar ticket:", err);
         const detalhes = err.response?.data?.detalhes || err.message;
         setError(ticket._id ? "Erro ao editar ticket." : "Erro ao adicionar ticket.");
-        adicionarNotificacao("erro", ticket._id ? "Erro ao editar ticket." : "Erro ao adicionar ticket.", detalhes);
+        toast({
+          title: ticket._id ? "Erro ao editar ticket." : "Erro ao adicionar ticket.",
+          description: detalhes,
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
+        return err.response?.data;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [toast]
+  );
+
+  // Função para aprovar um ticket
+  const aprovarTicket = useCallback(
+    async (id) => {
+      setLoading(true);
+      try {
+        await aprovarTicketService(id);
+        carregarTickets();
+
+        toast({
+          title: "Ticket aprovado com sucesso!",
+          status: "success",
+          duration: 5000,
+          isClosable: true,
+        });
+        return true; // Indica sucesso
+      } catch (err) {
+        const mensagem = err.response?.data?.message || "Erro ao aprovar ticket";
+        const detalhes = err.response?.data?.detalhes || err.message;
+        toast({
+          title: mensagem,
+          description: detalhes,
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
+        setError(mensagem);
         return false; // Indica falha
       } finally {
         setLoading(false);
       }
     },
-    [adicionarNotificacao]
+    [toast]
+  );
+
+  // Função para reprovar um ticket
+  const reprovarTicket = useCallback(
+    async (id) => {
+      setLoading(true);
+      try {
+        await reprovarTicketService(id);
+        carregarTickets();
+
+        toast({
+          title: "Ticket recusado com sucesso!",
+          status: "info",
+          duration: 5000,
+          isClosable: true,
+        });
+        return true; // Indica sucesso
+      } catch (err) {
+        const mensagem = err.response?.data?.message || "Erro ao recusar ticket";
+        const detalhes = err.response?.data?.detalhes || err.message;
+        toast({
+          title: mensagem,
+          description: detalhes,
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
+        setError(mensagem);
+        return false; // Indica falha
+      } finally {
+        setLoading(false);
+      }
+    },
+    [toast]
   );
 
   // Função para alterar o status do ticket
@@ -83,122 +169,122 @@ export const TicketProvider = ({ children }) => {
     async (id, novoStatus) => {
       setLoading(true);
       try {
-        await api.put(`/tickets/${id}/status`, { status: novoStatus });
-        setListaTickets((prevTickets) =>
-          prevTickets.map((ticket) =>
-            ticket._id === id ? { ...ticket, status: novoStatus } : ticket
-          )
-        );
-        setError(null);
-        adicionarNotificacao("info", "Status do ticket atualizado com sucesso!", true);
+        await alterarTicket(id, { status: novoStatus });
+        carregarTickets();
+
+        toast({
+          title: "Status do ticket atualizado com sucesso!",
+          status: "success",
+          duration: 5000,
+          isClosable: true,
+        });
         return true; // Indica sucesso
       } catch (err) {
-        console.error("Erro ao atualizar status do ticket:", err);
-        const detalhes = err.response?.data?.detalhes || err.message;
-        setError("Erro ao atualizar status do ticket.");
-        adicionarNotificacao("erro", "Erro ao atualizar status do ticket.", detalhes);
-        return false; // Indica falha
+        console.error("Erro ao atualizar status do ticket.", err);
+
+        toast({
+          title: "Erro ao atualizar status do ticket.",
+          description: err.message,
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
+        return false;
       } finally {
         setLoading(false);
       }
     },
-    [adicionarNotificacao]
+    [toast]
   );
 
   // Função para carregar todos os tickets
   const carregarTickets = useCallback(async () => {
     setLoading(true);
     try {
-      let url = "/tickets";
-      if (baseOmie) url += `/base-omie/${baseOmie._id}`;
+      const filtro = baseOmie ? { baseOmieId: baseOmie._id } : {};
+      const response = await listarTickets(filtro);
 
-      const response = await api.get(url);
-
-      setListaTodosTickets(response.data); // Armazena todos os tickets
-      setListaTickets(response.data); // Inicializa listaTickets com todos os tickets
+      setListaTodosTickets(response); // Armazena todos os tickets
+      setListaTickets(response); // Inicializa listaTickets com todos os tickets
       setError(null);
     } catch (err) {
       console.error("Erro ao buscar tickets:", err);
       const detalhes = err.response?.data?.detalhes || err.message;
       setError("Erro ao buscar tickets.");
-      adicionarNotificacao("erro", "Erro ao buscar tickets.", detalhes);
+      toast({
+        title: "Erro ao buscar tickets.",
+        description: detalhes,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
     } finally {
       setLoading(false);
     }
-  }, [baseOmie, adicionarNotificacao]);
+  }, [baseOmie, toast]);
 
-  // Função para deletar um ticket
+  // Função para deletar (arquivar) um ticket
   const deletarTicket = useCallback(
     async (id) => {
       setLoading(true);
       try {
-        await api.delete(`/tickets/${id}`);
-        setListaTickets((prevTickets) => prevTickets.filter((ticket) => ticket._id !== id));
+        const response = await alterarTicket(id, { status: "arquivado" });
+        setListaTickets((prevTickets) =>
+          prevTickets.map((ticket) => (ticket._id === id ? response : ticket))
+        );
         setError(null);
-        adicionarNotificacao("info", "Ticket removido com sucesso!", true);
+        toast({
+          title: "Ticket arquivado com sucesso!",
+          status: "warning",
+          duration: 5000,
+          isClosable: true,
+        });
         return true; // Indica sucesso
       } catch (err) {
-        console.error("Erro ao excluir ticket:", err);
+        console.error("Erro ao arquivar ticket:", err);
         const detalhes = err.response?.data?.detalhes || err.message;
-        setError("Erro ao excluir ticket.");
-        adicionarNotificacao("erro", "Erro ao excluir ticket.", detalhes);
+        setError("Erro ao arquivar ticket.");
+        toast({
+          title: "Erro ao arquivar ticket.",
+          description: detalhes,
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
         return false; // Indica falha
       } finally {
         setLoading(false);
       }
     },
-    [adicionarNotificacao]
+    [toast]
   );
 
-  // Função para aprovar ou recusar um ticket
-  const aprovacaoTicket = useCallback(
-    async (id, aprovar) => {
+  // Função para buscar ticket por ID
+  const buscarTicketPorId = useCallback(
+    async (id) => {
       setLoading(true);
       try {
-        const url = aprovar ? `/aprovacoes/${id}/aprovar` : `/aprovacoes/${id}/recusar`;
-        const response = await api.post(url);
-        setListaTickets((prevTickets) =>
-          prevTickets.map((ticket) => (ticket._id === id ? response.data : ticket))
-        );
+        const response = await carregarTicket(id);
         setError(null);
-        adicionarNotificacao(
-          "info",
-          aprovar ? "Ticket aprovado com sucesso!" : "Ticket recusado com sucesso!",
-          true
-        );
-        return true; // Indica sucesso
+        return response; // Retorna o ticket encontrado
       } catch (err) {
-        const mensagem = err.response?.data?.message || (aprovar ? "Erro ao aprovar ticket" : "Erro ao recusar ticket");
+        console.error("Erro ao buscar ticket pelo ID:", err);
         const detalhes = err.response?.data?.detalhes || err.message;
-        adicionarNotificacao("erro", mensagem, detalhes, false);
-        setError(mensagem);
-        return false; // Indica falha
+        setError("Erro ao buscar ticket.");
+        toast({
+          title: "Erro ao buscar ticket.",
+          description: detalhes,
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
+        return null; // Retorna null se falhar
       } finally {
         setLoading(false);
       }
     },
-    [adicionarNotificacao]
+    [toast]
   );
-
-const buscarTicketPorId = useCallback(
-  async (id) => {
-    setLoading(true);
-    try {
-      const response = await api.get(`/tickets/${id}`);
-      setError(null);
-      return response.data; // Retorna o ticket encontrado
-    } catch (err) {
-      console.error("Erro ao buscar ticket pelo ID:", err);
-      const detalhes = err.response?.data?.detalhes || err.message;
-      setError("Erro ao buscar ticket.");
-      adicionarNotificacao("erro", "Erro ao buscar ticket.", detalhes);
-      return null; // Retorna null se falhar
-    } finally {
-      setLoading(false);
-    }
-  },
-  [adicionarNotificacao]
-);
 
   // Carregar os tickets quando o componente for montado
   useEffect(() => {
@@ -214,10 +300,11 @@ const buscarTicketPorId = useCallback(
         carregarTickets,
         salvarTicket,
         deletarTicket,
-        aprovacaoTicket,
+        aprovarTicket,
+        reprovarTicket,
         alterarStatusTicket,
-        filtrarTickets,       
-        buscarTicketPorId
+        filtrarTickets,
+        buscarTicketPorId,
       }}
     >
       {children}
@@ -228,4 +315,4 @@ const buscarTicketPorId = useCallback(
 // Hook para usar o contexto de Ticket
 export const useTicket = () => useContext(TicketContext);
 
-export default TicketContext;
+export default TicketContext;

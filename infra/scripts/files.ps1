@@ -1,19 +1,25 @@
-# Define the root directory to start the search
-$rootDir = "."
+# Define the source directory
+$sourceDir = "../.."
+$srcDir = "../../src"
 
-# Get all directories recursively, excluding the node_modules directory
-$directories = Get-ChildItem -Path $rootDir -Recurse -Directory | Where-Object { $_.FullName -notmatch "\\node_modules\\" }
+# Get all files in the root directory, excluding package-lock.json
+$rootFilesToWrite = Get-ChildItem -Path $sourceDir -File | Where-Object { $_.Name -ne "package-lock.json" }
 
-foreach ($dir in $directories) {
-    Write-Host "Pasta encontrada: $($dir.FullName)"
-    Read-Host -Prompt "Pressione Enter para listar os arquivos e exibir o conteúdo"
+# Get all files in the src directory
+$srcFilesToWrite = Get-ChildItem -Path $srcDir -File -Recurse
 
-    # Get all files in the current directory
-    $files = Get-ChildItem -Path $dir.FullName -File
+# Write the contents of the files from the root directory to the console
+Write-Host "Conteúdos dos arquivos na raiz (exceto package-lock.json):"
+foreach ($file in $rootFilesToWrite) {
+    Write-Host "Conteúdo do arquivo: $($file.Name)"
+    Get-Content -Path $file.FullName
+    Write-Host "`n"  # Add a newline for better readability
+}
 
-    foreach ($file in $files) {
-        Write-Host "Conteúdo do arquivo: $($file.FullName)"
-        Get-Content -Path $file.FullName
-        Write-Host "`n"  # Add a newline for better readability
-    }
+# Write the contents of the files from the src directory to the console
+Write-Host "`nConteúdos dos arquivos no diretório src e seus subdiretórios:"
+foreach ($file in $srcFilesToWrite) {
+    Write-Host "Conteúdo do arquivo: $($file.FullName)"
+    Get-Content -Path $file.FullName
+    Write-Host "`n"  # Add a newline for better readability
 }

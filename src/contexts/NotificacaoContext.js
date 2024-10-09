@@ -1,37 +1,41 @@
+// src/contexts/NotificacaoContext.js
 import React, { createContext, useState, useContext } from 'react';
+import { useToast } from '@chakra-ui/react';
 
 const NotificacaoContext = createContext();
 
 export const NotificacaoProvider = ({ children }) => {
   const [notificacoes, setNotificacoes] = useState([]);
+  const toast = useToast();
 
-  const adicionarNotificacao = (tipo, mensagem, detalhes = '', autoClose = true) => {
-    const novaNotificacao = { 
-      id: Date.now(), 
-      tipo, 
-      mensagem, 
-      detalhes, 
-      showDetalhes: false, 
-      autoClose 
+  const adicionarNotificacao = (tipo, mensagem, detalhes = '') => {
+    const novaNotificacao = {
+      id: Date.now(),
+      tipo,
+      mensagem,
+      detalhes,
+      showDetalhes: false,
     };
-    setNotificacoes(prevNotificacoes => [...prevNotificacoes, novaNotificacao]);
+    setNotificacoes(prev => [...prev, novaNotificacao]);
 
-    if (autoClose) {
-      setTimeout(() => {
-        removerNotificacao(novaNotificacao.id);
-      }, 5000);
-    }
+    toast({
+      title: tipo === 'erro' ? 'Erro' : 'Informação',
+      description: mensagem,
+      status: tipo === 'erro' ? 'error' : 'info',
+      duration: 5000,
+      isClosable: true,
+    });
   };
 
   const removerNotificacao = (id) => {
-    setNotificacoes(prevNotificacoes => prevNotificacoes.filter(notificacao => notificacao.id !== id));
+    setNotificacoes(prev => prev.filter(notificacao => notificacao.id !== id));
   };
 
   const toggleDetalhes = (id) => {
-    setNotificacoes(prevNotificacoes =>
-      prevNotificacoes.map(notificacao =>
-        notificacao.id === id 
-          ? { ...notificacao, showDetalhes: !notificacao.showDetalhes } 
+    setNotificacoes(prev =>
+      prev.map(notificacao =>
+        notificacao.id === id
+          ? { ...notificacao, showDetalhes: !notificacao.showDetalhes }
           : notificacao
       )
     );
@@ -43,6 +47,5 @@ export const NotificacaoProvider = ({ children }) => {
     </NotificacaoContext.Provider>
   );
 };
-
 
 export const useNotificacao = () => useContext(NotificacaoContext);

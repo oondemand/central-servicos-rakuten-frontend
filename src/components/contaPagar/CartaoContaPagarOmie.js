@@ -1,7 +1,16 @@
+// CartaoContaPagarOmie.js
 import React, { useState, useEffect } from "react";
-import api from "../../api/apiService";
+import {
+  Box,
+  Text,
+  Spinner,
+  Badge,
+  useColorModeValue,
+} from "@chakra-ui/react";
+import api from "../../services/api";
+import { formatDate } from "../../utils/formatDate";
 
-const CartaoContaPagar = ({ ticket }) => {
+const CartaoContaPagarOmie = ({ ticket }) => {
   const [contaPagar, setContaPagar] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -31,27 +40,59 @@ const CartaoContaPagar = ({ ticket }) => {
     }
   }, [ticket.contaPagarOmie, retry]);
 
+  const bg = useColorModeValue('gray.200', 'gray.600');
+  const errorBg = useColorModeValue('red.100', 'red.600');
+  const warningBg = useColorModeValue('yellow.100', 'yellow.600');
+  // const successBg = useColorModeValue('green.100', 'green.600');
+
   if (loading) {
-    return <div>Carregando...</div>;
+    return (
+      <Box p={4} bg={bg} rounded="md" shadow="sm">
+        <Spinner />
+      </Box>
+    );
   }
 
   if (error) {
-    return <div>{error}</div>;
+    return (
+      <Box p={4} bg={errorBg} rounded="md" shadow="sm">
+        <Text color="red.500">{error}</Text>
+      </Box>
+    );
   }
 
   if (!contaPagar) {
-    return <div>Conta a pagar não encontrada.</div>;
+    return (
+      <Box p={4} bg={warningBg} rounded="md" shadow="sm">
+        <Text>Conta a pagar não encontrada.</Text>
+      </Box>
+    );
   }
 
   return (
-    <div className="cartao">
-      <p className="titulo">NFS-e: {ticket.nfse.infoNfse.numero}</p>
-      <p className="subtitulo">Documento: {contaPagar.numero_documento}</p>
-      <p className="texto-pequeno">Valor: R$ {contaPagar.valor_documento.toFixed(2)}</p>
-      <p className="texto-pequeno">Vencimento: {contaPagar.data_vencimento}</p>
-      <p className="texto-pequeno">Status: {contaPagar.status_titulo}</p>
-    </div>
+    <Box p={4} rounded="md" shadow="sm">
+      <Text fontWeight="bold">NFS-e: {ticket.nfse.infoNfse.numero}</Text>
+      <Text>Documento: {contaPagar.numero_documento}</Text>
+      <Text>Valor: R$ {contaPagar.valor_documento.toFixed(2)}</Text>
+      <Text>Vencimento: {formatDate(contaPagar.data_vencimento)}</Text>
+      <Badge colorScheme={getColorScheme(contaPagar.status_titulo)}>
+        {contaPagar.status_titulo}
+      </Badge>
+    </Box>
   );
 };
 
-export default CartaoContaPagar;
+const getColorScheme = (status) => {
+  switch (status.toLowerCase()) {
+    case 'pago':
+      return 'green';
+    case 'pendente':
+      return 'yellow';
+    case 'vencido':
+      return 'red';
+    default:
+      return 'gray';
+  }
+};
+
+export default CartaoContaPagarOmie;

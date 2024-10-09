@@ -1,26 +1,26 @@
+// src/components/Esteira.js
 import React from "react";
 import Etapa from "./Etapa";
 import ContaPagar from "./ContaPagar";
 import { useEtapa } from "../contexts/EtapaContext";
+import { Box, Flex } from "@chakra-ui/react";
 
 const Esteira = () => {
   const { listaEtapas } = useEtapa();
 
   return (
-    <div className="p-4 bg-gray-100 dark:bg-gray-900 h-full">
-      <div className="overflow-x-auto">
-        <div className="flex space-x-4 max-w-screen-2xl mx-auto">
-          {listaEtapas.map((etapa, index) => (
-            <div key={etapa._id} className="flex-shrink-0">
-              <Etapa etapa={etapa} index={index} />
-            </div>
-          ))}
-          <div className="flex-shrink-0">
-            <ContaPagar />
-          </div>
-        </div>
-      </div>
-    </div>
+    <Box p={4} height="full" overflowX="auto">
+      <Flex gap={4} maxW="2xl" mx="auto">
+        {listaEtapas.map((etapa, index) => (
+          <Box key={etapa._id} flexShrink={0}>
+            <Etapa etapa={etapa} index={index} />
+          </Box>
+        ))}
+        <Box flexShrink={0}>
+          <ContaPagar />
+        </Box>
+      </Flex>
+    </Box>
   );
 };
 

@@ -1,21 +1,38 @@
+// src/components/ticket/CartaoTicket.js
 import React from "react";
+import { Box, Text, Flex, Badge } from "@chakra-ui/react";
 
 const CartaoTicket = ({ ticket, onClick }) => {
-    const statusColor = ticket.status === "aguardando-inicio" ? "yellow-500" :
-                      ticket.status === "trabalhando" ? "green-500" :
-                      ticket.status === "revisao" ? "red-500" :
-                      "blue-500"; // Cor padrão caso o status não corresponda a nenhum dos especificados
+  const statusColor = getStatusColor(ticket.status);
 
   return (
-    <div className="cartao" onClick={onClick}>
-      <p className="titulo">NFS-e: {ticket.titulo}</p>
-      <p className="texto-pequeno">{ticket.descricao}</p>
-      <div className="flex items-center mt-4">
-        <span className={`inline-block w-2.5 h-2.5 rounded-full bg-${statusColor} mr-2`}></span>
-        <p className="status-texto">{ticket.status}</p>
-      </div>
-    </div>
+    <Box p={4} rounded="md" shadow="sm" cursor="pointer" onClick={onClick}>
+      <Text fontWeight="bold">{ticket.titulo}</Text>
+      <Text>{ticket.descricao}</Text>
+      <Flex align="center" mt={4}>
+        <Badge colorScheme={statusColor} mr={2}>
+          {capitalize(ticket.status)}
+        </Badge>
+      </Flex>
+    </Box>
   );
+};
+
+const getStatusColor = (status) => {
+  switch (status) {
+    case "aguardando-inicio":
+      return "yellow";
+    case "trabalhando":
+      return "green";
+    case "revisao":
+      return "red";
+    default:
+      return "blue";
+  }
+};
+
+const capitalize = (str) => {
+  return str.charAt(0).toUpperCase() + str.slice(1);
 };
 
 export default CartaoTicket;

@@ -1,198 +1,95 @@
-// src/components/PrestadorForm.js
-
 import React from "react";
-import {
-  AccordionItem,
-  AccordionButton,
-  AccordionIcon,
-  AccordionPanel,
-  Box,
-  Flex,
-  FormControl,
-  FormLabel,
-  Input,
-  Select,
-  Textarea,
-  useColorModeValue,
-} from "@chakra-ui/react";
-import InputMask from "react-input-mask";
+import { VStack, HStack, Accordion, AccordionItem, AccordionButton, AccordionIcon, AccordionPanel, Box } from "@chakra-ui/react";
+import { useFormikContext } from "formik";
+import FormField from "./common/FormField"; // Certifique-se de que o caminho está correto
 
-const PrestadorForm = ({ formik, accordionStyles }) => {
-  const { accordionBg, accordionHoverBg, accordionBorderColor, inputBg } =
-    accordionStyles;
+const PrestadorForm = () => {
+  const formik = useFormikContext();
 
   return (
-    <AccordionItem
-      border="1px solid"
-      borderColor={accordionBorderColor}
-      borderRadius="md"
-      mb={4}
-    >
-      <h2>
-        <AccordionButton
-          _expanded={{
-            bg: accordionHoverBg,
-            color: "white",
-          }}
-        >
-          <Box flex="1" textAlign="left" fontWeight="bold">
-            Informações do Prestador
-          </Box>
-          <AccordionIcon />
-        </AccordionButton>
-      </h2>
-      <AccordionPanel pb={4} bg={accordionBg}>
-        <Flex mb={4} gap={4} direction="column">
-          {/* Nome e Tipo do Prestador */}
-          <Flex gap={4}>
-            {/* Nome do Prestador */}
-            <FormControl
-              isRequired
-              isInvalid={!!formik.errors.prestador?.nome && formik.touched.prestador?.nome}
-              flex="1"
-            >
-              <FormLabel>Nome</FormLabel>
-              <Input
-                name="prestador.nome"
-                value={formik.values.prestador.nome}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                placeholder="Nome do Prestador"
-                bg={inputBg}
-              />
-              {formik.errors.prestador?.nome && formik.touched.prestador?.nome && (
-                <Box color="red.500" mt={1}>
-                  {formik.errors.prestador.nome}
-                </Box>
-              )}
-            </FormControl>
-
-            {/* Tipo do Prestador */}
-            <FormControl
-              isRequired
-              isInvalid={!!formik.errors.prestador?.tipo && formik.touched.prestador?.tipo}
-              flex="1"
-            >
-              <FormLabel>Tipo</FormLabel>
-              <Select
+    <Accordion allowToggle defaultIndex={[0]}>
+      <AccordionItem border="1px solid" borderColor="gray.200" borderRadius="md" mb={4}>
+        <h2>
+          <AccordionButton>
+            <Box flex="1" textAlign="left" fontWeight="bold">
+              Informações do Prestador
+            </Box>
+            <AccordionIcon />
+          </AccordionButton>
+        </h2>
+        <AccordionPanel pb={4}>
+          <VStack spacing={4} align="stretch">
+            <HStack spacing={4} align="stretch">
+              <FormField
+                label="Tipo"
                 name="prestador.tipo"
-                placeholder="Selecione o tipo"
-                value={formik.values.prestador.tipo}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                bg={inputBg}
-              >
-                <option value="pj">Pessoa Jurídica</option>
-                <option value="pf">Pessoa Física</option>
-              </Select>
-              {formik.errors.prestador?.tipo && formik.touched.prestador?.tipo && (
-                <Box color="red.500" mt={1}>
-                  {formik.errors.prestador.tipo}
-                </Box>
-              )}
-            </FormControl>
-          </Flex>
-
-          {/* Documento e Email do Prestador */}
-          <Flex gap={4}>
-            {/* Documento do Prestador */}
-            <FormControl
-              isRequired
-              isInvalid={
-                !!formik.errors.prestador?.documento && formik.touched.prestador?.documento
-              }
-              flex="1"
-            >
-              <FormLabel>Documento</FormLabel>
-              <Input
-                as={InputMask}
-                mask={
-                  formik.values.prestador.tipo === "pj"
-                    ? "99.999.999/9999-99"
-                    : "999.999.999-99"
-                }
-                name="prestador.documento"
-                value={formik.values.prestador.documento}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                placeholder={
-                  formik.values.prestador.tipo === "pj" ? "CNPJ" : "CPF"
-                }
-                bg={inputBg}
+                type="select"
+                options={[
+                  { value: "pf", label: "Pessoa Física (CPF)" },
+                  { value: "pj", label: "Pessoa Jurídica (CNPJ)" },
+                ]}
+                touched={formik.touched.prestador?.tipo}
+                errors={formik.errors.prestador?.tipo}
               />
-              {formik.errors.prestador?.documento && formik.touched.prestador?.documento && (
-                <Box color="red.500" mt={1}>
-                  {formik.errors.prestador.documento}
-                </Box>
-              )}
-            </FormControl>
 
-            {/* Email do Prestador */}
-            <FormControl
-              isRequired
-              isInvalid={!!formik.errors.prestador?.email && formik.touched.prestador?.email}
-              flex="1"
-            >
-              <FormLabel>Email</FormLabel>
-              <Input
+              <FormField
+                label="Documento (CPF/CNPJ)"
+                name="prestador.documento"
+                type="text"
+                touched={formik.touched.prestador?.documento}
+                errors={formik.errors.prestador?.documento}
+                mask={
+                  formik.values.prestador.tipo === "pf" ? "999.999.999-99" : "99.999.999/9999-99"
+                }
+              />
+            </HStack>
+
+            <HStack spacing={4} align="stretch">
+              <FormField
+                label="Nome"
+                name="prestador.nome"
+                type="text"
+                touched={formik.touched.prestador?.nome}
+                errors={formik.errors.prestador?.nome}
+              />
+
+              <FormField
+                label="E-mail"
                 name="prestador.email"
                 type="email"
-                value={formik.values.prestador.email}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                placeholder="Email do Prestador"
-                bg={inputBg}
+                touched={formik.touched.prestador?.email}
+                errors={formik.errors.prestador?.email}
               />
-              {formik.errors.prestador?.email && formik.touched.prestador?.email && (
-                <Box color="red.500" mt={1}>
-                  {formik.errors.prestador.email}
-                </Box>
-              )}
-            </FormControl>
-          </Flex>
+            </HStack>
 
-          {/* Status do Prestador */}
-          <FormControl
-            isRequired
-            isInvalid={!!formik.errors.prestador?.status && formik.touched.prestador?.status}
-          >
-            <FormLabel>Status</FormLabel>
-            <Select
-              name="prestador.status"
-              placeholder="Selecione o status"
-              value={formik.values.prestador.status}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              bg={inputBg}
-            >
-              <option value="ativo">Ativo</option>
-              <option value="em-analise">Em Análise</option>
-              <option value="pendente-de-revisao">Pendente de Revisão</option>
-              <option value="inativo">Inativo</option>
-              <option value="arquivado">Arquivado</option>
-            </Select>
-            {formik.errors.prestador?.status && formik.touched.prestador?.status && (
-              <Box color="red.500" mt={1}>
-                {formik.errors.prestador.status}
-              </Box>
-            )}
-          </FormControl>
+            <HStack spacing={4} align="stretch">
+              <FormField
+                label="Status"
+                name="prestador.status"
+                type="select"
+                options={[
+                  { value: "ativo", label: "Ativo" },
+                  { value: "em-analise", label: "Em Análise" },
+                  { value: "pendente-de-revisao", label: "Pendente de Revisão" },
+                  { value: "inativo", label: "Inativo" },
+                  { value: "arquivado", label: "Arquivado" },
+                ]}
+                touched={formik.touched.prestador?.status}
+                errors={formik.errors.prestador?.status}
+              />
 
-          {/* Comentários de Revisão */}
-          <FormControl>
-            <FormLabel>Comentários de Revisão</FormLabel>
-            <Textarea
-              name="prestador.comentariosRevisao"
-              value={formik.values.prestador.comentariosRevisao}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              placeholder="Comentários de Revisão"
-              bg={inputBg}
-            />
-          </FormControl>
-        </Flex>
-      </AccordionPanel>
-    </AccordionItem>
+              <FormField
+                label="Comentários de Revisão"
+                name="prestador.comentariosRevisao"
+                type="textarea"
+                touched={formik.touched.prestador?.comentariosRevisao}
+                errors={formik.errors.prestador?.comentariosRevisao}
+              />
+            </HStack>
+          </VStack>
+        </AccordionPanel>
+      </AccordionItem>
+    </Accordion>
   );
 };
 
