@@ -3,16 +3,16 @@ import { extendTheme } from "@chakra-ui/react";
 
 const colors = {
   brand: {
-    50: "#f5e6ff",
-    100: "#e0b3ff",
-    200: "#cc80ff",
-    300: "#b34dff",
-    400: "#9933ff",
-    500: "#8000ff",
-    600: "#6600cc",
-    700: "#4d0099",
-    800: "#330066",
-    900: "#1a0033",
+    50: "#faf5ff",  // Tom claro
+    100: "#e9d8fd", // Interpolado entre 50 e 700
+    200: "#d6bcfa", // Interpolado entre 50 e 700
+    300: "#b794f4", // Interpolado entre 50 e 700
+    400: "#9f7aea", // Interpolado entre 50 e 700
+    500: "#805ad5", // Interpolado entre 50 e 700
+    600: "#6b46c1", // Interpolado entre 50 e 700
+    700: "#5a3e8e", // Tom médio
+    800: "#44337a", // Interpolado entre 700 e 900
+    900: "#3d1c4f", // Tom escuro
     // Adicionando subpaletas para estados específicos, se necessário
     error: {
       50: "#ffe3e3",
@@ -78,11 +78,21 @@ const theme = extendTheme({
   styles: {
     global: {
       "html, body": {
-        backgroundColor: "brand.50",
+        backgroundColor: "white",
       },
       // Adiciona margem discreta aos componentes <Box>
       ".chakra-box": {
         margin: "2",
+      },
+      "input, textarea, select": {
+        borderColor: "gray.300",
+        _hover: {
+          borderColor: "gray.400",
+        },
+        _focus: {
+          borderColor: "gray.500",
+          boxShadow: "0 0 0 1px gray.500",
+        },
       },
     },
   },

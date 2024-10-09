@@ -48,6 +48,8 @@ const Etapa = ({ index, etapa }) => {
     <Box
       rounded="md"
       shadow="sm"
+      bg="brand.300"
+      p={2}
     > 
       <Flex justify="space-between" align="center">
         <Heading size="md" color="brand.800">{etapa.nome}</Heading>

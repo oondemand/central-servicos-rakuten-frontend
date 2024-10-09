@@ -4,10 +4,9 @@ import { Box, Text, Flex, Badge, useColorModeValue } from "@chakra-ui/react";
 
 const CartaoTicket = ({ ticket, onClick }) => {
   const statusColor = getStatusColor(ticket.status);
-  const bg = useColorModeValue('brand.50', 'brand.700');
 
   return (
-    <Box rounded="md" shadow="sm" cursor="pointer" onClick={onClick} bg="brand.100" p={2} m={2}>
+    <Box rounded="md" shadow="sm" cursor="pointer" onClick={onClick} bg="brand.100" p={2} my={2}>
       <Text fontWeight="bold" color="brand.500">{ticket.titulo}</Text>
       <Text color="brand.700">{ticket.descricao}</Text>
       <Flex align="center" mt={4}>

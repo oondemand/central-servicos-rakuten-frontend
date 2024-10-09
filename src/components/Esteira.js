@@ -12,11 +12,11 @@ const Esteira = () => {
     <Box height="full" overflowX="auto">
       <Flex width="100%" gap={4}>
         {listaEtapas.map((etapa, index) => (
-          <Box key={etapa._id} flexShrink={0} width="200px">
+          <Box key={etapa._id} flexShrink={0} width="220px">
             <Etapa etapa={etapa} index={index} />
           </Box>
         ))}
-        <Box flexShrink={0} width="200px">
+        <Box flexShrink={0} width="220px">
           <EtapaIntegracaoOmie />
         </Box>
       </Flex>
