@@ -12,7 +12,7 @@ import CrudBaseOmies from './CrudBaseOmies';
 
 const ConfigTabs = () => {
   return (
-    <Tabs variant="enclosed" colorScheme="blue">
+    <Tabs variant="enclosed">
       <TabList mb="1em">
         <Tab>Usuários</Tab>
         <Tab>Bases Omie</Tab>

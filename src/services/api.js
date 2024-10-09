@@ -2,7 +2,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || "http://localhost:4000", // Correto para CRA
+  baseURL: process.env.REACT_APP_API_URL || "http://localhost:4000",
   timeout: 10000,
 });
 
@@ -35,7 +35,7 @@ api.interceptors.response.use(
         // Apenas realizar logout/redirecionamento se a requisição NÃO for de autenticação
         localStorage.removeItem("token");
         localStorage.removeItem("usuario");
-        window.location.href = "/"; // Redireciona para login
+        window.location.href = "/login"; // Redireciona para login
       }
       // Se for uma requisição de autenticação, não faz nada aqui
     }

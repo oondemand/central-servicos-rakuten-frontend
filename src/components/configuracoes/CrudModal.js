@@ -27,7 +27,7 @@ const CrudModal = ({ isOpen, onClose, title, children, onSubmit }) => {
             <Button variant="ghost" mr={3} onClick={onClose}>
               Cancelar
             </Button>
-            <Button colorScheme="blue" type="submit">
+            <Button type="submit">
               Salvar
             </Button>
           </ModalFooter>
