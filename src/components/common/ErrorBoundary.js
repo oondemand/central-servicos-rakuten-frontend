@@ -21,7 +21,7 @@ class ErrorBoundary extends React.Component {
       return (
         <Box textAlign="center" mt={20}>
           <Text fontSize="2xl" mb={4}>Algo deu errado.</Text>
-          <Button onClick={this.resetError} colorScheme="blue">
+          <Button onClick={this.resetError} colorScheme="brand">
             Tentar Novamente
           </Button>
         </Box>

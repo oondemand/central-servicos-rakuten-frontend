@@ -78,7 +78,7 @@ const CrudList = ({
           {title}
         </Text>
         <Button
-          colorScheme="blue"
+          colorScheme="brand"
           onClick={() => {
             formik.resetForm();
             setIsEditMode(false);

@@ -16,8 +16,8 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
   return (
     <Modal isOpen={isOpen} onClose={closeModal} size="6xl" isCentered>
       <ModalOverlay />
-      <ModalContent>
-        <ModalHeader>{isEditMode ? "Editar Ticket" : "Adicionar Novo Ticket"}</ModalHeader>
+      <ModalContent bg="brand.50" color="brand.800">
+        <ModalHeader bg="brand.100">{isEditMode ? "Editar Ticket" : "Adicionar Novo Ticket"}</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           <TicketForm isEditMode={isEditMode} ticket={ticket} closeModal={closeModal} />

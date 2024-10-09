@@ -7,7 +7,7 @@ import CombinedProvider from "../../contexts/CombinedProvider";
 function Layout() {
   return (
     <CombinedProvider>
-      <Flex direction="column" minHeight="100vh" bg="brand.100">
+      <Flex direction="column" minHeight="100vh" bg="brand.50">
         <Header />
         <Box flex="1" p={4}>
           <Outlet />

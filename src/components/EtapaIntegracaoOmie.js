@@ -9,7 +9,7 @@ const EtapaIntegracaoOmie = () => {
 
   return (
     <Box rounded="md" shadow="sm">
-      <Heading size="md" mb={4}>
+      <Heading size="md" mb={4} color="brand.800">
         Integração Omie
       </Heading>
 
