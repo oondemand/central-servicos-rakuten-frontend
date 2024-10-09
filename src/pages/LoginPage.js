@@ -1,74 +1,84 @@
+// src/pages/Login.jsx
 import React from "react";
-import { useNavigate } from "react-router-dom";
-import { useFormik } from "formik";
+import { Formik, Form, Field } from "formik";
+import {
+  Box,
+  Button,
+  FormControl,
+  FormLabel,
+  Input,
+  FormErrorMessage,
+  Heading,
+  VStack,
+} from "@chakra-ui/react";
 import * as Yup from "yup";
-
-import { loginUsuario } from "../api/authApi";
+import { login as loginService } from "../services/authService";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
-import ErrorMessage from "../components/common/ErrorMessage";
+import { getErrorMessage } from "../utils/errorUtils"; // Importa a função auxiliar
 
-const LoginPage = () => {
-  const { login } = useAuth();
+const LoginSchema = Yup.object().shape({
+  email: Yup.string().email("E-mail inválido").required("E-mail é obrigatório"),
+  senha: Yup.string().required("Senha é obrigatória"),
+});
+
+const Login = () => {
   const navigate = useNavigate();
-  const [error, setError] = React.useState(null);
-
-  const formik = useFormik({
-    initialValues: {
-      email: "",
-      senha: "",
-    },
-    validationSchema: Yup.object({
-      email: Yup.string().email("Email inválido").required("Email é obrigatório"),
-      senha: Yup.string().min(1, "Senha deve ter no mínimo 1 caracteres").required("Senha é obrigatória"),
-    }),
-    onSubmit: async (values) => {
-      try {
-        const userData = await loginUsuario(values.email, values.senha);
-        login(userData);
-        navigate("/home");
-      } catch (error) {
-        setError({ message: "Falha ao fazer login", details: error.message });
-      }
-    },
-  });
+  const { login } = useAuth();
 
   return (
-    <div className="flex flex-col justify-center items-center h-screen bg-gray-900 dark:bg-gray-900 text-gray-100">
-      <form
-        className="bg-gray-800 p-8 rounded-lg shadow-md w-full max-w-sm"
-        onSubmit={formik.handleSubmit}
+    <Box maxW="md" mx="auto" mt={10} p={6} boxShadow="md" borderRadius="md">
+      <Heading mb={6} textAlign="center">
+        Login
+      </Heading>
+      <Formik
+        initialValues={{
+          email: "",
+          senha: "",
+        }}
+        validationSchema={LoginSchema}
+        onSubmit={async (values, actions) => {
+          try {
+            const response = await loginService(values);
+            const { token, usuario } = response.data;
+            console.log("usuario", usuario);
+            console.log("token", token);
+
+            login(token, usuario);
+            navigate("/home");
+          } catch (error) {
+            const errorMessage = getErrorMessage(error) || "Erro ao fazer login";
+            actions.setFieldError("general", errorMessage);
+          }
+          actions.setSubmitting(false);
+        }}
       >
-        <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
-        {error && <ErrorMessage message={error.message} details={error.details} />}
-        <input
-          type="email"
-          placeholder="Email"
-          className="w-full p-2 mb-4 border border-gray-700 rounded bg-gray-700 text-gray-200"
-          {...formik.getFieldProps("email")}
-        />
-        {formik.touched.email && formik.errors.email ? (
-          <div className="text-red-500 mb-4">{formik.errors.email}</div>
-        ) : null}
+        {({ errors, touched, isSubmitting }) => (
+          <Form>
+            <VStack spacing={4} align="flex-start">
+              <FormControl isInvalid={errors.email && touched.email}>
+                <FormLabel htmlFor="email">E-mail</FormLabel>
+                <Field as={Input} id="email" name="email" type="email" />
+                <FormErrorMessage>{errors.email}</FormErrorMessage>
+              </FormControl>
 
-        <input
-          type="password"
-          placeholder="Senha"
-          className="w-full p-2 mb-4 border border-gray-700 rounded bg-gray-700 text-gray-200"
-          {...formik.getFieldProps("senha")}
-        />
-        {formik.touched.senha && formik.errors.senha ? (
-          <div className="text-red-500 mb-4">{formik.errors.senha}</div>
-        ) : null}
+              <FormControl isInvalid={errors.senha && touched.senha}>
+                <FormLabel htmlFor="senha">Senha</FormLabel>
+                <Field as={Input} id="senha" name="senha" type="password" />
+                <FormErrorMessage>{errors.senha}</FormErrorMessage>
+              </FormControl>
 
-        <button
-          type="submit"
-          className="w-full p-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-        >
-          Entrar
-        </button>
-      </form>
-    </div>
+              {errors.general && <Box color="red.500">{errors.general}</Box>}
+
+              <Button type="submit" colorScheme="teal" width="full" isLoading={isSubmitting}>
+                Entrar
+              </Button>
+            </VStack>
+          </Form>
+        )}
+      </Formik>
+    </Box>
   );
 };
 
-export default LoginPage;
+export default Login;

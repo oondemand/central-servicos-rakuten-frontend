@@ -1,29 +1,35 @@
+// src/contexts/EtapaContext.js
 import React, { createContext, useState, useContext, useEffect } from "react";
-import api from "../api/apiService"; // Supondo que apiService já está configurado para fazer chamadas à API
+import api from "../services/api";
+import { useToast } from "@chakra-ui/react";
 
-// Criação do contexto para Etapas
 const EtapaContext = createContext();
 
-// Provedor do contexto para Etapas
 export const EtapaProvider = ({ children }) => {
-  const [listaEtapas, setListaEtapas] = useState([]); // Armazena a lista de etapas carregada
+  const [listaEtapas, setListaEtapas] = useState([]);
+  const toast = useToast();
 
-  // Função que carrega a lista de etapas da API
   useEffect(() => {
     const carregarEtapas = async () => {
       try {
-        const response = await api.get("/etapas/ativas"); // Chama a API para carregar as etapas
-        setListaEtapas(response.data); // Atualiza o estado com a lista de etapas recebida
+        const response = await api.get("/etapas/ativas");
+        setListaEtapas(response.data);
       } catch (error) {
         console.error("Erro ao carregar etapas:", error);
+        toast({
+          title: "Erro ao carregar etapas.",
+          description: error.message,
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
       }
     };
 
-    carregarEtapas(); // Carrega as etapas assim que o componente é montado
-  }, []);
+    carregarEtapas();
+  }, [toast]);
 
   return <EtapaContext.Provider value={{ listaEtapas }}>{children}</EtapaContext.Provider>;
 };
 
-// Hook para usar o contexto de Etapas em outros componentes
 export const useEtapa = () => useContext(EtapaContext);

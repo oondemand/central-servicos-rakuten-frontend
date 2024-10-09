@@ -1,4 +1,5 @@
-import api from "../api/apiService";
+// src/services/PrestadorService.js
+import api from "./api";
 
 export const salvarPrestador = async (prestador) => {
   try {

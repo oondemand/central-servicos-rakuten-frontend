@@ -1,43 +1,41 @@
-import React from "react";
-import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
+// src/App.js
+import React, { Suspense, lazy } from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
+import { Spinner } from "@chakra-ui/react";
+import CombinedProvider from "./contexts/CombinedProvider"; // Importa o combinador
+import ErrorBoundary from "./components/common/ErrorBoundary"; // Importa o ErrorBoundary
+import Layout from "./components/Layout/Layout";
+import PrivateRoute from "./components/PrivateRoute.js";
 
-import { AuthContextProvider } from "./contexts/AuthContext";
-import { NotificacaoProvider } from "./contexts/NotificacaoContext";
-
-import NotificacaoUsuario from "./components/common/NotificacaoUsuario";
-import AuthRoute from "./components/common/AuthRoute"; // Usando o AuthRoute
-
-import LoginPage from "./pages/LoginPage";
-import HomePage from "./pages/HomePage";
-import ConfigPage from "./pages/ConfigPage";
-import { ChakraProvider } from "@chakra-ui/react";
+const LoginPage = lazy(() => import("./pages/LoginPage"));
+const HomePage = lazy(() => import("./pages/HomePage"));
+const ConfigPage = lazy(() => import("./pages/ConfigPage"));
+const NotFoundPage = lazy(() => import("./pages/NotFoundPage")); // Crie uma página 404
 
 function App() {
-  document.documentElement.classList.add("dark");
-
   return (
-    <AuthContextProvider>
-      <ChakraProvider>
-      <NotificacaoProvider>
-        <BrowserRouter>
-          <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
-            <NotificacaoUsuario /> {/* Adicionando o componente de exibição de notificações */}
-            <Routes>
-              <Route path="/" element={<LoginPage />} />
+    <CombinedProvider>
+      <ErrorBoundary>
+        <Suspense fallback={<Spinner size="xl" />}>
+          <Routes>
+            {/* Rotas Públicas */}
+            <Route path="/login" element={<LoginPage />} />
 
-              {/* Agrupa todas as rotas privadas dentro de AuthRoute */}
-              <Route path="/" element={<AuthRoute />}>
-                <Route path="/home" element={<HomePage />} />
-                <Route path="/configuracoes" element={<ConfigPage />} />
+            {/* Rotas Protegidas */}
+            <Route path="/" element={<PrivateRoute />}>
+              <Route element={<Layout />}>
+                <Route path="home" element={<HomePage />} />
+                <Route path="configuracoes" element={<ConfigPage />} />
               </Route>
+            </Route>
 
-              <Route path="*" element={<Navigate to="/" />} />
-            </Routes>
-          </div>
-        </BrowserRouter>
-      </NotificacaoProvider>
-      </ChakraProvider>
-    </AuthContextProvider>
+            {/* Rota padrão */}
+            <Route path="/" element={<Navigate to="/home" replace />} />
+            <Route path="*" element={<NotFoundPage />} />
+          </Routes>
+        </Suspense>
+      </ErrorBoundary>
+    </CombinedProvider>
   );
 }
 

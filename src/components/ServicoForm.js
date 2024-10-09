@@ -1,145 +1,52 @@
 // src/components/ServicoForm.js
-
 import React from "react";
 import {
+  Accordion,
   AccordionItem,
   AccordionButton,
   AccordionIcon,
   AccordionPanel,
   Box,
-  Flex,
+  VStack,
   FormControl,
   FormLabel,
   Input,
-  Select,
+  FormErrorMessage,
 } from "@chakra-ui/react";
 
-const ServicoForm = ({ formik, accordionStyles }) => {
-  const { accordionBg, accordionHoverBg, accordionBorderColor, inputBg } = accordionStyles;
-
+const ServicoForm = ({ formik }) => {
   return (
-    <AccordionItem
-      border="1px solid"
-      borderColor={accordionBorderColor}
-      borderRadius="md"
-      mb={4}
-    >
-      <h2>
-        <AccordionButton
-          _expanded={{
-            bg: accordionHoverBg,
-            color: "white",
-          }}
-        >
-          <Box flex="1" textAlign="left" fontWeight="bold">
-            Informações do Serviço
-          </Box>
-          <AccordionIcon />
-        </AccordionButton>
-      </h2>
-      <AccordionPanel pb={4} bg={accordionBg}>
-        <Flex mb={4} gap={4} direction="column">
-          {/* Descrição do Serviço */}
-          <FormControl
-            isRequired
-            isInvalid={
-              !!formik.errors.servico?.descricao && formik.touched.servico?.descricao
-            }
-          >
-            <FormLabel>Descrição</FormLabel>
-            <Input
-              name="servico.descricao"
-              value={formik.values.servico.descricao || ""}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              placeholder="Descrição do Serviço"
-              bg={inputBg}
-            />
-            {formik.errors.servico?.descricao && formik.touched.servico?.descricao && (
-              <Box color="red.500" mt={1}>
-                {formik.errors.servico.descricao}
-              </Box>
-            )}
-          </FormControl>
-
-          <Flex gap={4}>
-            {/* Valor do Serviço */}
+    <Accordion allowToggle>
+      <AccordionItem border="1px solid" borderColor="gray.200" borderRadius="md" mb={4}>
+        <h2>
+          <AccordionButton>
+            <Box flex="1" textAlign="left" fontWeight="bold">
+              Informações do Serviço
+            </Box>
+            <AccordionIcon />
+          </AccordionButton>
+        </h2>
+        <AccordionPanel pb={4}>
+          <VStack spacing={4} align="stretch">
             <FormControl
               isRequired
-              isInvalid={
-                !!formik.errors.servico?.valor && formik.touched.servico?.valor
-              }
-              flex="1"
+              isInvalid={!!formik.errors.servico?.descricao && formik.touched.servico?.descricao}
             >
-              <FormLabel>Valor</FormLabel>
+              <FormLabel>Descrição</FormLabel>
               <Input
-                name="servico.valor"
-                type="number"
-                value={formik.values.servico.valor || ""}
+                name="servico.descricao"
+                value={formik.values.servico.descricao || ""}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
-                placeholder="Valor do Serviço"
-                bg={inputBg}
+                placeholder="Descrição do Serviço"
               />
-              {formik.errors.servico?.valor && formik.touched.servico?.valor && (
-                <Box color="red.500" mt={1}>
-                  {formik.errors.servico.valor}
-                </Box>
-              )}
+              <FormErrorMessage>{formik.errors.servico?.descricao}</FormErrorMessage>
             </FormControl>
-
-            {/* Data do Serviço */}
-            <FormControl
-              isRequired
-              isInvalid={!!formik.errors.servico?.data && formik.touched.servico?.data}
-              flex="1"
-            >
-              <FormLabel>Data</FormLabel>
-              <Input
-                name="servico.data"
-                type="date"
-                value={formik.values.servico.data || ""}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                placeholder="Data do Serviço"
-                bg={inputBg}
-              />
-              {formik.errors.servico?.data && formik.touched.servico?.data && (
-                <Box color="red.500" mt={1}>
-                  {formik.errors.servico.data}
-                </Box>
-              )}
-            </FormControl>
-          </Flex>
-
-          {/* Status do Serviço */}
-          <FormControl
-            isRequired
-            isInvalid={
-              !!formik.errors.servico?.status && formik.touched.servico?.status
-            }
-          >
-            <FormLabel>Status</FormLabel>
-            <Select
-              name="servico.status"
-              placeholder="Selecione o status"
-              value={formik.values.servico.status || "ativo"}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              bg={inputBg}
-            >
-              <option value="ativo">Ativo</option>
-              <option value="arquivado">Arquivado</option>
-            </Select>
-            {formik.errors.servico?.status && formik.touched.servico?.status && (
-              <Box color="red.500" mt={1}>
-                {formik.errors.servico.status}
-              </Box>
-            )}
-          </FormControl>
-        </Flex>
-      </AccordionPanel>
-    </AccordionItem>
+            {/* Adicione outros campos do formulário do serviço aqui */}
+          </VStack>
+        </AccordionPanel>
+      </AccordionItem>
+    </Accordion>
   );
 };
 

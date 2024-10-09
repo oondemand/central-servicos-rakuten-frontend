@@ -1,12 +1,20 @@
+// src/components/ticket/TicketFields.js
 import React from "react";
-import { FormControl, FormLabel, Input, Textarea, Box, Flex } from "@chakra-ui/react";
+import {
+  FormControl,
+  FormLabel,
+  Input,
+  Textarea,
+  Flex,
+  FormErrorMessage,
+} from "@chakra-ui/react";
 
 const TicketFields = ({ formik }) => {
   return (
     <Flex justifyContent="space-between" width="100%">
       <Flex flex="1" flexDirection="column">
-        <FormControl mb={4} isInvalid={formik.errors.titulo && formik.touched.titulo}>
-          <FormLabel>Título do Ticket</FormLabel>
+        <FormControl isInvalid={formik.errors.titulo && formik.touched.titulo} mb={4}>
+          <FormLabel htmlFor="titulo">Título do Ticket</FormLabel>
           <Input
             type="text"
             id="titulo"
@@ -16,14 +24,12 @@ const TicketFields = ({ formik }) => {
             onBlur={formik.handleBlur}
             placeholder="Título do Ticket"
           />
-          {formik.touched.titulo && formik.errors.titulo ? (
-            <Box color="red.500" mt={1}>
-              {formik.errors.titulo}
-            </Box>
-          ) : null}
+          {formik.touched.titulo && formik.errors.titulo && (
+            <FormErrorMessage>{formik.errors.titulo}</FormErrorMessage>
+          )}
         </FormControl>
-        <FormControl mb={4} isInvalid={formik.errors.observacao && formik.touched.observacao}>
-          <FormLabel>Observação</FormLabel>
+        <FormControl isInvalid={formik.errors.observacao && formik.touched.observacao} mb={4}>
+          <FormLabel htmlFor="observacao">Observação</FormLabel>
           <Textarea
             id="observacao"
             name="observacao"
@@ -33,11 +39,9 @@ const TicketFields = ({ formik }) => {
             rows={3}
             placeholder="Observação do Ticket"
           />
-          {formik.touched.observacao && formik.errors.observacao ? (
-            <Box color="red.500" mt={1}>
-              {formik.errors.observacao}
-            </Box>
-          ) : null}
+          {formik.touched.observacao && formik.errors.observacao && (
+            <FormErrorMessage>{formik.errors.observacao}</FormErrorMessage>
+          )}
         </FormControl>
       </Flex>
     </Flex>

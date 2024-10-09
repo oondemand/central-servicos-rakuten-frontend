@@ -1,4 +1,4 @@
-import api from "../api/apiService";
+import api from "./api";
 
 // Serviço para adicionar um novo ticket
 export const adicionarTicket = async (ticket) => {

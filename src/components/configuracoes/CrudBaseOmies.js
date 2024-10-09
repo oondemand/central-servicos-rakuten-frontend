@@ -1,188 +1,141 @@
-import React, { useState, useEffect } from 'react';
-import api from '../../api/apiService';
-import CrudModal from './CrudModal';
-import DeleteConfirmationModal from '../common/DeleteConfirmationModal';
+// src/components/configuracoes/CrudBaseOmies.js
+import React, { useEffect, useState } from 'react';
+import CrudList from './CrudList';
+import { listarBaseOmies, adicionarBaseOmie, alterarBaseOmie, excluirBaseOmie } from '../../services/baseOmieService';
+import { useToast } from '@chakra-ui/react';
+import * as Yup from 'yup';
 
 const CrudBaseOmies = () => {
-    const [baseomies, setBaseOmies] = useState([]);
-    const [nome, setNome] = useState('');
-    const [cnpj, setCnpj] = useState('');
-    const [appKey, setAppKey] = useState('');
-    const [appSecret, setAppSecret] = useState('');
-    const [status, setStatus] = useState('ativo');
-    const [editId, setEditId] = useState(null);
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-    const [itemToDelete, setItemToDelete] = useState(null);
+  const [baseOmies, setBaseOmies] = useState([]);
+  const toast = useToast();
 
-    useEffect(() => {
-        fetchBaseOmies();
-    }, []);
+  const fetchBaseOmies = async () => {
+    try {
+      const data = await listarBaseOmies();
+      setBaseOmies(data);
+    } catch (error) {
+      toast({
+        title: "Erro ao buscar Bases Omie.",
+        description: error.message,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+  };
 
-    const fetchBaseOmies = async () => {
-        try {
-            const response = await api.get('/baseomies');
-            setBaseOmies(response.data);
-        } catch (error) {
-            console.error('Erro ao buscar baseomies:', error.message);
-        }
-    };
+  useEffect(() => {
+    fetchBaseOmies();
+  }, []);
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+  const handleAdd = async (values) => {
+    try {
+      await adicionarBaseOmie(values);
+      toast({
+        title: "Base Omie adicionada com sucesso!",
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+      });
+      fetchBaseOmies();
+    } catch (error) {
+      toast({
+        title: "Erro ao adicionar Base Omie.",
+        description: error.message,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+  };
 
-        const baseData = { nome, cnpj, appKey, appSecret, status };
+  const handleEdit = async (item) => {
+    try {
+      await alterarBaseOmie(item._id, item);
+      toast({
+        title: "Base Omie atualizada com sucesso!",
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+      });
+      fetchBaseOmies();
+    } catch (error) {
+      toast({
+        title: "Erro ao atualizar Base Omie.",
+        description: error.message,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+  };
 
-        try {
-            if (editId) {
-                await api.put(`/baseomies/${editId}`, baseData);
-            } else {
-                await api.post('/baseomies', baseData);
-            }
+  const handleDelete = async (id) => {
+    try {
+      await excluirBaseOmie(id);
+      toast({
+        title: "Base Omie excluída com sucesso!",
+        status: "info",
+        duration: 5000,
+        isClosable: true,
+      });
+      fetchBaseOmies();
+    } catch (error) {
+      toast({
+        title: "Erro ao excluir Base Omie.",
+        description: error.message,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+  };
 
-            setNome('');
-            setCnpj('');
-            setAppKey('');
-            setAppSecret('');
-            setStatus('ativo');
-            setEditId(null);
-            setIsModalOpen(false);
-            fetchBaseOmies();
-        } catch (error) {
-            console.error('Erro ao salvar base:', error.message);
-        }
-    };
+  const formFields = [
+    { label: "Nome", name: "nome", type: "text" },
+    { label: "CNPJ", name: "cnpj", type: "text" },
+    { label: "App Key Omie", name: "appKey", type: "text" },
+    { label: "App Secret Omie", name: "appSecret", type: "text" },
+    { 
+      label: "Status", 
+      name: "status", 
+      type: "select",
+      options: [
+        { value: "ativo", label: "Ativo" },
+        { value: "inativo", label: "Inativo" },
+      ],
+    },
+  ];
 
-    const handleEdit = (base) => {
-        setNome(base.nome);
-        setCnpj(base.cnpj);
-        setAppKey(base.appKey);
-        setAppSecret(base.appSecret);
-        setStatus(base.status);
-        setEditId(base._id);
-        setIsModalOpen(true);
-    };
+  const validationSchema = {
+    nome: Yup.string().required('Nome é obrigatório'),
+    cnpj: Yup.string().required('CNPJ é obrigatório'),
+    appKey: Yup.string().required('App Key é obrigatório'),
+    appSecret: Yup.string().required('App Secret é obrigatório'),
+    status: Yup.string().oneOf(['ativo', 'inativo'], 'Status inválido').required('Status é obrigatório'),
+  };
 
-    const handleDelete = async (id) => {
-        try {
-            await api.delete(`/baseomies/${id}`);
-            fetchBaseOmies();
-            setIsDeleteModalOpen(false);
-        } catch (error) {
-            console.error('Erro ao excluir base:', error.message);
-        }
-    };
+  const initialValues = {
+    nome: '',
+    cnpj: '',
+    appKey: '',
+    appSecret: '',
+    status: 'ativo',
+    _id: '',
+  };
 
-    const confirmDelete = (base) => {
-        setItemToDelete(base);
-        setIsDeleteModalOpen(true);
-    };
-
-    return (
-        <div className="p-4 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 rounded-lg shadow">
-            <h2 className="text-2xl font-bold mb-4">Gerenciamento de Bases Omie</h2>
-
-            <button
-                onClick={() => setIsModalOpen(true)}
-                className="mb-4 bg-blue-500 text-white px-4 py-2 rounded"
-            >
-                Criar Nova Base Omie
-            </button>
-
-            <ul className="space-y-4">
-                {baseomies.map((base) => (
-                    <li key={base._id} className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg flex justify-between">
-                        <div>
-                            <h3 className="font-bold">{base.nome}</h3>
-                            <p>CNPJ: {base.cnpj}</p>
-                            <p>Status: {base.status}</p>
-                        </div>
-                        <div className="flex space-x-2">
-                            <button
-                                onClick={() => handleEdit(base)}
-                                className="bg-yellow-500 text-white px-4 py-2 rounded"
-                            >
-                                Editar
-                            </button>
-                            <button
-                                onClick={() => confirmDelete(base)}
-                                className="bg-red-500 text-white px-4 py-2 rounded"
-                            >
-                                Excluir
-                            </button>
-                        </div>
-                    </li>
-                ))}
-            </ul>
-
-            <CrudModal
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-                title={editId ? 'Editar Base Omie' : 'Criar Base Omie'}
-            >
-                <form id="modal-form" onSubmit={handleSubmit}>
-                    <div className="mb-2">
-                        <label className="block text-gray-700 dark:text-gray-300">Nome:</label>
-                        <input
-                            type="text"
-                            value={nome}
-                            onChange={(e) => setNome(e.target.value)}
-                            className="p-2 w-full bg-gray-200 dark:bg-gray-800 dark:text-gray-300 focus:outline-none"
-                            required
-                        />
-                    </div>
-                    <div className="mb-2">
-                        <label className="block text-gray-700 dark:text-gray-300">CNPJ:</label>
-                        <input
-                            type="text"
-                            value={cnpj}
-                            onChange={(e) => setCnpj(e.target.value)}
-                            className="p-2 w-full bg-gray-200 dark:bg-gray-800 dark:text-gray-300 focus:outline-none"
-                            required
-                        />
-                    </div>
-                    <div className="mb-2">
-                        <label className="block text-gray-700 dark:text-gray-300">App Key Omie:</label>
-                        <input
-                            type="text"
-                            value={appKey}
-                            onChange={(e) => setAppKey(e.target.value)}
-                            className="p-2 w-full bg-gray-200 dark:bg-gray-800 dark:text-gray-300 focus:outline-none"
-                            required
-                        />
-                    </div>
-                    <div className="mb-2">
-                        <label className="block text-gray-700 dark:text-gray-300">App Secret Omie:</label>
-                        <input
-                            type="text"
-                            value={appSecret}
-                            onChange={(e) => setAppSecret(e.target.value)}
-                            className="p-2 w-full bg-gray-200 dark:bg-gray-800 dark:text-gray-300 focus:outline-none"
-                            required
-                        />
-                    </div>
-                    <div className="mb-2">
-                        <label className="block text-gray-700 dark:text-gray-300">Status:</label>
-                        <select
-                            value={status}
-                            onChange={(e) => setStatus(e.target.value)}
-                            className="p-2 w-full bg-gray-200 dark:bg-gray-800 dark:text-gray-300 focus:outline-none"
-                        >
-                            <option value="ativo">Ativo</option>
-                            <option value="inativo">Inativo</option>
-                        </select>
-                    </div>
-                </form>
-            </CrudModal>
-
-            <DeleteConfirmationModal
-                isOpen={isDeleteModalOpen}
-                onClose={() => setIsDeleteModalOpen(false)}
-                onConfirm={() => handleDelete(itemToDelete._id)}
-                item={itemToDelete}
-            />
-        </div>
-    );
+  return (
+    <CrudList
+      title="Bases Omie"
+      items={baseOmies}
+      onAdd={handleAdd}
+      onEdit={handleEdit}
+      onDelete={handleDelete}
+      formFields={formFields}
+      validationSchema={validationSchema}
+      initialValues={initialValues}
+    />
+  );
 };
 
 export default CrudBaseOmies;

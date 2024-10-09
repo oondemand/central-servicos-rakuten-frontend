@@ -1,4 +1,5 @@
-import React, { useEffect } from "react";
+// src/components/ticket/TicketModal.js
+import React from "react";
 import {
   Modal,
   ModalOverlay,
@@ -6,28 +7,16 @@ import {
   ModalHeader,
   ModalCloseButton,
   ModalBody,
-  useColorMode,
-  useColorModeValue,
 } from "@chakra-ui/react";
 import TicketForm from "./TicketForm";
 
 const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
   const isEditMode = Boolean(ticket);
-  const { colorMode, toggleColorMode } = useColorMode();
-
-  useEffect(() => {
-    if (isOpen && colorMode !== "dark") {
-      toggleColorMode();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen]);
-
-  const modalBg = useColorModeValue("white", "gray.800");
 
   return (
-    <Modal isOpen={isOpen} onClose={closeModal} size="6xl">
+    <Modal isOpen={isOpen} onClose={closeModal} size="6xl" isCentered>
       <ModalOverlay />
-      <ModalContent bg={modalBg}>
+      <ModalContent>
         <ModalHeader>{isEditMode ? "Editar Ticket" : "Adicionar Novo Ticket"}</ModalHeader>
         <ModalCloseButton />
         <ModalBody>

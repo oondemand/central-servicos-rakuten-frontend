@@ -1,5 +1,6 @@
+// src/components/ticket/TicketStatusButtons.js
 import React from "react";
-import { FormControl, FormLabel, Flex, Button } from "@chakra-ui/react";
+import { FormControl, FormLabel, Button, ButtonGroup } from "@chakra-ui/react";
 
 const TicketStatusButtons = ({ formik }) => {
   const handleStatusChange = async (newStatus) => {
@@ -9,18 +10,16 @@ const TicketStatusButtons = ({ formik }) => {
   return (
     <FormControl mb={3} flex="0 0 25%" ml={4}>
       <FormLabel>Status</FormLabel>
-      <Flex flexDirection={"column"} gap={2}>
+      <ButtonGroup spacing={4} direction="column">
         <Button
           onClick={() => handleStatusChange("aguardando-inicio")}
           colorScheme={formik.values.status === "aguardando-inicio" ? "yellow" : "gray"}
-          mb={2}
         >
           Aguardando Início
         </Button>
         <Button
           onClick={() => handleStatusChange("trabalhando")}
           colorScheme={formik.values.status === "trabalhando" ? "green" : "gray"}
-          mb={2}
         >
           Trabalhando
         </Button>
@@ -30,7 +29,7 @@ const TicketStatusButtons = ({ formik }) => {
         >
           Revisão
         </Button>
-      </Flex>
+      </ButtonGroup>
     </FormControl>
   );
 };
