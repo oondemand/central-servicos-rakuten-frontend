@@ -59,7 +59,7 @@ const Header = () => {
   }, [baseOmie, listaBases]);
 
   return (
-    <Flex shadow="md" p={4} align="center" justify="space-between" bg="brand.500" color="white">
+    <Flex shadow="md" p={4} align="center" justify="space-between" bg="brand.900" color="white">
       <Flex align="center">
         <Link to="/home">
           <Box as="span" fontSize="xl" fontWeight="bold" color="white">
