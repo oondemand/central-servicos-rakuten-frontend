@@ -1,5 +1,5 @@
 // src/components/common/FormField.js
-import React from 'react';
+import React from "react";
 import {
   FormControl,
   FormLabel,
@@ -24,24 +24,25 @@ const FormField = ({
   const isInvalid = touched && errors;
 
   return (
-    <FormControl isInvalid={isInvalid} mb={4}>
+    <FormControl isInvalid={isInvalid} mb={1}>
       <FormLabel htmlFor={name}>{label}</FormLabel>
       {type === "select" ? (
-        <Field as={Select} id={name} name={name} placeholder={`Selecione ${label.toLowerCase()}`} {...props} color="brand.500">
-          {options.map(option => (
+        <Field
+          as={Select}
+          id={name}
+          name={name}
+          placeholder={`Selecione ${label.toLowerCase()}`}
+          {...props}
+          color="brand.500"
+        >
+          {options.map((option) => (
             <option key={option.value} value={option.value}>
               {option.label}
             </option>
           ))}
         </Field>
       ) : type === "textarea" ? (
-        <Field
-          as={Textarea}
-          id={name}
-          name={name}
-          {...props}
-          color="brand.500"
-        />
+        <Field as={Textarea} id={name} name={name} {...props} color="brand.500" />
       ) : mask ? (
         // Utilizar InputMask se a prop 'mask' for fornecida
         <Field name={name}>
@@ -67,6 +68,7 @@ const FormField = ({
           placeholder={`Digite ${label.toLowerCase()}`}
           {...props}
           color="brand.500"
+          mb={2}
         />
       )}
       <FormErrorMessage>
