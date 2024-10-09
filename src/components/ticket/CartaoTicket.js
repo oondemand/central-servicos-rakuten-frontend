@@ -13,7 +13,6 @@ const CartaoTicket = ({ ticket, onClick }) => {
         <Badge colorScheme={statusColor} mr={2}>
           {capitalize(ticket.status)}
         </Badge>
-        <Text>{ticket.status}</Text>
       </Flex>
     </Box>
   );

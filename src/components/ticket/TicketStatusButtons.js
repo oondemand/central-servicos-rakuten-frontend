@@ -1,31 +1,34 @@
 // src/components/ticket/TicketStatusButtons.js
 import React from "react";
 import { FormControl, FormLabel, Button, ButtonGroup } from "@chakra-ui/react";
+import { useTicket } from "../../contexts/TicketContext";
 
-const TicketStatusButtons = ({ formik }) => {
-  const handleStatusChange = async (newStatus) => {
-    formik.setFieldValue("status", newStatus);
+const TicketStatusButtons = ({ formik, ticket }) => {
+  const { alterarStatusTicket } = useTicket();
+  const handleStatusChange = (newStatus) => {
+    alterarStatusTicket(ticket._id, newStatus);
+    ticket.status = newStatus;
   };
 
   return (
-    <FormControl mb={3} flex="0 0 25%" ml={4}>
+    <FormControl mb={3}>
       <FormLabel>Status</FormLabel>
-      <ButtonGroup spacing={4} direction="column">
+      <ButtonGroup spacing={4} variant="outline">
         <Button
           onClick={() => handleStatusChange("aguardando-inicio")}
-          colorScheme={formik.values.status === "aguardando-inicio" ? "yellow" : "gray"}
+          colorScheme={ticket.status === "aguardando-inicio" ? "yellow" : "gray"}
         >
           Aguardando Início
         </Button>
         <Button
           onClick={() => handleStatusChange("trabalhando")}
-          colorScheme={formik.values.status === "trabalhando" ? "green" : "gray"}
+          colorScheme={ticket.status === "trabalhando" ? "green" : "gray"}
         >
           Trabalhando
         </Button>
         <Button
           onClick={() => handleStatusChange("revisao")}
-          colorScheme={formik.values.status === "revisao" ? "red" : "gray"}
+          colorScheme={ticket.status === "revisao" ? "red" : "gray"}
         >
           Revisão
         </Button>

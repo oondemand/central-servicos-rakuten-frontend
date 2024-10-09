@@ -1,18 +1,15 @@
-// src/components/ServicoForm.js
 import React from "react";
 import {
+  VStack,
+  HStack,
   Accordion,
   AccordionItem,
   AccordionButton,
   AccordionIcon,
   AccordionPanel,
   Box,
-  VStack,
-  FormControl,
-  FormLabel,
-  Input,
-  FormErrorMessage,
 } from "@chakra-ui/react";
+import FormField from "./common/FormField"; // Certifique-se de que o caminho está correto
 
 const ServicoForm = ({ formik }) => {
   return (
@@ -28,51 +25,55 @@ const ServicoForm = ({ formik }) => {
         </h2>
         <AccordionPanel pb={4}>
           <VStack spacing={4} align="stretch">
-            <FormControl
-              isRequired
-              isInvalid={!!formik.errors.servico?.descricao && formik.touched.servico?.descricao}
-            >
-              <FormLabel>Descrição</FormLabel>
-              <Input
-                name="servico.descricao"
-                value={formik.values.servico.descricao || ""}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                placeholder="Descrição do Serviço"
-              />
-              <FormErrorMessage>{formik.errors.servico?.descricao}</FormErrorMessage>
-            </FormControl>
-            <FormControl
-              isRequired
-              isInvalid={!!formik.errors.servico?.valor && formik.touched.servico?.valor}
-            >
-              <FormLabel>Valor</FormLabel>
-              <Input
-                name="servico.valor"
-                value={formik.values.servico.valor || ""}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                placeholder="Valor do Serviço"
-              />
-              <FormErrorMessage>{formik.errors.servico?.valor}</FormErrorMessage>
-            </FormControl>
-
-            {/* Campo Data */}
-            <FormControl
-              isRequired
-              isInvalid={!!formik.errors.servico?.data && formik.touched.servico?.data}
-            >
-              <FormLabel>Data</FormLabel>
-              <Input
-                type="date"
+            <HStack spacing={4} align="stretch">
+              <FormField
+                label="Data"
                 name="servico.data"
-                value={formik.values.servico.data || ""}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                placeholder="Data do Serviço"
+                type="date"
+                touched={formik.touched.servico?.data}
+                errors={formik.errors.servico?.data}
               />
-              <FormErrorMessage>{formik.errors.servico?.data}</FormErrorMessage>
-            </FormControl>
+
+              <FormField
+                label="Valor"
+                name="servico.valor"
+                type="number"
+                touched={formik.touched.servico?.valor}
+                errors={formik.errors.servico?.valor}
+              />
+            </HStack>
+
+            <FormField
+              label="Descrição"
+              name="servico.descricao"
+              type="textarea"
+              touched={formik.touched.servico?.descricao}
+              errors={formik.errors.servico?.descricao}
+            />
+
+            <HStack spacing={4} align="stretch">
+              <FormField
+                label="Status"
+                name="servico.status"
+                type="select"
+                options={[
+                  { value: "ativo", label: "Ativo" },
+                  { value: "em-analise", label: "Em Análise" },
+                  { value: "pendente-de-revisao", label: "Pendente de Revisão" },
+                  { value: "arquivado", label: "Arquivado" },
+                ]}
+                touched={formik.touched.servico?.status}
+                errors={formik.errors.servico?.status}
+              />
+
+              <FormField
+                label="Comentários de Revisão"
+                name="servico.comentariosRevisao"
+                type="textarea"
+                touched={formik.touched.servico?.comentariosRevisao}
+                errors={formik.errors.servico?.comentariosRevisao}
+              />
+            </HStack>
           </VStack>
         </AccordionPanel>
       </AccordionItem>

@@ -101,11 +101,9 @@ export const TicketProvider = ({ children }) => {
     async (id) => {
       setLoading(true);
       try {
-        const response = await aprovarTicketService(id);
-        setListaTickets((prevTickets) =>
-          prevTickets.map((ticket) => (ticket._id === id ? response : ticket))
-        );
-        setError(null);
+        await aprovarTicketService(id);
+        carregarTickets();
+
         toast({
           title: "Ticket aprovado com sucesso!",
           status: "success",
@@ -137,11 +135,9 @@ export const TicketProvider = ({ children }) => {
     async (id) => {
       setLoading(true);
       try {
-        const response = await reprovarTicketService(id);
-        setListaTickets((prevTickets) =>
-          prevTickets.map((ticket) => (ticket._id === id ? response : ticket))
-        );
-        setError(null);
+        await reprovarTicketService(id);
+        carregarTickets();
+
         toast({
           title: "Ticket recusado com sucesso!",
           status: "info",
@@ -174,11 +170,8 @@ export const TicketProvider = ({ children }) => {
       setLoading(true);
       try {
         await alterarTicket(id, { status: novoStatus });
-        setListaTickets((prevTickets) =>
-          prevTickets.map((ticket) =>
-            ticket._id === id ? { ...ticket, status: novoStatus } : ticket
-          )
-        );
+        carregarTickets();
+
         toast({
           title: "Status do ticket atualizado com sucesso!",
           status: "success",

@@ -13,39 +13,25 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { FaCheck, FaTimes, FaTrash } from "react-icons/fa";
-import { useToast } from "@chakra-ui/react";
 import { useTicket } from "../../contexts/TicketContext";
 
-const TicketActions = ({ formik, isEditMode, closeModal }) => {
-  const toast = useToast();
+const TicketActions = ({ formik, ticket, isEditMode, closeModal }) => {
   const { salvarTicket, aprovarTicket, reprovarTicket } = useTicket();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = useRef();
 
   const handleApprove = async () => {
     if (!isEditMode) return;
-    const sucesso = await aprovarTicket(formik.values._id);
+    const sucesso = await aprovarTicket(ticket._id);
     if (sucesso) {
-      toast({
-        title: "Ticket aprovado com sucesso!",
-        status: "success",
-        duration: 5000,
-        isClosable: true,
-      });
       closeModal();
     }
-  };
+  }; 
 
   const handleReject = async () => {
     if (!isEditMode) return;
-    const sucesso = await reprovarTicket(formik.values._id);
+    const sucesso = await reprovarTicket(ticket._id);
     if (sucesso) {
-      toast({
-        title: "Ticket recusado com sucesso!",
-        status: "info",
-        duration: 5000,
-        isClosable: true,
-      });
       closeModal();
     }
   };
@@ -56,16 +42,10 @@ const TicketActions = ({ formik, isEditMode, closeModal }) => {
   };
 
   const confirmArquivar = async () => {
-    const ticketUpdate = { _id: formik.values._id, status: "arquivado" };
+    const ticketUpdate = { _id: ticket._id, status: "arquivado" };
     const sucesso = await salvarTicket(ticketUpdate);
 
     if (sucesso) {
-      toast({
-        title: "Ticket arquivado com sucesso!",
-        status: "info",
-        duration: 5000,
-        isClosable: true,
-      });
       closeModal();
     }
     onClose();
@@ -98,12 +78,7 @@ const TicketActions = ({ formik, isEditMode, closeModal }) => {
       </ModalFooter>
 
       {/* AlertDialog para confirmação de arquivamento */}
-      <AlertDialog
-        isOpen={isOpen}
-        leastDestructiveRef={cancelRef}
-        onClose={onClose}
-        isCentered
-      >
+      <AlertDialog isOpen={isOpen} leastDestructiveRef={cancelRef} onClose={onClose} isCentered>
         <AlertDialogOverlay>
           <AlertDialogContent>
             <AlertDialogHeader fontSize="lg" fontWeight="bold">
