@@ -50,7 +50,7 @@ const Etapa = ({ index, etapa }) => {
       shadow="sm"
     > 
       <Flex justify="space-between" align="center">
-        <Heading size="md">{etapa.nome}</Heading>
+        <Heading size="md" color="brand.800">{etapa.nome}</Heading>
         {index === 0 && (
           <IconButton
             aria-label="Adicionar Ticket"

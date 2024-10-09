@@ -1,4 +1,4 @@
-// src/theme.js
+// src/theme/index.js
 import { extendTheme } from "@chakra-ui/react";
 
 const colors = {
@@ -13,6 +13,43 @@ const colors = {
     700: "#4d0099",
     800: "#330066",
     900: "#1a0033",
+    // Adicionando subpaletas para estados específicos, se necessário
+    error: {
+      50: "#ffe3e3",
+      100: "#ffbdbd",
+      200: "#ff9999",
+      300: "#ff7575",
+      400: "#ff5252",
+      500: "#ff2f2f",
+      600: "#e60000",
+      700: "#b30000",
+      800: "#800000",
+      900: "#4d0000",
+    },
+    success: {
+      50: "#e3ffe3",
+      100: "#b3ffb3",
+      200: "#80ff80",
+      300: "#4dff4d",
+      400: "#33ff33",
+      500: "#00ff00",
+      600: "#00cc00",
+      700: "#009900",
+      800: "#006600",
+      900: "#003300",
+    },
+    warning: {
+      50: "#fff4e6",
+      100: "#ffe0b3",
+      200: "#ffcc80",
+      300: "#ffb34d",
+      400: "#ff9933",
+      500: "#ff8000",
+      600: "#cc6600",
+      700: "#994d00",
+      800: "#663300",
+      900: "#331a00",
+    },
   },
 };
 
@@ -28,10 +65,16 @@ const borders = {
   lg: "3px solid",
 };
 
+const fonts = {
+  heading: `'Segoe UI', sans-serif`,
+  body: `'Segoe UI', sans-serif`,
+};
+
 const theme = extendTheme({
   colors,
   shadows,
   borders,
+  fonts,
   styles: {
     global: {
       "html, body": {
@@ -42,6 +85,20 @@ const theme = extendTheme({
         margin: "2",
       },
     },
+  },
+  components: {
+    Button: {
+      variants: {
+        solid: (props) => ({
+          bg: props.colorScheme === "brand" ? "brand.500" : props.bg,
+          color: props.colorScheme === "brand" ? "white" : props.color,
+          _hover: {
+            bg: props.colorScheme === "brand" ? "brand.600" : props.bg,
+          },
+        }),
+      },
+    },
+    // Você pode adicionar personalizações para outros componentes aqui
   },
 });
 

@@ -7,9 +7,9 @@ const CartaoTicket = ({ ticket, onClick }) => {
   const bg = useColorModeValue('brand.50', 'brand.700');
 
   return (
-    <Box rounded="md" shadow="sm" cursor="pointer" onClick={onClick} bg={bg} p={2} m={2}>
+    <Box rounded="md" shadow="sm" cursor="pointer" onClick={onClick} bg="brand.100" p={2} m={2}>
       <Text fontWeight="bold" color="brand.500">{ticket.titulo}</Text>
-      <Text color="gray.700">{ticket.descricao}</Text>
+      <Text color="brand.700">{ticket.descricao}</Text>
       <Flex align="center" mt={4}>
         <Badge colorScheme={statusColor}>
           {capitalize(ticket.status)}

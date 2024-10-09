@@ -98,6 +98,7 @@ const Header = () => {
             width="300px"
             bg="white"
             color="black"
+            _focus={{ borderColor: "brand.500", boxShadow: "outline" }}
           />
         </InputGroup>
 
@@ -118,9 +119,7 @@ const Header = () => {
             <Avatar name="MF" bg="brand.100" color="black" size="sm" ml={2} />
           </MenuButton>
           <MenuList bg="brand.100" color="black">
-            <MenuItem onClick={handleLogout}>
-              Logout
-            </MenuItem>
+            <MenuItem onClick={handleLogout}>Logout</MenuItem>
           </MenuList>
         </Menu>
       </Flex>

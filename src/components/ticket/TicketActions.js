@@ -26,7 +26,7 @@ const TicketActions = ({ formik, ticket, isEditMode, closeModal }) => {
     if (sucesso) {
       closeModal();
     }
-  }; 
+  };
 
   const handleReject = async () => {
     if (!isEditMode) return;
@@ -71,7 +71,7 @@ const TicketActions = ({ formik, ticket, isEditMode, closeModal }) => {
           <Button onClick={closeModal} colorScheme="gray">
             Cancelar
           </Button>
-          <Button type="submit" colorScheme="blue" isLoading={formik.isSubmitting}>
+          <Button type="submit" colorScheme="brand" isLoading={formik.isSubmitting}>
             {isEditMode ? "Salvar Alterações" : "Salvar"}
           </Button>
         </ButtonGroup>

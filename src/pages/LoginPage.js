@@ -61,7 +61,7 @@ const Login = () => {
           actions.setSubmitting(false);
         }}
       >
-         {({ errors, touched, isSubmitting }) => (
+        {({ errors, touched, isSubmitting }) => (
           <Form>
             <VStack spacing={4} align="flex-start">
               <FormControl isInvalid={errors.email && touched.email}>
@@ -95,14 +95,14 @@ const Login = () => {
               </FormControl>
 
               {errors.general && (
-                <Box color="red.500" w="full">
+                <Box color="brand.error.500" w="full">
                   {errors.general}
                 </Box>
               )}
 
               <Button
                 type="submit"
-                colorScheme="purple"
+                colorScheme="brand" // Utiliza o colorScheme personalizado
                 isLoading={isSubmitting}
                 width="full"
               >
