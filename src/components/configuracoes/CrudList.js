@@ -1,5 +1,5 @@
-// src/components/common/CrudList.js
-import React, { useState, useRef } from 'react';
+// src/components/configuracoes/CrudList.js
+import React, { useState, useRef } from "react";
 import {
   Box,
   Button,
@@ -15,10 +15,10 @@ import {
   AlertDialogContent,
   AlertDialogOverlay,
 } from "@chakra-ui/react";
-import CrudModal from './CrudModal';
-import { useFormik } from 'formik';
-import * as Yup from 'yup';
-import FormField from './FormField';
+import CrudModal from "./CrudModal";
+import { useFormik } from "formik";
+import * as Yup from "yup";
+import FormField from "../common/FormField"; // Certifique-se de importar a versão correta
 
 const CrudList = ({
   title,
@@ -31,11 +31,7 @@ const CrudList = ({
   initialValues,
 }) => {
   const { isOpen, onOpen, onClose } = useDisclosure(); // Controle do Modal de criação/edição
-  const {
-    isOpen: isAlertOpen,
-    onOpen: onAlertOpen,
-    onClose: onAlertClose,
-  } = useDisclosure(); // Controle do AlertDialog de exclusão
+  const { isOpen: isAlertOpen, onOpen: onAlertOpen, onClose: onAlertClose } = useDisclosure(); // Controle do AlertDialog de exclusão
   const cancelRef = useRef(); // Referência para o botão de cancelar no AlertDialog
   const [itemToDelete, setItemToDelete] = useState(null); // Item selecionado para exclusão
   const [isEditMode, setIsEditMode] = useState(false); // Estado para determinar o modo do formulário
@@ -78,8 +74,17 @@ const CrudList = ({
     <Box p={6} rounded="md" shadow="md">
       {/* Cabeçalho com título e botão de criação */}
       <Flex justify="space-between" align="center" mb={4}>
-        <Text fontSize="2xl" fontWeight="bold">{title}</Text>
-        <Button colorScheme="blue" onClick={() => { formik.resetForm(); setIsEditMode(false); onOpen(); }}>
+        <Text fontSize="2xl" fontWeight="bold">
+          {title}
+        </Text>
+        <Button
+          colorScheme="blue"
+          onClick={() => {
+            formik.resetForm();
+            setIsEditMode(false);
+            onOpen();
+          }}
+        >
           Criar Novo
         </Button>
       </Flex>
@@ -87,12 +92,7 @@ const CrudList = ({
       {/* Lista de itens */}
       <List spacing={3}>
         {items.map((item) => (
-          <ListItem
-            key={item._id}
-            p={4}
-            rounded="md"
-            shadow="sm"
-          >
+          <ListItem key={item._id} p={4} rounded="md" shadow="sm">
             <Flex justify="space-between" align="center">
               <Box>
                 {formFields.map(({ label, name }) => (
@@ -102,19 +102,10 @@ const CrudList = ({
                 ))}
               </Box>
               <Flex>
-                <Button
-                  size="sm"
-                  colorScheme="yellow"
-                  mr={2}
-                  onClick={() => handleEdit(item)}
-                >
+                <Button size="sm" colorScheme="yellow" mr={2} onClick={() => handleEdit(item)}>
                   Editar
                 </Button>
-                <Button
-                  size="sm"
-                  colorScheme="red"
-                  onClick={() => confirmDelete(item)}
-                >
+                <Button size="sm" colorScheme="red" onClick={() => confirmDelete(item)}>
                   Excluir
                 </Button>
               </Flex>
@@ -126,7 +117,11 @@ const CrudList = ({
       {/* Modal para criação/edição */}
       <CrudModal
         isOpen={isOpen}
-        onClose={() => { formik.resetForm(); setIsEditMode(false); onClose(); }}
+        onClose={() => {
+          formik.resetForm();
+          setIsEditMode(false);
+          onClose();
+        }}
         title={isEditMode ? `Editar ${title.slice(0, -1)}` : `Criar ${title.slice(0, -1)}`}
         onSubmit={formik.handleSubmit}
       >
@@ -138,8 +133,8 @@ const CrudList = ({
               name={name}
               type={type}
               options={options}
-              touched={formik.touched}
-              errors={formik.errors}
+              touched={formik.touched[name]} 
+              errors={formik.errors[name]}
             />
           ))}
         </Box>
@@ -162,14 +157,19 @@ const CrudList = ({
             </AlertDialogHeader>
 
             <AlertDialogBody>
-              {`Tem certeza que deseja excluir "${itemToDelete?.nome || 'Este item'}"? Essa ação não pode ser desfeita.`}
+              {`Tem certeza que deseja excluir "${
+                itemToDelete?.nome || "Este item"
+              }"? Essa ação não pode ser desfeita.`}
             </AlertDialogBody>
 
             <AlertDialogFooter>
-              <Button ref={cancelRef} onClick={() => {
-                onAlertClose();
-                setItemToDelete(null);
-              }}>
+              <Button
+                ref={cancelRef}
+                onClick={() => {
+                  onAlertClose();
+                  setItemToDelete(null);
+                }}
+              >
                 Cancelar
               </Button>
               <Button colorScheme="red" onClick={handleDelete} ml={3}>
@@ -190,7 +190,7 @@ const capitalizeFirstLetter = (string) => {
 
 // Função auxiliar para acessar valores aninhados usando notação de ponto (ex: "prestador.nome")
 const getNestedValue = (obj, path) => {
-  return path.split('.').reduce((acc, part) => acc && acc[part], obj);
+  return path.split(".").reduce((acc, part) => acc && acc[part], obj);
 };
 
 export default CrudList;

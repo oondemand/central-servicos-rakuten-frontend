@@ -8,7 +8,7 @@ const PrestadorForm = () => {
 
   return (
     <Accordion allowToggle defaultIndex={[0]}>
-      <AccordionItem border="1px solid" borderColor="gray.200" borderRadius="md" mb={4}>
+      <AccordionItem borderRadius="md" mb={4}>
         <h2>
           <AccordionButton>
             <Box flex="1" textAlign="left" fontWeight="bold">

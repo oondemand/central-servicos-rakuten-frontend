@@ -102,7 +102,7 @@ const TicketForm = ({ isEditMode, ticket, closeModal }) => {
     >
       {(formik) => (
         <Form>
-          <VStack spacing={4} align="stretch">
+          <VStack spacing={1} align="stretch">
             <TicketFields formik={formik} />
             <PrestadorForm formik={formik} />
             <ServicoForm formik={formik} />

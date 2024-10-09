@@ -2,7 +2,6 @@
 import React, { Suspense, lazy } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { Spinner } from "@chakra-ui/react";
-import CombinedProvider from "./contexts/CombinedProvider";
 import ErrorBoundary from "./components/common/ErrorBoundary";
 import Layout from "./components/Layout/Layout";
 import PrivateRoute from "./components/PrivateRoute.js";
@@ -16,28 +15,26 @@ const NotFoundPage = lazy(() => import("./pages/NotFoundPage"));
 function App() {
   return (
     <AuthProvider>
-      <CombinedProvider>
-        <ErrorBoundary>
-          <Suspense fallback={<Spinner size="xl" />}>
-            <Routes>
-              {/* Rotas Públicas */}
-              <Route path="/login" element={<LoginPage />} />
+      <ErrorBoundary>
+        <Suspense fallback={<Spinner size="xl" />}>
+          <Routes>
+            {/* Rotas Públicas */}
+            <Route path="/login" element={<LoginPage />} />
 
-              {/* Rotas Protegidas */}
-              <Route path="/" element={<PrivateRoute />}>
-                <Route element={<Layout />}>
-                  <Route path="home" element={<HomePage />} />
-                  <Route path="configuracoes" element={<ConfigPage />} />
-                </Route>
+            {/* Rotas Protegidas */}
+            <Route path="/" element={<PrivateRoute />}>
+              <Route element={<Layout />}>
+                <Route path="home" element={<HomePage />} />
+                <Route path="configuracoes" element={<ConfigPage />} />
               </Route>
+            </Route>
 
-              {/* Rota padrão */}
-              <Route path="/" element={<Navigate to="/home" replace />} />
-              <Route path="*" element={<NotFoundPage />} />
-            </Routes>
-          </Suspense>
-        </ErrorBoundary>
-      </CombinedProvider>
+            {/* Rota padrão */}
+            <Route path="/" element={<Navigate to="/home" replace />} />
+            <Route path="*" element={<NotFoundPage />} />
+          </Routes>
+        </Suspense>
+      </ErrorBoundary>
     </AuthProvider>
   );
 }

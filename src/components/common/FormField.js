@@ -27,7 +27,7 @@ const FormField = ({
     <FormControl isInvalid={isInvalid} mb={4}>
       <FormLabel htmlFor={name}>{label}</FormLabel>
       {type === "select" ? (
-        <Field as={Select} id={name} name={name} placeholder={`Selecione ${label.toLowerCase()}`} {...props}>
+        <Field as={Select} id={name} name={name} placeholder={`Selecione ${label.toLowerCase()}`} {...props} color="brand.500">
           {options.map(option => (
             <option key={option.value} value={option.value}>
               {option.label}
@@ -40,6 +40,7 @@ const FormField = ({
           id={name}
           name={name}
           {...props}
+          color="brand.500"
         />
       ) : mask ? (
         // Utilizar InputMask se a prop 'mask' for fornecida
@@ -53,6 +54,7 @@ const FormField = ({
               as={props.as} // Permitir a substituição do componente
               mask={mask}
               {...props}
+              color="brand.500"
             />
           )}
         </Field>
@@ -64,6 +66,7 @@ const FormField = ({
           type={type}
           placeholder={`Digite ${label.toLowerCase()}`}
           {...props}
+          color="brand.500"
         />
       )}
       <FormErrorMessage>

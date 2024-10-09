@@ -17,7 +17,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const initializeAuth = async () => {
       try {
-        console.log("Inicializando autenticação...");
+        // console.log("Inicializando autenticação...");
         const token = localStorage.getItem("token");
         const usuarioData = localStorage.getItem("usuario");
 
@@ -31,7 +31,7 @@ export const AuthProvider = ({ children }) => {
 
           const parsedUsuario = JSON.parse(usuarioData);
           setUsuario(parsedUsuario);
-          console.log("Usuário autenticado:", parsedUsuario);
+          // console.log("Usuário autenticado:", parsedUsuario);
         }
       } catch (error) {
         console.error("Erro ao inicializar a autenticação:", error);

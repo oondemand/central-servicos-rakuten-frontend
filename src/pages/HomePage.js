@@ -5,8 +5,8 @@ import { Flex, Box } from "@chakra-ui/react";
 
 const HomePage = () => {
   return (
-    <Flex direction="column" minH="100vh">
-      <Box flex="1" p={4} display="flex">
+    <Flex direction="column">
+      <Box flex="1" display="flex">
         <Esteira />
       </Box>
     </Flex>

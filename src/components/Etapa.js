@@ -46,18 +46,15 @@ const Etapa = ({ index, etapa }) => {
 
   return (
     <Box
-      p={4}
       rounded="md"
       shadow="sm"
-      mb={4}
-    >
-      <Flex justify="space-between" align="center" mb={4}>
+    > 
+      <Flex justify="space-between" align="center">
         <Heading size="md">{etapa.nome}</Heading>
         {index === 0 && (
           <IconButton
             aria-label="Adicionar Ticket"
             icon={<FaPlus />}
-            colorScheme="blue"
             onClick={handleCadastrarTicket}
           />
         )}

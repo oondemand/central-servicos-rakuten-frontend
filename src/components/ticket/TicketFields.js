@@ -5,7 +5,7 @@ import FormField from "../common/FormField";
 
 const TicketFields = ({ formik }) => {
   return (
-    <VStack spacing={4} align="stretch">
+    <VStack spacing={1} align="stretch">
       <FormField
         label="Título do Ticket"
         name="titulo"

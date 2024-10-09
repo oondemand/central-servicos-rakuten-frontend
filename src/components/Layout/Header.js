@@ -1,4 +1,4 @@
-// src/components/common/Header.js
+// src/components/Layout/Header.js
 import React from "react";
 import { FaSearch, FaCog } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
@@ -59,10 +59,10 @@ const Header = () => {
   }, [baseOmie, listaBases]);
 
   return (
-    <Flex shadow="md" p={4} align="center" justify="space-between">
+    <Flex shadow="md" p={4} align="center" justify="space-between" bg="brand.500" color="white">
       <Flex align="center">
         <Link to="/home">
-          <Box as="span" fontSize="xl" fontWeight="bold" color="#00E2F4">
+          <Box as="span" fontSize="xl" fontWeight="bold" color="white">
             Central de Serviços
           </Box>
         </Link>
@@ -74,6 +74,7 @@ const Header = () => {
           value={baseOmieDropdown}
           onChange={handleBaseOmieChange}
           size="sm"
+          colorScheme="brand"
         >
           {listaBases.map((base) => (
             <option key={base._id} value={base._id}>
@@ -86,7 +87,7 @@ const Header = () => {
       <Flex align="center">
         <InputGroup display={{ base: "none", md: "flex" }}>
           <InputLeftElement pointerEvents="none">
-            <FaSearch color="gray.400" />
+            <FaSearch color="gray.300" />
           </InputLeftElement>
           <Input
             type="text"
@@ -95,6 +96,8 @@ const Header = () => {
             onChange={handlePesquisaChange}
             size="sm"
             width="300px"
+            bg="white"
+            color="black"
           />
         </InputGroup>
 
@@ -102,7 +105,7 @@ const Header = () => {
           <IconButton
             aria-label="Configurações"
             icon={<FaCog />}
-            colorScheme="blue"
+            colorScheme="brand"
             variant="ghost"
             size="lg"
             onClick={handleConfigClick}
@@ -112,7 +115,7 @@ const Header = () => {
 
         <Menu>
           <MenuButton>
-            <Avatar name="MF" bg="#00E2F4" color="black" size="sm" ml={2} />
+            <Avatar name="MF" bg="brand.400" color="black" size="sm" ml={2} />
           </MenuButton>
           <MenuList>
             <MenuItem onClick={handleLogout}>Logout</MenuItem>

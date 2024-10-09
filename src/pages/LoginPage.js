@@ -27,8 +27,16 @@ const Login = () => {
   const { login } = useAuth();
 
   return (
-    <Box maxW="md" mx="auto" mt={10} p={6} boxShadow="md" borderRadius="md">
-      <Heading mb={6} textAlign="center">
+    <Box
+      maxW="md"
+      mx="auto"
+      mt={10}
+      p={6}
+      boxShadow="md"
+      borderRadius="md"
+      bg="brand.50" // Fundo alinhado com o tema
+    >
+      <Heading mb={6} textAlign="center" color="brand.500">
         Login
       </Heading>
       <Formik
@@ -53,24 +61,51 @@ const Login = () => {
           actions.setSubmitting(false);
         }}
       >
-        {({ errors, touched, isSubmitting }) => (
+         {({ errors, touched, isSubmitting }) => (
           <Form>
             <VStack spacing={4} align="flex-start">
               <FormControl isInvalid={errors.email && touched.email}>
-                <FormLabel htmlFor="email">E-mail</FormLabel>
-                <Field as={Input} id="email" name="email" type="email" />
+                <FormLabel htmlFor="email" color="brand.500">
+                  E-mail
+                </FormLabel>
+                <Field
+                  as={Input}
+                  id="email"
+                  name="email"
+                  type="email"
+                  bg="white"
+                  _focus={{ borderColor: "brand.400" }}
+                />
                 <FormErrorMessage>{errors.email}</FormErrorMessage>
               </FormControl>
 
               <FormControl isInvalid={errors.senha && touched.senha}>
-                <FormLabel htmlFor="senha">Senha</FormLabel>
-                <Field as={Input} id="senha" name="senha" type="password" />
+                <FormLabel htmlFor="senha" color="brand.500">
+                  Senha
+                </FormLabel>
+                <Field
+                  as={Input}
+                  id="senha"
+                  name="senha"
+                  type="password"
+                  bg="white"
+                  _focus={{ borderColor: "brand.400" }}
+                />
                 <FormErrorMessage>{errors.senha}</FormErrorMessage>
               </FormControl>
 
-              {errors.general && <Box color="red.500">{errors.general}</Box>}
+              {errors.general && (
+                <Box color="red.500" w="full">
+                  {errors.general}
+                </Box>
+              )}
 
-              <Button type="submit" colorScheme="teal" width="full" isLoading={isSubmitting}>
+              <Button
+                type="submit"
+                colorScheme="purple"
+                isLoading={isSubmitting}
+                width="full"
+              >
                 Entrar
               </Button>
             </VStack>
