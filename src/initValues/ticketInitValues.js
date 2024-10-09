@@ -1,5 +1,7 @@
 // src/initValues/ticketInitValues.js
 
+import { format } from "date-fns";
+
 export const ticketInitValues = (isEditMode, ticket) => ({
   titulo: isEditMode ? (ticket?.titulo || "") : "",
   observacao: isEditMode ? (ticket?.observacao || "") : "",
@@ -14,7 +16,9 @@ export const ticketInitValues = (isEditMode, ticket) => ({
   servico: {
     descricao: isEditMode && ticket?.servico ? (ticket.servico.descricao || "") : "",
     valor: isEditMode && ticket?.servico ? (ticket.servico.valor || "") : "",
-    data: isEditMode && ticket?.servico ? (ticket.servico.data || "") : "",
+    data: isEditMode && ticket?.servico && ticket.servico.data 
+      ? format(new Date(ticket.servico.data), 'yyyy-MM-dd') 
+      : "",
     status: isEditMode && ticket?.servico ? (ticket.servico.status || "ativo") : "ativo",
   },
 });

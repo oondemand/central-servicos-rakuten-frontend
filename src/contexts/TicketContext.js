@@ -59,11 +59,8 @@ export const TicketProvider = ({ children }) => {
     async (ticket) => {
       setLoading(true);
       try {
-        await salvarTicketService(ticket);
+        const sucesso = await salvarTicketService(ticket);
         if (ticket._id) {
-          // setListaTickets((prevTickets) =>
-          //   prevTickets.map((t) => (t._id === ticket._id ? response : t))
-          // );
           toast({
             title: "Ticket atualizado com sucesso!",
             status: "info",
@@ -71,7 +68,6 @@ export const TicketProvider = ({ children }) => {
             isClosable: true,
           });
         } else {
-          // setListaTickets((prevTickets) => [...prevTickets, response]);
           toast({
             title: "Ticket adicionado com sucesso!",
             status: "success",
@@ -79,8 +75,8 @@ export const TicketProvider = ({ children }) => {
             isClosable: true,
           });
         }
-        await carregarTickets();
-        return true;
+        carregarTickets();
+        return sucesso;
       } catch (err) {
         console.error("Erro ao salvar ticket:", err);
         const detalhes = err.response?.data?.detalhes || err.message;
@@ -92,7 +88,7 @@ export const TicketProvider = ({ children }) => {
           duration: 5000,
           isClosable: true,
         });
-        return false; // Indica falha
+        return err.response?.data;
       } finally {
         setLoading(false);
       }

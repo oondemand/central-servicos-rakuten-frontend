@@ -27,7 +27,7 @@ const Etapa = ({ index, etapa }) => {
     setLoadingTicket(true);
     try {
       const fetchedTicket = await buscarTicketPorId(ticket._id);
-      console.log(fetchedTicket, "fetchedTicket");
+      // console.log(fetchedTicket, "fetchedTicket");
 
       if (fetchedTicket) {
         setSelectedTicket(fetchedTicket);

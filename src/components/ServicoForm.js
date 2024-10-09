@@ -16,7 +16,7 @@ import {
 
 const ServicoForm = ({ formik }) => {
   return (
-    <Accordion allowToggle>
+    <Accordion allowToggle defaultIndex={[0]}>
       <AccordionItem border="1px solid" borderColor="gray.200" borderRadius="md" mb={4}>
         <h2>
           <AccordionButton>
@@ -42,7 +42,37 @@ const ServicoForm = ({ formik }) => {
               />
               <FormErrorMessage>{formik.errors.servico?.descricao}</FormErrorMessage>
             </FormControl>
-            {/* Adicione outros campos do formulário do serviço aqui */}
+            <FormControl
+              isRequired
+              isInvalid={!!formik.errors.servico?.valor && formik.touched.servico?.valor}
+            >
+              <FormLabel>Valor</FormLabel>
+              <Input
+                name="servico.valor"
+                value={formik.values.servico.valor || ""}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                placeholder="Valor do Serviço"
+              />
+              <FormErrorMessage>{formik.errors.servico?.valor}</FormErrorMessage>
+            </FormControl>
+
+            {/* Campo Data */}
+            <FormControl
+              isRequired
+              isInvalid={!!formik.errors.servico?.data && formik.touched.servico?.data}
+            >
+              <FormLabel>Data</FormLabel>
+              <Input
+                type="date"
+                name="servico.data"
+                value={formik.values.servico.data || ""}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                placeholder="Data do Serviço"
+              />
+              <FormErrorMessage>{formik.errors.servico?.data}</FormErrorMessage>
+            </FormControl>
           </VStack>
         </AccordionPanel>
       </AccordionItem>
