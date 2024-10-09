@@ -35,7 +35,11 @@ const theme = extendTheme({
   styles: {
     global: {
       "html, body": {
-        backgroundColor: "white", // Define o fundo branco para o corpo
+        backgroundColor: "brand.50",
+      },
+      // Adiciona margem discreta aos componentes <Box>
+      ".chakra-box": {
+        margin: "2",
       },
     },
   },

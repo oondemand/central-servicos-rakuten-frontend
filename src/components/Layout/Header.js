@@ -87,7 +87,7 @@ const Header = () => {
       <Flex align="center">
         <InputGroup display={{ base: "none", md: "flex" }}>
           <InputLeftElement pointerEvents="none">
-            <FaSearch color="gray.300" />
+            <FaSearch color="brand.300" />
           </InputLeftElement>
           <Input
             type="text"
@@ -115,10 +115,12 @@ const Header = () => {
 
         <Menu>
           <MenuButton>
-            <Avatar name="MF" bg="brand.400" color="black" size="sm" ml={2} />
+            <Avatar name="MF" bg="brand.100" color="black" size="sm" ml={2} />
           </MenuButton>
-          <MenuList>
-            <MenuItem onClick={handleLogout}>Logout</MenuItem>
+          <MenuList bg="brand.100" color="black">
+            <MenuItem onClick={handleLogout}>
+              Logout
+            </MenuItem>
           </MenuList>
         </Menu>
       </Flex>

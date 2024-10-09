@@ -34,7 +34,7 @@ const Login = () => {
       p={6}
       boxShadow="md"
       borderRadius="md"
-      bg="brand.50" // Fundo alinhado com o tema
+      bg="brand.100" // Fundo alinhado com o tema
     >
       <Heading mb={6} textAlign="center" color="brand.500">
         Login
