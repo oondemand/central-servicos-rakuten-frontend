@@ -2,15 +2,8 @@
 import React, { useState } from "react";
 import { useTicket } from "../contexts/TicketContext";
 import CartaoTicket from "./ticket/CartaoTicket";
-import TicketModal from "./ticket/TicketModal"; 
-import {
-  Box,
-  Flex,
-  Heading,
-  IconButton,
-  Spinner,
-  Text,
-} from "@chakra-ui/react";
+import TicketModal from "./ticket/TicketModal";
+import { Box, Flex, Heading, IconButton, Spinner, Text } from "@chakra-ui/react";
 import { FaPlus } from "react-icons/fa";
 
 const Etapa = ({ index, etapa }) => {
@@ -45,19 +38,18 @@ const Etapa = ({ index, etapa }) => {
   };
 
   return (
-    <Box
-      rounded="md"
-      shadow="sm"
-      bg="brand.300"
-      p={2}
-    > 
+    <Box p={2} bg="brand.400" rounded="md" shadow="md">
       <Flex justify="space-between" align="center">
-        <Heading size="md" color="brand.800">{etapa.nome}</Heading>
+        <Heading size="md" color="white">
+          {etapa.nome}
+        </Heading>
         {index === 0 && (
           <IconButton
             aria-label="Adicionar Ticket"
             icon={<FaPlus />}
             onClick={handleCadastrarTicket}
+            bg="#FEDF00"
+            color="brand.500"
           />
         )}
       </Flex>
@@ -65,17 +57,11 @@ const Etapa = ({ index, etapa }) => {
       {listaTickets
         .filter((ticket) => ticket.etapa === etapa.codigo)
         .map((ticket) => (
-          <CartaoTicket
-            key={ticket._id}
-            ticket={ticket}
-            onClick={() => handleEditTicket(ticket)}
-          />
+          <CartaoTicket key={ticket._id} ticket={ticket} onClick={() => handleEditTicket(ticket)} />
         ))}
 
       {/* Modal para adicionar novo ticket */}
-      {isAddModalOpen && (
-        <TicketModal isOpen={isAddModalOpen} closeModal={closeModal} />
-      )}
+      {isAddModalOpen && <TicketModal isOpen={isAddModalOpen} closeModal={closeModal} />}
 
       {/* Modal para editar ticket existente */}
       {selectedTicket && (

@@ -1,3 +1,4 @@
+// src/components/ServicoForm.js
 import React from "react";
 import {
   VStack,
@@ -9,12 +10,12 @@ import {
   AccordionPanel,
   Box,
 } from "@chakra-ui/react";
-import FormField from "./common/FormField"; // Certifique-se de que o caminho está correto
+import FormField from "@/components/common/FormField";
 
-const ServicoForm = ({ formik }) => {
+const ServicoForm = () => {
   return (
     <Accordion allowToggle defaultIndex={[0]}>
-      <AccordionItem  borderRadius="md" mb={4}>
+      <AccordionItem borderRadius="md" mb={4}>
         <h2>
           <AccordionButton>
             <Box flex="1" textAlign="left" fontWeight="bold">
@@ -30,27 +31,18 @@ const ServicoForm = ({ formik }) => {
                 label="Data"
                 name="servico.data"
                 type="date"
-                touched={formik.touched.servico?.data}
-                errors={formik.errors.servico?.data}
               />
-
               <FormField
                 label="Valor"
                 name="servico.valor"
                 type="number"
-                touched={formik.touched.servico?.valor}
-                errors={formik.errors.servico?.valor}
               />
             </HStack>
-
             <FormField
               label="Descrição"
               name="servico.descricao"
               type="textarea"
-              touched={formik.touched.servico?.descricao}
-              errors={formik.errors.servico?.descricao}
             />
-
             <HStack spacing={4} align="stretch">
               <FormField
                 label="Status"
@@ -62,16 +54,11 @@ const ServicoForm = ({ formik }) => {
                   { value: "pendente-de-revisao", label: "Pendente de Revisão" },
                   { value: "arquivado", label: "Arquivado" },
                 ]}
-                touched={formik.touched.servico?.status}
-                errors={formik.errors.servico?.status}
               />
-
               <FormField
                 label="Comentários de Revisão"
                 name="servico.comentariosRevisao"
                 type="textarea"
-                touched={formik.touched.servico?.comentariosRevisao}
-                errors={formik.errors.servico?.comentariosRevisao}
               />
             </HStack>
           </VStack>

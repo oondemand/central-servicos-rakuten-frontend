@@ -3,16 +3,16 @@ import { extendTheme } from "@chakra-ui/react";
 
 const colors = {
   brand: {
-    50: "#faf5ff",  // Tom claro
-    100: "#e9d8fd", // Interpolado entre 50 e 700
-    200: "#d6bcfa", // Interpolado entre 50 e 700
-    300: "#b794f4", // Interpolado entre 50 e 700
-    400: "#9f7aea", // Interpolado entre 50 e 700
-    500: "#805ad5", // Interpolado entre 50 e 700
-    600: "#6b46c1", // Interpolado entre 50 e 700
-    700: "#5a3e8e", // Tom médio
-    800: "#44337a", // Interpolado entre 700 e 900
-    900: "#3d1c4f", // Tom escuro
+    50: "#FAF3FF",  // Tom claro (branco suave)
+    100: "#d3d3e0", // Interpolado entre 50 e 500
+    200: "#D9B0F9", // Interpolado entre 50 e 500
+    300: "#9f9fc6", // Interpolado entre 50 e 500
+    400: "#8528CE", // Interpolado entre 50 e 500
+    500: "#8528CE", // Tom predominante (roxo vibrante)
+    600: "#7200e6", // Interpolado entre 500 e 700
+    700: "#5e00b3", // Tom médio
+    800: "#4a0080", // Interpolado entre 700 e 900
+    900: "#2e0033", // Tom escuro (roxo profundo)
     // Adicionando subpaletas para estados específicos, se necessário
     error: {
       50: "#ffe3e3",
@@ -54,7 +54,7 @@ const colors = {
 };
 
 const shadows = {
-  outline: "0 0 0 3px rgba(66, 153, 225, 0.6)", // Aumenta o contorno
+  outline: "0 0 0 3px rgba(128, 0, 255, 0.6)", // Aumenta o contorno para combinar com a cor primária
   lg: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)", // Sombra grande
   xl: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)", // Sombra extra grande
 };
@@ -78,20 +78,20 @@ const theme = extendTheme({
   styles: {
     global: {
       "html, body": {
-        backgroundColor: "white",
+        backgroundColor: "#FFFFFF", // Cor de fundo branco suave
       },
       // Adiciona margem discreta aos componentes <Box>
       ".chakra-box": {
         margin: "2",
       },
       "input, textarea, select": {
-        borderColor: "gray.300",
+        borderColor: "brand.300",
         _hover: {
-          borderColor: "gray.400",
+          borderColor: "brand.400",
         },
         _focus: {
-          borderColor: "gray.500",
-          boxShadow: "0 0 0 1px gray.500",
+          borderColor: "brand.500",
+          boxShadow: "0 0 0 1px brand.500",
         },
       },
     },
@@ -109,6 +109,37 @@ const theme = extendTheme({
       },
     },
     // Você pode adicionar personalizações para outros componentes aqui
+    Input: {
+      variants: {
+        outline: {
+          field: {
+            _focus: {
+              borderColor: "brand.500",
+              boxShadow: "0 0 0 1px rgba(128, 0, 255, 0.6)",
+            },
+          },
+        },
+      },
+    },
+    Select: {
+      variants: {
+        outline: {
+          field: {
+            _focus: {
+              borderColor: "brand.500",
+              boxShadow: "0 0 0 1px rgba(128, 0, 255, 0.6)",
+            },
+          },
+        },
+      },
+    },
+    IconButton: {
+      baseStyle: {
+        _hover: {
+          bg: "brand.600",
+        },
+      },
+    },
   },
 });
 

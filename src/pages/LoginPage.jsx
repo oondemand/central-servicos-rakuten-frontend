@@ -1,4 +1,3 @@
-// src/pages/Login.jsx
 import React from "react";
 import { Formik, Form, Field } from "formik";
 import {
@@ -23,6 +22,8 @@ const LoginSchema = Yup.object().shape({
 });
 
 const Login = () => {
+  console.log("Login");
+
   const navigate = useNavigate();
   const { login } = useAuth();
 
@@ -34,7 +35,7 @@ const Login = () => {
       p={6}
       boxShadow="md"
       borderRadius="md"
-      bg="brand.100" // Fundo alinhado com o tema
+      bg="brand.100"
     >
       <Heading mb={6} textAlign="center" color="brand.500">
         Login
@@ -53,7 +54,7 @@ const Login = () => {
             console.log("token", token);
 
             login(token, usuario);
-            navigate("/home");
+            navigate("/auth/home");
           } catch (error) {
             const errorMessage = getErrorMessage(error) || "Erro ao fazer login";
             actions.setFieldError("general", errorMessage);
