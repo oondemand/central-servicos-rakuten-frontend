@@ -31,6 +31,7 @@ import { salvarPrestador } from "../../services/prestadorService";
 import { salvarServico } from "../../services/servicoService";
 import { useToast } from "@chakra-ui/react";
 import * as Yup from "yup";
+import { format } from "date-fns";
 
 const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
   const isEditMode = Boolean(ticket);
@@ -38,8 +39,8 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
   const { baseOmie } = useBaseOmie();
   const { listaEtapas } = useEtapa();
   const toast = useToast();
-  const [mostrarPrestador, setMostrarPrestador] = useState(ticket.prestador ? true : false);
-  const [mostrarServico, setMostrarServico] = useState(ticket.servico ? true : false);
+  const [mostrarPrestador, setMostrarPrestador] = useState(ticket?.prestador ? true : false);
+  const [mostrarServico, setMostrarServico] = useState(ticket?.servico ? true : false);
 
   const combinedValidationSchema = useMemo(() => {
     let schema = ticketValidationSchema;
@@ -83,6 +84,9 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
         prestador: ticket.prestador || prestadorInitValues,
         servico: ticket.servico || servicoInitValues,
       };
+      initValues.servico.data = ticket.servico?.data
+        ? format(new Date(ticket.servico?.data), "yyyy-MM-dd")
+        : "";
     }
 
     return initValues;
@@ -117,7 +121,6 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
         }
       }
 
-      console.log("mostrarServico", mostrarServico);
       if (mostrarServico && values.servico) {
         if (isEditMode && ticket.servico) {
           servicoId = ticket.servico._id;
@@ -150,8 +153,6 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
             prestadorId,
             servicoId: servicoId,
           };
-
-      console.log("ticketData", ticketData);
 
       const sucessoTicket = await salvarTicket(ticketData);
 

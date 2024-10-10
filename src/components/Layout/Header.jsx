@@ -41,7 +41,7 @@ const Header = () => {
   };
 
   const handleConfigClick = () => {
-    navigate("/configuracoes");
+    navigate("/auth/configuracoes");
   };
 
   const handleLogout = () => {
@@ -60,7 +60,7 @@ const Header = () => {
   return (
     <Flex shadow="md" p={4} align="center" justify="space-between" bg="brand.50" color="white">
       <Flex align="center">
-        <Link to="/home">
+        <Link to="/auth/home">
           <Box as="span" fontSize="xl" fontWeight="bold" color="brand.500">
             Central de Serviços Rakuten
           </Box>

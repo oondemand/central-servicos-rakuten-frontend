@@ -8,7 +8,7 @@ const NotFoundPage = () => {
     <Box textAlign="center" mt={20}>
       <Heading>404 - Página Não Encontrada</Heading>
       <Text mt={4}>A página que você está procurando não existe.</Text>
-      <Button as={Link} to="/home" colorScheme="blue" mt={6}>
+      <Button as={Link} to="/auth/home" colorScheme="brand.500" mt={6}>
         Voltar para Home
       </Button>
     </Box>
