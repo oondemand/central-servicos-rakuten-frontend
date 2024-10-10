@@ -1,9 +1,11 @@
 // src/components/ticket/TicketFields.js
 import React from "react";
 import { VStack } from "@chakra-ui/react";
-import FormField from "../common/FormField";
+import FormField from "@/components/common/FormField";
+import { useFormikContext } from "formik";
 
-const TicketFields = ({ formik }) => {
+const TicketFields = () => {
+  const formik = useFormikContext();
   return (
     <VStack spacing={1} align="stretch" bg="white" rounded="md" p={4}>
       <FormField

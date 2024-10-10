@@ -1,5 +1,5 @@
 // src/components/common/FormField.js
-import React from "react";
+import React, { useRef } from "react";
 import {
   FormControl,
   FormLabel,
@@ -8,23 +8,16 @@ import {
   Textarea,
   FormErrorMessage,
 } from "@chakra-ui/react";
-import { Field, ErrorMessage } from "formik";
+import { Field, useFormikContext } from "formik";
+import InputMask from "react-input-mask";
 
-const FormField = ({
-  label,
-  name,
-  type = "text",
-  options = [],
-  touched,
-  errors,
-  mask, // Adicionado para InputMask
-  ...props
-}) => {
-  // Agora, 'touched' e 'errors' são valores individuais
-  const isInvalid = touched && errors;
+const FormField = ({ label, name, type = "text", options = [], mask, ...props }) => {
+  const { touched, errors } = useFormikContext();
+  const isInvalid = touched[name] && errors[name];
+  const inputRef = useRef(null);
 
   return (
-    <FormControl isInvalid={isInvalid} mb={1}>
+    <FormControl isInvalid={isInvalid} mb={4}>
       <FormLabel htmlFor={name}>{label}</FormLabel>
       {type === "select" ? (
         <Field
@@ -44,19 +37,20 @@ const FormField = ({
       ) : type === "textarea" ? (
         <Field as={Textarea} id={name} name={name} {...props} color="brand.500" />
       ) : mask ? (
-        // Utilizar InputMask se a prop 'mask' for fornecida
         <Field name={name}>
           {({ field }) => (
-            <Input
-              {...field}
-              id={name}
-              type={type}
-              placeholder={`Digite ${label.toLowerCase()}`}
-              as={props.as} // Permitir a substituição do componente
-              mask={mask}
-              {...props}
-              color="brand.500"
-            />
+            <InputMask mask={mask} {...field} {...props}>
+              {(inputProps) => (
+                <Input
+                  {...inputProps}
+                  ref={inputRef}
+                  id={name}
+                  type={type}
+                  color="brand.500"
+                  placeholder={`Digite ${label.toLowerCase()}`}
+                />
+              )}
+            </InputMask>
           )}
         </Field>
       ) : (
@@ -68,12 +62,9 @@ const FormField = ({
           placeholder={`Digite ${label.toLowerCase()}`}
           {...props}
           color="brand.500"
-          mb={2}
         />
       )}
-      <FormErrorMessage>
-        <ErrorMessage name={name} />
-      </FormErrorMessage>
+      <FormErrorMessage>{errors[name]}</FormErrorMessage>
     </FormControl>
   );
 };

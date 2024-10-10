@@ -1,9 +1,11 @@
 // src/components/ticket/TicketStatusButtons.js
 import React from "react";
-import { FormControl, VStack, Button, useColorModeValue } from "@chakra-ui/react";
+import { FormControl, VStack, Button } from "@chakra-ui/react";
+import { useFormikContext } from "formik";
 import { useTicket } from "../../contexts/TicketContext";
 
-const TicketStatusButtons = ({ formik, ticket }) => {
+const TicketStatusButtons = ({  ticket }) => {
+  const formik = useFormikContext();
   const { alterarStatusTicket } = useTicket();
 
   const handleStatusChange = async (newStatus) => {

@@ -1,7 +1,8 @@
+// src/components/PrestadorForm.js
 import React from "react";
 import { VStack, HStack, Accordion, AccordionItem, AccordionButton, AccordionIcon, AccordionPanel, Box } from "@chakra-ui/react";
 import { useFormikContext } from "formik";
-import FormField from "./common/FormField"; // Certifique-se de que o caminho está correto
+import FormField from "@/components/common/FormField";
 
 const PrestadorForm = () => {
   const formik = useFormikContext();
@@ -31,7 +32,6 @@ const PrestadorForm = () => {
                 touched={formik.touched.prestador?.tipo}
                 errors={formik.errors.prestador?.tipo}
               />
-
               <FormField
                 label="Documento (CPF/CNPJ)"
                 name="prestador.documento"
@@ -39,11 +39,10 @@ const PrestadorForm = () => {
                 touched={formik.touched.prestador?.documento}
                 errors={formik.errors.prestador?.documento}
                 mask={
-                  formik.values.prestador.tipo === "pf" ? "999.999.999-99" : "99.999.999/9999-99"
+                  formik.values.prestador?.tipo === "pf" ? "999.999.999-99" : "99.999.999/9999-99"
                 }
               />
             </HStack>
-
             <HStack spacing={4} align="stretch">
               <FormField
                 label="Nome"
@@ -52,7 +51,6 @@ const PrestadorForm = () => {
                 touched={formik.touched.prestador?.nome}
                 errors={formik.errors.prestador?.nome}
               />
-
               <FormField
                 label="E-mail"
                 name="prestador.email"
@@ -61,7 +59,6 @@ const PrestadorForm = () => {
                 errors={formik.errors.prestador?.email}
               />
             </HStack>
-
             <HStack spacing={4} align="stretch">
               <FormField
                 label="Status"
@@ -77,7 +74,6 @@ const PrestadorForm = () => {
                 touched={formik.touched.prestador?.status}
                 errors={formik.errors.prestador?.status}
               />
-
               <FormField
                 label="Comentários de Revisão"
                 name="prestador.comentariosRevisao"

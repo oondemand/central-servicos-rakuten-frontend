@@ -1,10 +1,8 @@
-import { Box, Text, Flex, Badge, useColorModeValue, Icon } from "@chakra-ui/react";
+import { Box, Text, Flex, Icon } from "@chakra-ui/react";
 import { MdLens } from "react-icons/md";
 import React from "react";
 
 const CartaoTicket = ({ ticket, onClick }) => {
-  const statusColor = getStatusColor(ticket.status);
-
   return (
     <Box
       rounded="lg"

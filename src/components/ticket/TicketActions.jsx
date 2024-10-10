@@ -17,10 +17,10 @@ import { useTicket } from "../../contexts/TicketContext";
 import { useFormikContext } from "formik";
 
 const TicketActions = ({ ticket, isEditMode, closeModal }) => {
+  const formik = useFormikContext();
   const { salvarTicket, aprovarTicket, reprovarTicket } = useTicket();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = useRef();
-  const formik = useFormikContext(); // Obtém o contexto do Formik
 
   const handleApprove = async () => {
     if (!isEditMode) return;

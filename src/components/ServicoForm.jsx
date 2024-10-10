@@ -1,3 +1,4 @@
+// src/components/ServicoForm.js
 import React from "react";
 import {
   VStack,
@@ -9,12 +10,14 @@ import {
   AccordionPanel,
   Box,
 } from "@chakra-ui/react";
-import FormField from "./common/FormField"; // Certifique-se de que o caminho está correto
+import FormField from "@/components/common/FormField";
+import { useFormikContext } from "formik";
 
-const ServicoForm = ({ formik }) => {
+const ServicoForm = () => {
+  const formik = useFormikContext();
   return (
     <Accordion allowToggle defaultIndex={[0]}>
-      <AccordionItem  borderRadius="md" mb={4}>
+      <AccordionItem borderRadius="md" mb={4}>
         <h2>
           <AccordionButton>
             <Box flex="1" textAlign="left" fontWeight="bold">
@@ -33,7 +36,6 @@ const ServicoForm = ({ formik }) => {
                 touched={formik.touched.servico?.data}
                 errors={formik.errors.servico?.data}
               />
-
               <FormField
                 label="Valor"
                 name="servico.valor"
@@ -42,7 +44,6 @@ const ServicoForm = ({ formik }) => {
                 errors={formik.errors.servico?.valor}
               />
             </HStack>
-
             <FormField
               label="Descrição"
               name="servico.descricao"
@@ -50,7 +51,6 @@ const ServicoForm = ({ formik }) => {
               touched={formik.touched.servico?.descricao}
               errors={formik.errors.servico?.descricao}
             />
-
             <HStack spacing={4} align="stretch">
               <FormField
                 label="Status"
@@ -65,7 +65,6 @@ const ServicoForm = ({ formik }) => {
                 touched={formik.touched.servico?.status}
                 errors={formik.errors.servico?.status}
               />
-
               <FormField
                 label="Comentários de Revisão"
                 name="servico.comentariosRevisao"

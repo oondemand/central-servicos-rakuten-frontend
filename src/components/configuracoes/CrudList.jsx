@@ -18,7 +18,7 @@ import {
 import CrudModal from "./CrudModal";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import FormField from "../common/FormField"; // Certifique-se de importar a versão correta
+import FormField from "@/components/common/FormField";
 
 const CrudList = ({
   title,
