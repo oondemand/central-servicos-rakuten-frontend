@@ -8,12 +8,14 @@ import {
   Textarea,
   FormErrorMessage,
 } from "@chakra-ui/react";
-import { Field, useFormikContext } from "formik";
+import { Field, useFormikContext, getIn } from "formik";
 import InputMask from "react-input-mask";
 
 const FormField = ({ label, name, type = "text", options = [], mask, ...props }) => {
   const { touched, errors } = useFormikContext();
-  const isInvalid = touched[name] && errors[name];
+
+  const isInvalid = getIn(touched, name) && getIn(errors, name);
+
   const inputRef = useRef(null);
 
   return (
@@ -64,7 +66,7 @@ const FormField = ({ label, name, type = "text", options = [], mask, ...props })
           color="brand.500"
         />
       )}
-      <FormErrorMessage>{errors[name]}</FormErrorMessage>
+      <FormErrorMessage>{getIn(errors, name) || ""}</FormErrorMessage>
     </FormControl>
   );
 };

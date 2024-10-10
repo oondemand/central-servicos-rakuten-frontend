@@ -13,7 +13,6 @@ const ConfigPage = lazy(() => import("./pages/ConfigPage"));
 const NotFoundPage = lazy(() => import("./pages/NotFoundPage"));
 
 function App() {
-  console.log("App")
   return (
     <AuthProvider>
       <ErrorBoundary>

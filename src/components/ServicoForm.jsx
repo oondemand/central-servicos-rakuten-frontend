@@ -11,10 +11,8 @@ import {
   Box,
 } from "@chakra-ui/react";
 import FormField from "@/components/common/FormField";
-import { useFormikContext } from "formik";
 
 const ServicoForm = () => {
-  const formik = useFormikContext();
   return (
     <Accordion allowToggle defaultIndex={[0]}>
       <AccordionItem borderRadius="md" mb={4}>
@@ -33,23 +31,17 @@ const ServicoForm = () => {
                 label="Data"
                 name="servico.data"
                 type="date"
-                touched={formik.touched.servico?.data}
-                errors={formik.errors.servico?.data}
               />
               <FormField
                 label="Valor"
                 name="servico.valor"
                 type="number"
-                touched={formik.touched.servico?.valor}
-                errors={formik.errors.servico?.valor}
               />
             </HStack>
             <FormField
               label="Descrição"
               name="servico.descricao"
               type="textarea"
-              touched={formik.touched.servico?.descricao}
-              errors={formik.errors.servico?.descricao}
             />
             <HStack spacing={4} align="stretch">
               <FormField
@@ -62,15 +54,11 @@ const ServicoForm = () => {
                   { value: "pendente-de-revisao", label: "Pendente de Revisão" },
                   { value: "arquivado", label: "Arquivado" },
                 ]}
-                touched={formik.touched.servico?.status}
-                errors={formik.errors.servico?.status}
               />
               <FormField
                 label="Comentários de Revisão"
                 name="servico.comentariosRevisao"
                 type="textarea"
-                touched={formik.touched.servico?.comentariosRevisao}
-                errors={formik.errors.servico?.comentariosRevisao}
               />
             </HStack>
           </VStack>

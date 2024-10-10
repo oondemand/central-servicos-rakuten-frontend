@@ -30,21 +30,20 @@ import { useEtapa } from "../../contexts/EtapaContext";
 import { salvarPrestador } from "../../services/prestadorService";
 import { salvarServico } from "../../services/servicoService";
 import { useToast } from "@chakra-ui/react";
-import * as Yup from "yup"
+import * as Yup from "yup";
 
 const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
-  console.log(ticket);
   const isEditMode = Boolean(ticket);
   const { salvarTicket } = useTicket();
   const { baseOmie } = useBaseOmie();
   const { listaEtapas } = useEtapa();
   const toast = useToast();
-  const [mostrarPrestador, setMostrarPrestador] = useState(false);
-  const [mostrarServico, setMostrarServico] = useState(false);
+  const [mostrarPrestador, setMostrarPrestador] = useState(ticket.prestador ? true : false);
+  const [mostrarServico, setMostrarServico] = useState(ticket.servico ? true : false);
 
   const combinedValidationSchema = useMemo(() => {
     let schema = ticketValidationSchema;
-  
+
     if (mostrarPrestador) {
       schema = schema.shape({
         prestador: prestadorValidationSchema,
@@ -54,7 +53,7 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
         prestador: Yup.object().nullable(),
       });
     }
-  
+
     if (mostrarServico) {
       schema = schema.shape({
         servico: servicoValidationSchema,
@@ -64,12 +63,17 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
         servico: Yup.object().nullable(),
       });
     }
-  
+
     return schema;
   }, [mostrarPrestador, mostrarServico]);
 
   const combinedInitValues = useMemo(() => {
-    let initValues = ticketInitValues;
+    let initValues = {
+      titulo: "",
+      observacao: "",
+      prestador: prestadorInitValues,
+      servico: servicoInitValues,
+    };
 
     if (ticket) {
       initValues = {
@@ -83,14 +87,6 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
 
     return initValues;
   }, [ticket]);
-
-  const handleAdicionarPrestador = () => {
-    setMostrarPrestador(true);
-  };
-
-  const handleAdicionarServico = () => {
-    setMostrarServico(true);
-  };
 
   const handleSubmit = async (values, { setSubmitting }) => {
     setSubmitting(true);
@@ -121,6 +117,7 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
         }
       }
 
+      console.log("mostrarServico", mostrarServico);
       if (mostrarServico && values.servico) {
         if (isEditMode && ticket.servico) {
           servicoId = ticket.servico._id;
@@ -142,17 +139,19 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
             observacao: values.observacao,
             status: values.status,
             prestadorId,
-            servicoId,
+            servicoId: servicoId,
           }
         : {
-            baseOmieId: baseOmie?._id || "66fecc5b0c2acb31fa820b16",
+            baseOmieId: baseOmie?._id,
             etapa: listaEtapas[0]?.codigo || "",
             titulo: values.titulo,
             observacao: values.observacao,
             status: "aguardando-inicio",
             prestadorId,
-            servicoId,
+            servicoId: servicoId,
           };
+
+      console.log("ticketData", ticketData);
 
       const sucessoTicket = await salvarTicket(ticketData);
 
@@ -209,25 +208,50 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
                       )}
                     </Flex>
                     <HStack spacing={4} mt={4}>
-                      <Button
-                        onClick={handleAdicionarPrestador}
-                        colorScheme="teal"
-                        variant="outline"
-                      >
-                        Adicionar Prestador
-                      </Button>
-                      <Button onClick={handleAdicionarServico} colorScheme="teal" variant="outline">
-                        Adicionar Serviço
-                      </Button>
+                      {!mostrarPrestador ? (
+                        <Button
+                          onClick={() => setMostrarPrestador(true)}
+                          colorScheme="teal"
+                          variant="outline"
+                        >
+                          Adicionar Prestador
+                        </Button>
+                      ) : (
+                        <Button
+                          onClick={() => setMostrarPrestador(false)}
+                          colorScheme="red"
+                          variant="outline"
+                        >
+                          Remover Prestador
+                        </Button>
+                      )}
+
+                      {!mostrarServico ? (
+                        <Button
+                          onClick={() => setMostrarServico(true)}
+                          colorScheme="teal"
+                          variant="outline"
+                        >
+                          Adicionar Serviço
+                        </Button>
+                      ) : (
+                        <Button
+                          onClick={() => setMostrarServico(false)}
+                          colorScheme="red"
+                          variant="outline"
+                        >
+                          Remover Serviço
+                        </Button>
+                      )}
                     </HStack>
                     {mostrarPrestador && (
                       <Box mt={4}>
-                        {/* <PrestadorForm /> */}
+                        <PrestadorForm />
                       </Box>
                     )}
                     {mostrarServico && (
                       <Box mt={4}>
-                        {/* <ServicoForm /> */}
+                        <ServicoForm />
                       </Box>
                     )}
                   </ModalBody>

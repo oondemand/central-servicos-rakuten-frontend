@@ -3,27 +3,32 @@ import React from "react";
 import { FormControl, VStack, Button } from "@chakra-ui/react";
 import { useFormikContext } from "formik";
 import { useTicket } from "../../contexts/TicketContext";
+import { useToast } from "@chakra-ui/react";
 
-const TicketStatusButtons = ({  ticket }) => {
+const TicketStatusButtons = ({ ticket }) => {
+  const toast = useToast();
   const formik = useFormikContext();
   const { alterarStatusTicket } = useTicket();
 
   const handleStatusChange = async (newStatus) => {
     try {
       await alterarStatusTicket(ticket._id, newStatus);
-      // Atualiza o estado local do ticket
       ticket.status = newStatus;
-      // Atualizar o Formik se o status for parte do formulário
       formik.setFieldValue("status", newStatus);
     } catch (error) {
       console.error("Erro ao alterar status do ticket:", error);
-      // Opcional: Adicionar feedback ao usuário, como um toast
+      toast({
+        title: "Erro ao alterar status do ticket",
+        description: error.message,
+        status: "error",
+        duration: 5000,
+      });
     }
   };
 
   return (
     <FormControl>
-      <VStack spacing={10} align="stretch" height="100%"  bg="white" rounded="md" p={4}>
+      <VStack spacing={10} align="stretch" height="100%" bg="white" rounded="md" p={4}>
         <Button
           onClick={() => handleStatusChange("aguardando-inicio")}
           bg={ticket.status === "aguardando-inicio" ? "yellow.400" : "brand.200"}
