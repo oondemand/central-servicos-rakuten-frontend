@@ -1,6 +1,5 @@
-// src/components/Layout/Header.js
 import React from "react";
-import { FaSearch, FaCog } from "react-icons/fa";
+import { SearchIcon, SettingsIcon } from "@chakra-ui/icons";
 import { Link, useNavigate } from "react-router-dom";
 import {
   Flex,
@@ -59,22 +58,26 @@ const Header = () => {
   }, [baseOmie, listaBases]);
 
   return (
-    <Flex shadow="md" p={4} align="center" justify="space-between" bg="brand.900" color="white">
+    <Flex shadow="md" p={4} align="center" justify="space-between" bg="brand.50" color="white">
       <Flex align="center">
         <Link to="/home">
-          <Box as="span" fontSize="xl" fontWeight="bold" color="white">
-            Central de Serviços
+          <Box as="span" fontSize="xl" fontWeight="bold" color="brand.500">
+            Central de Serviços Rakuten
           </Box>
         </Link>
       </Flex>
 
       <Box width={{ base: "full", md: "auto" }} mb={{ base: 2, md: 0 }}>
         <Select
-          placeholder="Selecione uma Base Omie"
+          placeholder="Selecione a Base Omie"
           value={baseOmieDropdown}
           onChange={handleBaseOmieChange}
           size="sm"
-          colorScheme="brand"
+          variant="outline"
+          focusBorderColor="brand.500"
+          borderColor="gray.300"
+          borderRadius="md"
+          color="brand.600"
         >
           {listaBases.map((base) => (
             <option key={base._id} value={base._id}>
@@ -87,38 +90,40 @@ const Header = () => {
       <Flex align="center">
         <InputGroup display={{ base: "none", md: "flex" }}>
           <InputLeftElement pointerEvents="none">
-            <FaSearch color="brand.300" />
+            <SearchIcon color="brand.600" style={{ marginTop: '-7px' }} />
           </InputLeftElement>
           <Input
             type="text"
-            placeholder="Pesquise por CNPJ, NFS-e, etc..."
+            placeholder="Buscar por CNPJ, NFS-e, etc..."
             value={termoPesquisa}
             onChange={handlePesquisaChange}
             size="sm"
             width="300px"
-            bg="white"
-            color="black"
-            _focus={{ borderColor: "brand.500", boxShadow: "outline" }}
+            variant="outline"
+            focusBorderColor="brand.500"
+            borderColor="gray.300"
+            borderRadius="md"
+            color="brand.600"
           />
         </InputGroup>
 
         <Tooltip label="Configurações">
           <IconButton
             aria-label="Configurações"
-            icon={<FaCog />}
-            colorScheme="brand"
+            icon={<SettingsIcon />}
             variant="ghost"
             size="lg"
             onClick={handleConfigClick}
             ml={{ base: 2, md: 4 }}
+            color="brand.500"
           />
         </Tooltip>
 
         <Menu>
           <MenuButton>
-            <Avatar name="MF" bg="brand.100" color="black" size="sm" ml={2} />
+            <Avatar name="MF" bg="brand.500" size="sm" ml={2} />
           </MenuButton>
-          <MenuList bg="brand.100" color="black">
+          <MenuList bg="brand.50">
             <MenuItem onClick={handleLogout}>Logout</MenuItem>
           </MenuList>
         </Menu>

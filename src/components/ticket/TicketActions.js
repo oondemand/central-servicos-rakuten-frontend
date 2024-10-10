@@ -1,7 +1,6 @@
 // src/components/ticket/TicketActions.js
 import React, { useRef } from "react";
 import {
-  ModalFooter,
   ButtonGroup,
   Button,
   AlertDialog,
@@ -11,28 +10,41 @@ import {
   AlertDialogContent,
   AlertDialogOverlay,
   useDisclosure,
+  Flex,
 } from "@chakra-ui/react";
 import { FaCheck, FaTimes, FaTrash } from "react-icons/fa";
 import { useTicket } from "../../contexts/TicketContext";
+import { useFormikContext } from "formik";
 
-const TicketActions = ({ formik, ticket, isEditMode, closeModal }) => {
+const TicketActions = ({ ticket, isEditMode, closeModal }) => {
   const { salvarTicket, aprovarTicket, reprovarTicket } = useTicket();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = useRef();
+  const formik = useFormikContext(); // Obtém o contexto do Formik
 
   const handleApprove = async () => {
     if (!isEditMode) return;
-    const sucesso = await aprovarTicket(ticket._id);
-    if (sucesso) {
-      closeModal();
+    try {
+      const sucesso = await aprovarTicket(ticket._id);
+      if (sucesso) {
+        closeModal();
+      }
+    } catch (error) {
+      console.error("Erro ao aprovar ticket:", error);
+      // Opcional: Adicionar feedback ao usuário
     }
   };
 
   const handleReject = async () => {
     if (!isEditMode) return;
-    const sucesso = await reprovarTicket(ticket._id);
-    if (sucesso) {
-      closeModal();
+    try {
+      const sucesso = await reprovarTicket(ticket._id);
+      if (sucesso) {
+        closeModal();
+      }
+    } catch (error) {
+      console.error("Erro ao recusar ticket:", error);
+      // Opcional: Adicionar feedback ao usuário
     }
   };
 
@@ -42,40 +54,47 @@ const TicketActions = ({ formik, ticket, isEditMode, closeModal }) => {
   };
 
   const confirmArquivar = async () => {
-    const ticketUpdate = { _id: ticket._id, status: "arquivado" };
-    const sucesso = await salvarTicket(ticketUpdate);
+    try {
+      const ticketUpdate = { _id: ticket._id, status: "arquivado" };
+      const sucesso = await salvarTicket(ticketUpdate);
 
-    if (sucesso) {
-      closeModal();
+      if (sucesso) {
+        closeModal();
+      }
+      onClose();
+    } catch (error) {
+      console.error("Erro ao arquivar ticket:", error);
+      // Opcional: Adicionar feedback ao usuário
     }
-    onClose();
   };
 
   return (
     <>
-      <ModalFooter display="flex" justifyContent="space-between" pt={4}>
-        {isEditMode && (
-          <ButtonGroup spacing={4}>
-            <Button onClick={handleApprove} colorScheme="green" leftIcon={<FaCheck />}>
-              Aprovar Ticket
-            </Button>
-            <Button onClick={handleReject} colorScheme="red" leftIcon={<FaTimes />}>
-              Recusar Ticket
-            </Button>
-            <Button onClick={handleArquivar} colorScheme="yellow" leftIcon={<FaTrash />}>
-              Arquivar Ticket
-            </Button>
-          </ButtonGroup>
-        )}
-        <ButtonGroup>
-          <Button onClick={closeModal} colorScheme="gray">
+      <Flex justifyContent="space-between" width="100%">
+        <ButtonGroup spacing={4}>
+          {isEditMode && (
+            <>
+              <Button onClick={handleApprove} colorScheme="green" leftIcon={<FaCheck />}>
+                Aprovar Ticket
+              </Button>
+              <Button onClick={handleReject} colorScheme="red" leftIcon={<FaTimes />}>
+                Recusar Ticket
+              </Button>
+              <Button onClick={handleArquivar} colorScheme="yellow" leftIcon={<FaTrash />}>
+                Arquivar Ticket
+              </Button>
+            </>
+          )}
+        </ButtonGroup>
+        <ButtonGroup spacing={4}>
+          <Button bg="gray.500" color="white" onClick={closeModal}>
             Cancelar
           </Button>
           <Button type="submit" colorScheme="brand" isLoading={formik.isSubmitting}>
             {isEditMode ? "Salvar Alterações" : "Salvar"}
           </Button>
         </ButtonGroup>
-      </ModalFooter>
+      </Flex>
 
       {/* AlertDialog para confirmação de arquivamento */}
       <AlertDialog isOpen={isOpen} leastDestructiveRef={cancelRef} onClose={onClose} isCentered>

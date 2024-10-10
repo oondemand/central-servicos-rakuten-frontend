@@ -1,18 +1,35 @@
-// src/components/ticket/CartaoTicket.js
+import { Box, Text, Flex, Badge, useColorModeValue, Icon } from "@chakra-ui/react";
+import { MdLens } from "react-icons/md";
 import React from "react";
-import { Box, Text, Flex, Badge, useColorModeValue } from "@chakra-ui/react";
 
 const CartaoTicket = ({ ticket, onClick }) => {
   const statusColor = getStatusColor(ticket.status);
 
   return (
-    <Box rounded="md" shadow="sm" cursor="pointer" onClick={onClick} bg="brand.100" p={2} my={2}>
-      <Text fontWeight="bold" color="brand.500">{ticket.titulo}</Text>
-      <Text color="brand.700">{ticket.descricao}</Text>
-      <Flex align="center" mt={4}>
-        <Badge colorScheme={statusColor}>
-          {capitalize(ticket.status)}
-        </Badge>
+    <Box
+      rounded="lg"
+      shadow="md"
+      cursor="pointer"
+      onClick={onClick}
+      bg="brand.50"
+      p={2}
+      my={2}
+      borderWidth="1px"
+      borderColor="brand.200"
+    >
+      <Text fontWeight="bold" color="brand.900" fontSize="lg" mb={1}>
+        {ticket.titulo}
+      </Text>
+      <Text color="brand.700" fontSize="sm" mt={2} noOfLines={2}>
+        {ticket.observacao}
+      </Text>
+      <Flex align="center" mt={4} justify="flex-end">
+        <Flex align="center">
+          <Icon as={MdLens} color={getStatusColor(ticket.status)} boxSize={2} mr={1} />
+          <Text fontSize="sm" color="brand.900" fontWeight="bold">
+            {capitalize(ticket.status)}
+          </Text>
+        </Flex>
       </Flex>
     </Box>
   );
@@ -21,13 +38,13 @@ const CartaoTicket = ({ ticket, onClick }) => {
 const getStatusColor = (status) => {
   switch (status.toLowerCase()) {
     case "aguardando-inicio":
-      return "yellow";
+      return "yellow.500";
     case "trabalhando":
-      return "green";
+      return "green.500";
     case "revisao":
-      return "red";
+      return "red.500";
     default:
-      return "blue";
+      return "blue.500";
   }
 };
 

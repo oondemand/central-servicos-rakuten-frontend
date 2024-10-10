@@ -1,41 +1,61 @@
 // src/components/ticket/TicketStatusButtons.js
 import React from "react";
-import { FormControl, FormLabel, Button, ButtonGroup, useColorModeValue } from "@chakra-ui/react";
+import { FormControl, VStack, Button, useColorModeValue } from "@chakra-ui/react";
 import { useTicket } from "../../contexts/TicketContext";
 
 const TicketStatusButtons = ({ formik, ticket }) => {
   const { alterarStatusTicket } = useTicket();
-  const handleStatusChange = (newStatus) => {
-    alterarStatusTicket(ticket._id, newStatus);
-    ticket.status = newStatus;
+
+  const handleStatusChange = async (newStatus) => {
+    try {
+      await alterarStatusTicket(ticket._id, newStatus);
+      // Atualiza o estado local do ticket
+      ticket.status = newStatus;
+      // Atualizar o Formik se o status for parte do formulário
+      formik.setFieldValue("status", newStatus);
+    } catch (error) {
+      console.error("Erro ao alterar status do ticket:", error);
+      // Opcional: Adicionar feedback ao usuário, como um toast
+    }
   };
 
-  const activeColor = useColorModeValue("brand.500", "brand.300");
-  const inactiveColor = useColorModeValue("gray.500", "gray.300");
-
   return (
-    <FormControl mb={3}>
-      <FormLabel>Status</FormLabel>
-      <ButtonGroup spacing={4} variant="outline">
+    <FormControl>
+      <VStack spacing={10} align="stretch" height="100%"  bg="white" rounded="md" p={4}>
         <Button
           onClick={() => handleStatusChange("aguardando-inicio")}
-          colorScheme={ticket.status === "aguardando-inicio" ? "brand" : "gray"}
+          bg={ticket.status === "aguardando-inicio" ? "yellow.400" : "brand.200"}
+          color="brand.50"
+          width="100%"
+          _hover={{
+            bg: ticket.status === "aguardando-inicio" ? "yellow.500" : "brand.300",
+          }}
         >
           Aguardando Início
         </Button>
         <Button
           onClick={() => handleStatusChange("trabalhando")}
-          colorScheme={ticket.status === "trabalhando" ? "green" : "gray"}
+          bg={ticket.status === "trabalhando" ? "green.400" : "brand.200"}
+          color="brand.50"
+          width="100%"
+          _hover={{
+            bg: ticket.status === "trabalhando" ? "green.500" : "brand.300",
+          }}
         >
           Trabalhando
         </Button>
         <Button
           onClick={() => handleStatusChange("revisao")}
-          colorScheme={ticket.status === "revisao" ? "red" : "gray"}
+          bg={ticket.status === "revisao" ? "red.400" : "brand.200"}
+          color="brand.50"
+          width="100%"
+          _hover={{
+            bg: ticket.status === "revisao" ? "red.500" : "brand.300",
+          }}
         >
           Revisão
         </Button>
-      </ButtonGroup>
+      </VStack>
     </FormControl>
   );
 };
