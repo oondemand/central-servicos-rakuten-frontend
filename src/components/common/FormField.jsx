@@ -10,6 +10,7 @@ import {
 } from "@chakra-ui/react";
 import { Field, useFormikContext, getIn } from "formik";
 import InputMask from "react-input-mask";
+import CustomSelect from "./CustomSelect";
 
 const FormField = ({ label, name, type = "text", options = [], mask, ...props }) => {
   const { touched, errors } = useFormikContext();
@@ -22,22 +23,9 @@ const FormField = ({ label, name, type = "text", options = [], mask, ...props })
     <FormControl isInvalid={isInvalid} mb={4}>
       <FormLabel htmlFor={name}>{label}</FormLabel>
       {type === "select" ? (
-        <Field
-          as={Select}
-          id={name}
-          name={name}
-          placeholder={`Selecione ${label.toLowerCase()}`}
-          {...props}
-          color="brand.500"
-        >
-          {options.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </Field>
+        <CustomSelect label={label} name={name} options={options} {...props} />
       ) : type === "textarea" ? (
-        <Field as={Textarea} id={name} name={name} {...props} color="brand.500" />
+        <Field as={Textarea} id={name} name={name} {...props} />
       ) : mask ? (
         <Field name={name}>
           {({ field }) => (
@@ -48,7 +36,6 @@ const FormField = ({ label, name, type = "text", options = [], mask, ...props })
                   ref={inputRef}
                   id={name}
                   type={type}
-                  color="brand.500"
                   placeholder={`Digite ${label.toLowerCase()}`}
                 />
               )}
@@ -63,7 +50,6 @@ const FormField = ({ label, name, type = "text", options = [], mask, ...props })
           type={type}
           placeholder={`Digite ${label.toLowerCase()}`}
           {...props}
-          color="brand.500"
         />
       )}
       <FormErrorMessage>{getIn(errors, name) || ""}</FormErrorMessage>

@@ -1,6 +1,15 @@
 // src/components/PrestadorForm.js
 import React from "react";
-import { VStack, HStack, Accordion, AccordionItem, AccordionButton, AccordionIcon, AccordionPanel, Box } from "@chakra-ui/react";
+import {
+  VStack,
+  HStack,
+  Accordion,
+  AccordionItem,
+  AccordionButton,
+  AccordionIcon,
+  AccordionPanel,
+  Box,
+} from "@chakra-ui/react";
 import { useFormikContext } from "formik";
 import FormField from "@/components/common/FormField";
 
@@ -34,19 +43,12 @@ const PrestadorForm = () => {
                 label="Documento (CPF/CNPJ)"
                 name="prestador.documento"
                 type="text"
+                maxLength={11}
               />
             </HStack>
             <HStack spacing={4} align="stretch">
-              <FormField
-                label="Nome"
-                name="prestador.nome"
-                type="text"
-              />
-              <FormField
-                label="E-mail"
-                name="prestador.email"
-                type="email"
-              />
+              <FormField label="Nome" name="prestador.nome" type="text" />
+              <FormField label="E-mail" name="prestador.email" type="email" />
             </HStack>
             <HStack spacing={4} align="stretch">
               <FormField
