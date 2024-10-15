@@ -14,8 +14,9 @@ const CartaoTicket = ({ ticket, onClick }) => {
       my={2}
       borderWidth="1px"
       borderColor="brand.200"
+      color="brand.900" 
     >
-      <Text fontWeight="bold" color="brand.900" fontSize="md" mb={1}>
+      <Text fontWeight="bold" fontSize="md" mb={1}>
         <Icon as={MdLens} color={getStatusColor(ticket.status)} boxSize={2} mr={1} />
         {ticket.titulo}
       </Text>

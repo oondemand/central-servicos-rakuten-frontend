@@ -35,7 +35,7 @@ const Etapa = ({ index, etapa }) => {
   };
 
   return (
-    <Box p={2} bg="brand.400" rounded="md" shadow="md">
+    <Box bg="brand.400" p={2} rounded="md" shadow="md">
       <Flex justify="space-between" align="center">
         <Heading size="md" color="white">
           {etapa.nome}
