@@ -15,20 +15,10 @@ const CartaoTicket = ({ ticket, onClick }) => {
       borderWidth="1px"
       borderColor="brand.200"
     >
-      <Text fontWeight="bold" color="brand.900" fontSize="lg" mb={1}>
+      <Text fontWeight="bold" color="brand.900" fontSize="md" mb={1}>
+        <Icon as={MdLens} color={getStatusColor(ticket.status)} boxSize={2} mr={1} />
         {ticket.titulo}
       </Text>
-      <Text color="brand.700" fontSize="sm" mt={2} noOfLines={2}>
-        {ticket.observacao}
-      </Text>
-      <Flex align="center" mt={4} justify="flex-end">
-        <Flex align="center">
-          <Icon as={MdLens} color={getStatusColor(ticket.status)} boxSize={2} mr={1} />
-          <Text fontSize="sm" color="brand.900" fontWeight="bold">
-            {capitalize(ticket.status)}
-          </Text>
-        </Flex>
-      </Flex>
     </Box>
   );
 };

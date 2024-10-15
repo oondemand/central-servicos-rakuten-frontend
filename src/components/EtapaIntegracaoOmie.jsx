@@ -14,7 +14,7 @@ const EtapaIntegracaoOmie = () => {
       </Heading>
 
       {listaTickets
-        .filter((ticket) => ticket.etapa === "conta-pagar")
+        .filter((ticket) => ticket.etapa === "integracao-omie")
         .map((ticket) => (
           <CartaoContaPagar key={ticket._id} ticket={ticket} />
         ))}
