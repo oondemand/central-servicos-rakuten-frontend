@@ -15,13 +15,12 @@ import {
 import { Formik, Form } from "formik";
 import TicketFields from "./TicketFields";
 import TicketActions from "./TicketActions";
-import PrestadorForm from "../PrestadorForm";
-import ServicoForm from "../ServicoForm";
+import PrestadorForm from "../form/PrestadorForm";
+import ServicoForm from "../form/ServicoForm";
 import TicketStatusButtons from "./TicketStatusButtons";
 import { ticketValidationSchema } from "../../validation/ticketValidationSchema";
 import { prestadorValidationSchema } from "../../validation/prestadorValidationSchema";
 import { servicoValidationSchema } from "../../validation/servicoValidationSchema";
-import { ticketInitValues } from "../../initValues/ticketInitValues";
 import { prestadorInitValues } from "../../initValues/prestadorInitValues";
 import { servicoInitValues } from "../../initValues/servicoInitValues";
 import { useTicket } from "../../contexts/TicketContext";

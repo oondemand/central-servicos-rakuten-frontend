@@ -57,3 +57,14 @@ export const listarPrestadores = async (filtro) => {
     throw error; // Repassa o erro para que o chamador possa tratá-lo
   }
 };
+
+// carregar prestador por SID
+export const carregarPrestadorPorSid = async (sid) => {
+  try {
+    const response = await api.get(`prestadores/sid/${sid}`);
+    return response.data; // Retorna os dados da resposta
+  } catch (error) {
+    console.error("Erro ao carregar prestador por SID:", error);
+    throw error; // Repassa o erro para que o chamador possa tratá-lo
+  }
+};
