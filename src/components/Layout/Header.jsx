@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { SearchIcon, SettingsIcon } from "@chakra-ui/icons";
 import { Link, useNavigate } from "react-router-dom";
 import {
@@ -22,17 +22,17 @@ import { useBaseOmie } from "../../contexts/BaseOmieContext";
 import { useAuth } from "../../contexts/AuthContext"; // Importar o contexto de autenticação
 
 const Header = () => {
-  const { listaBases, baseOmie, selecionarBase } = useBaseOmie();
+  // const { listaBases, baseOmie, selecionarBase } = useBaseOmie();
   const { filtrarTickets } = useTicket();
   const { logout } = useAuth(); // Desestruturar a função de logout
   const navigate = useNavigate();
 
-  const [termoPesquisa, setTermoPesquisa] = React.useState("");
-  const [baseOmieDropdown, setBaseOmieSelecionadaDropdown] = React.useState("");
+  const [termoPesquisa, setTermoPesquisa] = useState("");
+  // const [baseOmieDropdown, setBaseOmieSelecionadaDropdown] = useState("");
 
-  const handleBaseOmieChange = (e) => {
-    selecionarBase(e.target.value);
-  };
+  // const handleBaseOmieChange = (e) => {
+  //   selecionarBase(e.target.value);
+  // };
 
   const handlePesquisaChange = (e) => {
     const termo = e.target.value;
@@ -49,13 +49,12 @@ const Header = () => {
     navigate("/login");
   };
 
-  React.useEffect(() => {
-    if (baseOmie) {
-      setBaseOmieSelecionadaDropdown(baseOmie._id);
-    } else {
-      setBaseOmieSelecionadaDropdown("");
-    }
-  }, [baseOmie, listaBases]);
+  // useEffect(() => {
+  //   if (listaBases.length > 0) {
+  //     selecionarBase(listaBases[0]._id);
+  //     setBaseOmieSelecionadaDropdown(listaBases[0]._id);
+  //   }
+  // }, [listaBases]);
 
   return (
     <Flex shadow="md" p={4} align="center" justify="space-between" bg="brand.50" color="white">
@@ -67,30 +66,10 @@ const Header = () => {
         </Link>
       </Flex>
 
-      <Box width={{ base: "full", md: "auto" }} mb={{ base: 2, md: 0 }}>
-        <Select
-          placeholder="Selecione a Base Omie"
-          value={baseOmieDropdown}
-          onChange={handleBaseOmieChange}
-          size="sm"
-          variant="outline"
-          focusBorderColor="brand.500"
-          borderColor="gray.300"
-          borderRadius="md"
-          color="brand.600"
-        >
-          {listaBases.map((base) => (
-            <option key={base._id} value={base._id}>
-              {base.nome}
-            </option>
-          ))}
-        </Select>
-      </Box>
-
       <Flex align="center">
         <InputGroup display={{ base: "none", md: "flex" }}>
           <InputLeftElement pointerEvents="none">
-            <SearchIcon color="brand.600" style={{ marginTop: '-7px' }} />
+            <SearchIcon color="brand.600" style={{ marginTop: "-7px" }} />
           </InputLeftElement>
           <Input
             type="text"

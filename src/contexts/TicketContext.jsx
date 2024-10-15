@@ -39,14 +39,14 @@ export const TicketProvider = ({ children }) => {
       const termoNormalizado = normalizarTexto(termo);
 
       const ticketsFiltrados = listaTodosTickets.filter((ticket) => {
-        const base = baseOmie ? baseOmie : {};
-        const { nome, documento } = base;
+        // const base = baseOmie ? baseOmie : {};
+        // const { nome, documento } = base;
 
         return (
           normalizarTexto(ticket.titulo).includes(termoNormalizado) ||
-          normalizarTexto(ticket.observacao).includes(termoNormalizado) ||
-          normalizarTexto(nome).includes(termoNormalizado) ||
-          normalizarTexto(documento).includes(termoNormalizado)
+          normalizarTexto(ticket.observacao).includes(termoNormalizado)
+          // normalizarTexto(nome).includes(termoNormalizado) ||
+          // normalizarTexto(documento).includes(termoNormalizado)
         );
       });
 

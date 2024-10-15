@@ -17,7 +17,7 @@ RUN npm install
 COPY . .
 
 # Executa o build da aplicação React
-RUN npm run build
+RUN npm run build 
 
 # Etapa 2: Usar uma imagem leve para o resultado
 FROM node:18-alpine
@@ -35,4 +35,4 @@ EXPOSE 3000
 RUN npm install -g serve
 
 # Comando para iniciar a aplicação
-CMD ["serve", "-s", "build"]
+CMD ["serve", "-s", "build", "-l", "3000"]
