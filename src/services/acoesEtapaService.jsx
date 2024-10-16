@@ -1,13 +1,20 @@
 // src/services/PrestadorService.js
 import api from "./api";
 
-export const importarComissoes = async (comissoes) => {
+export const importarComissoes = async (file) => {
   try {
-    const response = await api.post("acoes-etapas/importar-comissoes", comissoes);
-    return response.data; // Retorna os dados da resposta
+    const formData = new FormData();
+    formData.append("file", file, file.name);
+
+    api.post("acoes-etapas/importar-comissoes", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    return true;
   } catch (error) {
-    console.error("Erro ao importar comissões:", error);
-    throw error; // Repassa o erro para que o chamador possa tratá-lo
+    throw error;
   }
 };
 
@@ -29,7 +36,7 @@ export const exportarPrestadores = async (prestadores) => {
     console.error("Erro ao exportar prestadores:", error);
     throw error; // Repassa o erro para que o chamador possa tratá-lo
   }
-}
+};
 
 export const importarPrestadores = async (prestadores) => {
   try {
@@ -49,4 +56,4 @@ export const importarRPAs = async (rpas) => {
     console.error("Erro ao importar RPAs:", error);
     throw error; // Repassa o erro para que o chamador possa tratá-lo
   }
-}
+};

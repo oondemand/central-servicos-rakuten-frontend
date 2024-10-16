@@ -1,8 +1,11 @@
 // src/initValues/servicoInitValues.js
 export const servicoInitValues = {
-  descricao: '',
-  valor: '',
-  data: '',
-  status: 'ativo',
-  comentariosRevisao: '',
+  mesCompetencia: "",
+  anoCompetencia: "",
+  valorPrincipal: "",
+  valorBonus: "",
+  valorAjusteComercial: "",
+  valorHospedagemAnuncio: "",
+  valorTotal: "",
+  status: "ativo",
 };

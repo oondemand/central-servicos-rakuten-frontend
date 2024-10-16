@@ -121,7 +121,7 @@ const Login = () => {
                   </FormControl>
 
                   {errors.general && (
-                    <Box color="brand.error.500" w="full">
+                    <Box color="red.500" w="full">
                       {errors.general}
                     </Box>
                   )}

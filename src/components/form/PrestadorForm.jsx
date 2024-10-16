@@ -46,7 +46,7 @@ const PrestadorForm = () => {
     };
 
     // Executa a busca quando o SID for alterado e tiver um valor válido
-    if (values.prestador.sid && values.prestador.sid.length > 0) {
+    if (values.prestador.sid && values.prestador.sid.length === 7) {
       buscarPrestador(values.prestador.sid);
     }
   }, [values.prestador.sid, setFieldValue, toast]);
@@ -67,7 +67,7 @@ const PrestadorForm = () => {
             <HStack align="stretch">
               
               <FormField label="ID" name="prestador._id" type="text" isReadOnly={true}/>
-              <FormField label="SID" name="prestador.sid" type="text" />
+              <FormField label="SID" name="prestador.sid" type="text" maxLength={7} />
               <FormField
                 label="Tipo"
                 name="prestador.tipo"

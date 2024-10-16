@@ -1,9 +1,9 @@
 import React, { useRef } from "react";
-import { Box, Button } from "@chakra-ui/react";
-import * as XLSX from "xlsx";
+import { Box, Button, useToast } from "@chakra-ui/react";
 import * as acoesEtapaService from "../services/acoesEtapaService";
 
 const AcoesEtapa = ({ etapa, setIsAddModalOpen }) => {
+  const toast = useToast();
   const inputFileRef = useRef(null);
 
   const handleCadastrarTicket = () => {
@@ -14,25 +14,30 @@ const AcoesEtapa = ({ etapa, setIsAddModalOpen }) => {
     inputFileRef.current.click();
   };
 
-  const handleFileChange = (event) => {
+  const handleFileChangeComissoes = async (event) => {
     const file = event.target.files[0];
 
     if (file) {
-      const reader = new FileReader();
+      try {
+        await acoesEtapaService.importarComissoes(file);
 
-      reader.onload = (e) => {
-        const data = new Uint8Array(e.target.result);
-        const workbook = XLSX.read(data, { type: "array" });
-
-        // Aqui você pode processar o arquivo Excel e pegar os dados necessários
-        const sheetName = workbook.SheetNames[0]; // Pega o nome da primeira aba
-        const worksheet = workbook.Sheets[sheetName];
-        const jsonData = XLSX.utils.sheet_to_json(worksheet);
-
-        console.log("Dados importados:", jsonData);
-      };
-
-      reader.readAsArrayBuffer(file);
+        toast({
+          title: "Arquivo de comissões enviado para processamento",
+          description: "Assim que o processamento for concluído, você será notificado via e-mail.",
+          status: "success",
+          duration: 5000,
+          isClosable: true,
+        });
+      } catch (error) {
+        console.error("Erro ao enviar comissões:", error);
+        toast({
+          title: "Erro ao enviar comissões",
+          description: "Ocorreu um erro ao processar o arquivo.",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
+      }
     }
   };
 
@@ -85,7 +90,7 @@ const AcoesEtapa = ({ etapa, setIsAddModalOpen }) => {
           <input
             type="file"
             ref={inputFileRef}
-            onChange={handleFileChange}
+            onChange={handleFileChangeComissoes}
             style={{ display: "none" }}
             accept=".xlsx, .xls"
           />

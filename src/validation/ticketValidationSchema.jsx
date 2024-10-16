@@ -3,7 +3,7 @@ import * as Yup from "yup";
 
 export const ticketValidationSchema = Yup.object({
   titulo: Yup.string().required("Título é obrigatório"),
-  observacao: Yup.string().required("Observação é obrigatória"),
+  observacao: Yup.string(),
   prestador: Yup.object().nullable(), 
   servico: Yup.object().nullable(), 
 });
