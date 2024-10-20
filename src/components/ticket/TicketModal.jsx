@@ -13,6 +13,9 @@ import {
   Button,
 } from "@chakra-ui/react";
 import { Formik, Form } from "formik";
+import { useToast } from "@chakra-ui/react";
+import * as Yup from "yup";
+
 import TicketFields from "./TicketFields";
 import TicketActions from "./TicketActions";
 import PrestadorForm from "../form/PrestadorForm";
@@ -28,9 +31,6 @@ import { useBaseOmie } from "../../contexts/BaseOmieContext";
 import { useEtapa } from "../../contexts/EtapaContext";
 import { salvarPrestador } from "../../services/prestadorService";
 import { salvarServico } from "../../services/servicoService";
-import { useToast } from "@chakra-ui/react";
-import * as Yup from "yup";
-import { format } from "date-fns";
 
 const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
   const isEditMode = Boolean(ticket);
@@ -39,7 +39,7 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
   const { listaEtapas } = useEtapa();
   const toast = useToast();
   const [mostrarPrestador, setMostrarPrestador] = useState(ticket?.prestador ? true : false);
-  const [mostrarServico, setMostrarServico] = useState(ticket?.servico ? true : false);
+  const [mostrarServico, setMostrarServico] = useState(ticket?.servicos ? true : false);
 
   const combinedValidationSchema = useMemo(() => {
     let schema = ticketValidationSchema;
@@ -56,11 +56,13 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
 
     if (mostrarServico) {
       schema = schema.shape({
-        servico: servicoValidationSchema,
+        servicos: Yup.array()
+          .of(servicoValidationSchema)
+          .min(1, "É necessário adicionar pelo menos um serviço"),
       });
     } else {
       schema = schema.shape({
-        servico: Yup.object().nullable(),
+        servicos: Yup.array().of(Yup.object().nullable()),
       });
     }
 
@@ -72,7 +74,7 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
       titulo: "",
       observacao: "",
       prestador: prestadorInitValues,
-      servico: servicoInitValues,
+      servicos: [],
     };
 
     if (ticket) {
@@ -81,11 +83,13 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
         titulo: ticket.titulo,
         observacao: ticket.observacao,
         prestador: ticket.prestador || prestadorInitValues,
-        servico: ticket.servico || servicoInitValues,
+        servicos: ticket.servicos
+          ? ticket.servicos.map((servico) => ({
+              ...servicoInitValues,
+              ...servico,
+            }))
+          : [],
       };
-      initValues.servico.data = ticket.servico?.data
-        ? format(new Date(ticket.servico?.data), "yyyy-MM-dd")
-        : "";
     }
 
     return initValues;
@@ -95,7 +99,7 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
     setSubmitting(true);
     try {
       let prestadorId = null;
-      let servicoId = null;
+      let servicosIds = [];
 
       if (mostrarPrestador && values.prestador) {
         const documentoLimpo = values.prestador.documento
@@ -120,17 +124,24 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
         }
       }
 
-      if (mostrarServico && values.servico) {
-        if (isEditMode && ticket.servico) {
-          servicoId = ticket.servico._id;
-          const servicoResponse = await salvarServico({
-            ...values.servico,
-            _id: servicoId,
-          });
-          servicoId = servicoResponse.servico._id;
-        } else {
-          const servicoResponse = await salvarServico(values.servico);
-          servicoId = servicoResponse.servico._id;
+      if (mostrarServico && values.servicos.length > 0) {
+        for (let i = 0; i < values.servicos.length; i++) {
+          const servico = values.servicos[i];
+          if (servico) {
+            let servicoId = null;
+            if (isEditMode && ticket.servicos && ticket.servicos[i]) {
+              servicoId = ticket.servicos[i]._id;
+              const servicoResponse = await salvarServico({
+                ...servico,
+                _id: servicoId,
+              });
+              servicoId = servicoResponse.servico._id;
+            } else {
+              const servicoResponse = await salvarServico(servico);
+              servicoId = servicoResponse.servico._id;
+            }
+            servicosIds.push(servicoId);
+          }
         }
       }
 
@@ -141,7 +152,7 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
             observacao: values.observacao,
             status: values.status,
             prestadorId,
-            servicoId: servicoId,
+            servicosIds,
           }
         : {
             baseOmieId: baseOmie?._id,
@@ -150,7 +161,7 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
             observacao: values.observacao,
             status: "aguardando-inicio",
             prestadorId,
-            servicoId: servicoId,
+            servicosIds,
           };
 
       const sucessoTicket = await salvarTicket(ticketData);

@@ -3,5 +3,5 @@ export const ticketInitValues = {
   titulo: '',
   observacao: '',
   prestador: {},
-  servico: {},
+  servicos: [],
 };

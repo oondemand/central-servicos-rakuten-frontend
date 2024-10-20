@@ -1,4 +1,3 @@
-// src/contexts/TicketContext.js
 import React, { createContext, useState, useEffect, useCallback, useContext } from "react";
 import {
   salvarTicket as salvarTicketService,
@@ -11,27 +10,20 @@ import {
 import { useBaseOmie } from "./BaseOmieContext";
 import { useToast } from "@chakra-ui/react";
 
-// Cria o contexto para Ticket
 const TicketContext = createContext();
 
-// Provedor do contexto de Ticket
 export const TicketProvider = ({ children }) => {
-  const [listaTodosTickets, setListaTodosTickets] = useState([]); // Estado para armazenar todos os tickets
+  const [listaTodosTickets, setListaTodosTickets] = useState([]);
   const [listaTickets, setListaTickets] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const { baseOmie } = useBaseOmie();
   const toast = useToast();
 
-  // Função para normalizar strings, removendo acentos e convertendo para minúsculas
   const normalizarTexto = (texto) => {
-    return texto
-      .toLowerCase()
-      .normalize("NFD") // Decompor caracteres especiais (como acentos)
-      .replace(/[̀-ͯ]/g, ""); // Remover sinais diacríticos (acentos)
+    return texto.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
   };
 
-  // Função para filtrar tickets com base na pesquisa
   const filtrarTickets = (termo) => {
     if (!termo) {
       setListaTickets(listaTodosTickets);
@@ -54,7 +46,6 @@ export const TicketProvider = ({ children }) => {
     }
   };
 
-  // Função para salvar ticket (adicionar ou editar)
   const salvarTicket = useCallback(
     async (ticket) => {
       setLoading(true);
@@ -96,7 +87,6 @@ export const TicketProvider = ({ children }) => {
     [toast]
   );
 
-  // Função para aprovar um ticket
   const aprovarTicket = useCallback(
     async (id) => {
       setLoading(true);
@@ -110,7 +100,7 @@ export const TicketProvider = ({ children }) => {
           duration: 5000,
           isClosable: true,
         });
-        return true; // Indica sucesso
+        return true;
       } catch (err) {
         const mensagem = err.response?.data?.message || "Erro ao aprovar ticket";
         const detalhes = err.response?.data?.detalhes || err.message;
@@ -122,7 +112,7 @@ export const TicketProvider = ({ children }) => {
           isClosable: true,
         });
         setError(mensagem);
-        return false; // Indica falha
+        return false;
       } finally {
         setLoading(false);
       }
@@ -130,7 +120,6 @@ export const TicketProvider = ({ children }) => {
     [toast]
   );
 
-  // Função para reprovar um ticket
   const reprovarTicket = useCallback(
     async (id) => {
       setLoading(true);
@@ -144,7 +133,7 @@ export const TicketProvider = ({ children }) => {
           duration: 5000,
           isClosable: true,
         });
-        return true; // Indica sucesso
+        return true;
       } catch (err) {
         const mensagem = err.response?.data?.message || "Erro ao recusar ticket";
         const detalhes = err.response?.data?.detalhes || err.message;
@@ -156,7 +145,7 @@ export const TicketProvider = ({ children }) => {
           isClosable: true,
         });
         setError(mensagem);
-        return false; // Indica falha
+        return false;
       } finally {
         setLoading(false);
       }
@@ -164,7 +153,6 @@ export const TicketProvider = ({ children }) => {
     [toast]
   );
 
-  // Função para alterar o status do ticket
   const alterarStatusTicket = useCallback(
     async (id, novoStatus) => {
       setLoading(true);
@@ -178,7 +166,7 @@ export const TicketProvider = ({ children }) => {
           duration: 5000,
           isClosable: true,
         });
-        return true; // Indica sucesso
+        return true;
       } catch (err) {
         console.error("Erro ao atualizar status do ticket.", err);
 
@@ -197,15 +185,14 @@ export const TicketProvider = ({ children }) => {
     [toast]
   );
 
-  // Função para carregar todos os tickets
   const carregarTickets = useCallback(async () => {
     setLoading(true);
     try {
       const filtro = baseOmie ? { baseOmieId: baseOmie._id } : {};
       const response = await listarTickets(filtro);
 
-      setListaTodosTickets(response); // Armazena todos os tickets
-      setListaTickets(response); // Inicializa listaTickets com todos os tickets
+      setListaTodosTickets(response);
+      setListaTickets(response);
       setError(null);
     } catch (err) {
       console.error("Erro ao buscar tickets:", err);
@@ -223,7 +210,6 @@ export const TicketProvider = ({ children }) => {
     }
   }, [baseOmie, toast]);
 
-  // Função para deletar (arquivar) um ticket
   const deletarTicket = useCallback(
     async (id) => {
       setLoading(true);
@@ -239,7 +225,7 @@ export const TicketProvider = ({ children }) => {
           duration: 5000,
           isClosable: true,
         });
-        return true; // Indica sucesso
+        return true;
       } catch (err) {
         console.error("Erro ao arquivar ticket:", err);
         const detalhes = err.response?.data?.detalhes || err.message;
@@ -251,7 +237,7 @@ export const TicketProvider = ({ children }) => {
           duration: 5000,
           isClosable: true,
         });
-        return false; // Indica falha
+        return false;
       } finally {
         setLoading(false);
       }
@@ -259,14 +245,13 @@ export const TicketProvider = ({ children }) => {
     [toast]
   );
 
-  // Função para buscar ticket por ID
   const buscarTicketPorId = useCallback(
     async (id) => {
       setLoading(true);
       try {
         const response = await carregarTicket(id);
         setError(null);
-        return response; // Retorna o ticket encontrado
+        return response;
       } catch (err) {
         console.error("Erro ao buscar ticket pelo ID:", err);
         const detalhes = err.response?.data?.detalhes || err.message;
@@ -278,7 +263,7 @@ export const TicketProvider = ({ children }) => {
           duration: 5000,
           isClosable: true,
         });
-        return null; // Retorna null se falhar
+        return null;
       } finally {
         setLoading(false);
       }
@@ -286,7 +271,6 @@ export const TicketProvider = ({ children }) => {
     [toast]
   );
 
-  // Carregar os tickets quando o componente for montado
   useEffect(() => {
     carregarTickets();
   }, [carregarTickets]);
@@ -312,7 +296,6 @@ export const TicketProvider = ({ children }) => {
   );
 };
 
-// Hook para usar o contexto de Ticket
 export const useTicket = () => useContext(TicketContext);
 
 export default TicketContext;
