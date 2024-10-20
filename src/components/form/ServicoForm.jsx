@@ -45,14 +45,14 @@ const ServicoForm = () => {
   const totais = calcularTotais();
 
   return (
-    <Box mt={4}>
+    <Box mt={2}>
       <Text fontSize="lg" fontWeight="bold" mb={2}>
         Serviços
       </Text>
       <FieldArray name="servicos">
         {({ push, remove, form }) => (
-          <VStack align="stretch" spacing={4}>
-            <Table variant="simple">
+          <VStack align="stretch">
+            <Table variant="simple" size="sm">
               <Thead>
                 <Tr>
                   <Th>Competência</Th>
@@ -69,8 +69,8 @@ const ServicoForm = () => {
                   form.values.servicos.map((servico, index) => (
                     <Tr key={index}>
                       <Td>
-                        <HStack>
-                          <Box width="50px">
+                        <HStack spacing={1}>
+                          <Box width="55px">
                             <FormField
                               name={`servicos.${index}.mesCompetencia`}
                               type="number"
@@ -147,7 +147,7 @@ const ServicoForm = () => {
                   ))
                 ) : (
                   <Tr>
-                    <Td colSpan={10}>
+                    <Td colSpan={8}>
                       <Text textAlign="center">Nenhum serviço adicionado.</Text>
                     </Td>
                   </Tr>

@@ -52,7 +52,7 @@ const PrestadorForm = () => {
   }, [values.prestador.sid, setFieldValue, toast]);
 
   return (
-    <Accordion allowToggle defaultIndex={[0]}>
+    <Accordion allowToggle>
       <AccordionItem borderRadius="md">
         <h2>
           <AccordionButton>

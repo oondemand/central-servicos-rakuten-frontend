@@ -8,8 +8,8 @@ const EtapaIntegracaoOmie = () => {
   const { listaTickets } = useTicket();
 
   return (
-    <Box bg="brand.100" p={2} rounded="md" shadow="md">
-      <Flex justify="space-between" align="center">
+    <Box bg="brand.100" p={2} rounded="md" shadow="md" minH={420}>
+      <Flex justifyContent="center" alignItems="center">
         <Heading size="md" color="brand.800">
           Integração Omie
         </Heading>

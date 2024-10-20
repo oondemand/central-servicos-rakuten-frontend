@@ -11,7 +11,7 @@ function Layout() {
         <Box position="fixed" top="0" left="0" right="0" zIndex="1000">
           <Header />
         </Box>
-        <Box flex="1" p={8} mt="90px" mb="70px" overflow="auto" width="100vw" height="calc(100vh - 140px)" paddingBottom="0">
+        <Box flex="1" p={8} mt="70px" mb="60px" overflow="auto" width="100vw" height="calc(100vh - 140px)" paddingBottom="0">
           <Outlet />
         </Box>
         <Box position="fixed" bottom="0" left="0" right="0" zIndex="1000">
