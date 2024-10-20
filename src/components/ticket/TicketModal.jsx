@@ -193,6 +193,7 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
         validationSchema={combinedValidationSchema}
         onSubmit={handleSubmit}
         enableReinitialize
+        validateOnChange={false}
       >
         {(formik) => (
           <Form>
