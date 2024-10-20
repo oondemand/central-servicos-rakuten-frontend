@@ -25,7 +25,7 @@ const LoginSchema = Yup.object().shape({
 });
 
 const Login = () => {
-  console.log("Login");
+  // console.log("Login");
 
   const navigate = useNavigate();
   const { login } = useAuth();
@@ -75,8 +75,8 @@ const Login = () => {
               try {
                 const response = await loginService(values);
                 const { token, usuario } = response.data;
-                console.log("usuario", usuario);
-                console.log("token", token);
+                // console.log("usuario", usuario);
+                // console.log("token", token);
 
                 login(token, usuario);
                 navigate("/auth/home");

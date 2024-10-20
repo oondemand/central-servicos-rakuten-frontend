@@ -57,7 +57,7 @@ const PrestadorForm = () => {
         <h2>
           <AccordionButton>
             <Box flex="1" textAlign="left" fontWeight="bold">
-              Informações do Prestador
+                            Informações do Prestador: <label style={{ fontWeight: "normal", fontStyle: "italic" }}>{values.prestador.nome} - SID {values.prestador.sid}</label>
             </Box>
             <AccordionIcon />
           </AccordionButton>
