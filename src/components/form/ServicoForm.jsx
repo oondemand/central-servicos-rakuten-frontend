@@ -16,10 +16,34 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { CloseIcon } from "@chakra-ui/icons";
-import { Field, FieldArray } from "formik";
+import { Field, FieldArray, useFormikContext } from "formik";
 import FormField from "@/components/common/FormField";
 
 const ServicoForm = () => {
+  const { values } = useFormikContext();
+
+  const calcularTotais = () => {
+    const totais = {
+      valorPrincipal: 0,
+      valorBonus: 0,
+      valorAjusteComercial: 0,
+      valorHospedagemAnuncio: 0,
+      valorTotal: 0,
+    };
+
+    values.servicos?.forEach((servico) => {
+      totais.valorPrincipal += Number(servico.valorPrincipal) || 0;
+      totais.valorBonus += Number(servico.valorBonus) || 0;
+      totais.valorAjusteComercial += Number(servico.valorAjusteComercial) || 0;
+      totais.valorHospedagemAnuncio += Number(servico.valorHospedagemAnuncio) || 0;
+      totais.valorTotal += Number(servico.valorTotal) || 0;
+    });
+
+    return totais;
+  };
+
+  const totais = calcularTotais();
+
   return (
     <Box mt={4}>
       <Text fontSize="lg" fontWeight="bold" mb={2}>
@@ -126,6 +150,27 @@ const ServicoForm = () => {
                     <Td colSpan={10}>
                       <Text textAlign="center">Nenhum serviço adicionado.</Text>
                     </Td>
+                  </Tr>
+                )}
+                {form.values.servicos && form.values.servicos.length > 0 && (
+                  <Tr>
+                    <Td fontWeight="bold">Total</Td>
+                    <Td isNumeric fontWeight="bold">
+                      {totais.valorPrincipal.toFixed(2)}
+                    </Td>
+                    <Td isNumeric fontWeight="bold">
+                      {totais.valorBonus.toFixed(2)}
+                    </Td>
+                    <Td isNumeric fontWeight="bold">
+                      {totais.valorAjusteComercial.toFixed(2)}
+                    </Td>
+                    <Td isNumeric fontWeight="bold">
+                      {totais.valorHospedagemAnuncio.toFixed(2)}
+                    </Td>
+                    <Td isNumeric fontWeight="bold">
+                      {totais.valorTotal.toFixed(2)}
+                    </Td>
+                    <Td></Td>
                   </Tr>
                 )}
               </Tbody>
