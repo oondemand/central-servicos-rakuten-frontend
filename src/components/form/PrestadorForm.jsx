@@ -10,6 +10,7 @@ import {
   AccordionPanel,
   Box,
   useToast,
+  Text,
 } from "@chakra-ui/react";
 import { useFormikContext } from "formik";
 import FormField from "@/components/common/FormField";
@@ -52,7 +53,7 @@ const PrestadorForm = () => {
   }, [values.prestador.sid, setFieldValue, toast]);
 
   return (
-    <Accordion allowToggle>
+    <Accordion allowToggle defaultIndex={[0]}>
       <AccordionItem borderRadius="md">
         <h2>
           <AccordionButton>
@@ -64,10 +65,30 @@ const PrestadorForm = () => {
         </h2>
         <AccordionPanel>
           <VStack align="stretch">
+          <Text fontSize="lg" fontWeight="bold" mb={2}>  Cadastro  </Text>
+
+
             <HStack align="stretch">
-              
-              <FormField label="ID" name="prestador._id" type="text" isReadOnly={true}/>
+              <FormField dis label="ID" name="prestador._id" type="text" isReadOnly={true}/>
               <FormField label="SID" name="prestador.sid" type="text" maxLength={7} />
+              <FormField
+                label="Status"
+                name="prestador.status"
+                type="select"
+                options={[
+                  { value: "ativo", label: "Ativo" },
+                  { value: "em-analise", label: "Em Análise" },
+                  { value: "pendente-de-revisao", label: "Pendente de Revisão" },
+                  { value: "inativo", label: "Inativo" },
+                  { value: "arquivado", label: "Arquivado" },
+                ]}
+              />
+            </HStack>
+
+
+
+
+            <HStack align="stretch">
               <FormField
                 label="Tipo"
                 name="prestador.tipo"
@@ -93,9 +114,9 @@ const PrestadorForm = () => {
                 name="prestador.pessoaFisica.dataNascimento"
                 type="date"
               />
-              <FormField label="Nome da Mãe" name="prestador.pessoaFisica.nomeMae" type="text" />
               <FormField label="PIS" name="prestador.pessoaFisica.pis" type="text" />
               <FormField label="RG" name="prestador.pessoaFisica.rg.numero" type="text" />
+              <FormField label="Nome da Mãe" name="prestador.pessoaFisica.nomeMae" type="text" />
               <FormField
                 label="Órgão Emissor do RG"
                 name="prestador.pessoaFisica.rg.orgaoEmissor"
@@ -103,20 +124,24 @@ const PrestadorForm = () => {
               />
             </HStack>
 
+            <Text fontSize="lg" fontWeight="bold" mb={2}>  Endereço  </Text>
+
             <HStack align="stretch">
               <FormField label="CEP" name="prestador.endereco.cep" type="text" />
               <FormField label="Rua" name="prestador.endereco.rua" type="text" />
               <FormField label="Número" name="prestador.endereco.numero" type="text" />
+            </HStack>
+
+            <HStack align="stretch">
               <FormField label="Complemento" name="prestador.endereco.complemento" type="text" />
               <FormField label="Cidade" name="prestador.endereco.cidade" type="text" />
               <FormField label="Estado" name="prestador.endereco.estado" type="text" />
             </HStack>
 
+
+            <Text fontSize="lg" fontWeight="bold" mb={2}>  Dados Bancarios  </Text>
             <HStack align="stretch">
-              <FormField label="Banco" name="prestador.dadosBancarios.banco" type="text" />
-              <FormField label="Agência" name="prestador.dadosBancarios.agencia" type="text" />
-              <FormField label="Conta" name="prestador.dadosBancarios.conta" type="text" />
-              <FormField
+            <FormField
                 label="Tipo de Conta"
                 name="prestador.dadosBancarios.tipoConta"
                 type="select"
@@ -126,21 +151,13 @@ const PrestadorForm = () => {
                   { value: "poupanca", label: "Poupança" },
                 ]}
               />
+              <FormField label="Banco" name="prestador.dadosBancarios.banco" type="text" />
+              <FormField label="Agência" name="prestador.dadosBancarios.agencia" type="text" />
+              <FormField label="Conta" name="prestador.dadosBancarios.conta" type="text" />
             </HStack>
 
             <HStack align="stretch">
-              <FormField
-                label="Status"
-                name="prestador.status"
-                type="select"
-                options={[
-                  { value: "ativo", label: "Ativo" },
-                  { value: "em-analise", label: "Em Análise" },
-                  { value: "pendente-de-revisao", label: "Pendente de Revisão" },
-                  { value: "inativo", label: "Inativo" },
-                  { value: "arquivado", label: "Arquivado" },
-                ]}
-              />
+
               <FormField
                 label="Comentários de Revisão"
                 name="prestador.comentariosRevisao"

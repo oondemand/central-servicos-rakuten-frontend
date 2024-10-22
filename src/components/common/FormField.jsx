@@ -29,18 +29,18 @@ const FormField = ({ label, name, type = "text", options = [], mask, ...props })
   };
 
   return (
-    <FormControl isInvalid={isInvalid} mb={4}>
-      {label && <FormLabel htmlFor={name}>{label}</FormLabel>}
+    <FormControl isInvalid={isInvalid} mb={4} >
+      {label && <FormLabel  htmlFor={name}>{label}</FormLabel> }
       {type === "select" ? (
         <CustomSelect label={label} name={name} options={options} {...props} />
       ) : type === "textarea" ? (
-        <Field as={Textarea} id={name} name={name} {...props} />
+        <Field as={Textarea} id={name} name={name} {...props} bgColor={"#fff"}/>
       ) : mask ? (
-        <Field name={name}>
+        <Field name={name} bgColor={"#fff"}>
           {({ field }) => (
             <InputMask mask={mask} {...field} {...props}>
               {(inputProps) => (
-                <Input
+                <Input 
                   {...inputProps}
                   ref={inputRef}
                   id={name}
@@ -53,6 +53,8 @@ const FormField = ({ label, name, type = "text", options = [], mask, ...props })
         </Field>
       ) : (
         <Field
+        bgColor={"#fff"}
+       
           as={Input}
           id={name}
           name={name}
