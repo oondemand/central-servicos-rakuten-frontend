@@ -1,10 +1,9 @@
 // src/components/common/FormField.js
-import React, { useRef } from "react";
+import React from "react";
 import {
   FormControl,
   FormLabel,
   Input,
-  Select,
   Textarea,
   FormErrorMessage,
 } from "@chakra-ui/react";
@@ -15,55 +14,74 @@ import CustomSelect from "./CustomSelect";
 const FormField = ({ label, name, type = "text", options = [], mask, ...props }) => {
   const { touched, errors } = useFormikContext();
 
-  const isInvalid = getIn(touched, name) && getIn(errors, name);
+  // Desestrutura maxLength para removê-lo quando uma máscara estiver presente
+  const { maxLength, ...restProps } = props;
 
-  const inputRef = useRef(null);
+  const isInvalid = getIn(touched, name) && getIn(errors, name);
 
   const getPlaceholder = () => {
     if (label) {
       return `Digite ${label.toLowerCase()}`;
-    } else {
-      // Alternativa: usar o nome do campo com formatação
-      return ``;
     }
+    return "";
   };
 
-  return (
-    <FormControl isInvalid={isInvalid} mb={4} >
-      {label && <FormLabel  htmlFor={name}>{label}</FormLabel> }
-      {type === "select" ? (
-        <CustomSelect label={label} name={name} options={options} {...props} />
-      ) : type === "textarea" ? (
-        <Field as={Textarea} id={name} name={name} {...props} bgColor={"#fff"}/>
-      ) : mask ? (
-        <Field name={name} bgColor={"#fff"}>
+  const renderField = () => {
+    if (type === "select") {
+      return (
+        <CustomSelect
+          label={label}
+          name={name}
+          options={options}
+          {...restProps}
+        />
+      );
+    }
+
+    if (type === "textarea") {
+      return (
+        <Field as={Textarea} id={name} name={name} {...restProps} bgColor="#fff" />
+      );
+    }
+
+    if (mask) {
+      return (
+        <Field name={name}>
           {({ field }) => (
-            <InputMask mask={mask} {...field} {...props}>
+            <InputMask mask={mask} {...field} {...restProps}>
               {(inputProps) => (
-                <Input 
+                <Input
                   {...inputProps}
-                  ref={inputRef}
                   id={name}
                   type={type}
                   placeholder={getPlaceholder()}
+                  bgColor="#fff"
                 />
               )}
             </InputMask>
           )}
         </Field>
-      ) : (
-        <Field
-        bgColor={"#fff"}
-       
-          as={Input}
-          id={name}
-          name={name}
-          type={type}
-          placeholder={getPlaceholder()}
-          {...props}
-        />
-      )}
-      <FormErrorMessage>{getIn(errors, name) || ""}</FormErrorMessage>
+      );
+    }
+
+    return (
+      <Field
+        as={Input}
+        id={name}
+        name={name}
+        type={type}
+        placeholder={getPlaceholder()}
+        bgColor="#fff"
+        {...restProps}
+      />
+    );
+  };
+
+  return (
+    <FormControl isInvalid={isInvalid} mb={4}>
+      {label && <FormLabel htmlFor={name}>{label}</FormLabel>}
+      {renderField()}
+      {isInvalid && <FormErrorMessage>{getIn(errors, name)}</FormErrorMessage>}
     </FormControl>
   );
 };

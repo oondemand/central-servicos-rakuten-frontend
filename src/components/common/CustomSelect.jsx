@@ -28,6 +28,7 @@ const CustomSelect = ({ label, name, options, ...props }) => {
 
   return (
     <FormControl isInvalid={isInvalid} mb={4}>
+      {label && <FormLabel htmlFor={name}>{label}</FormLabel>}
       <Menu>
         <MenuButton
           as={Button}
@@ -36,6 +37,7 @@ const CustomSelect = ({ label, name, options, ...props }) => {
           color="brand.500"
           borderColor="brand.300"
           _hover={{ bg: "brand.100" }}
+          {...props}
         >
           {selectedLabel}
         </MenuButton>

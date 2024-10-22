@@ -1,5 +1,4 @@
 // src/components/ticket/TicketModal.js
-
 import React, { useMemo, useState, useRef } from "react";
 import {
   Modal,
@@ -19,9 +18,9 @@ import {
   AlertDialogHeader,
   AlertDialogBody,
   AlertDialogFooter,
+  useToast,
 } from "@chakra-ui/react";
 import { Formik, Form } from "formik";
-import { useToast } from "@chakra-ui/react";
 import * as Yup from "yup";
 
 import TicketFields from "./TicketFields";
@@ -193,6 +192,12 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
 
       if (sucessoTicket.ticket?._id) {
         closeModal();
+        toast({
+          title: "Ticket salvo com sucesso.",
+          status: "success",
+          duration: 5000,
+          isClosable: true,
+        });
       } else {
         throw new Error("Erro ao salvar ticket.");
       }

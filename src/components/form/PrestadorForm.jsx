@@ -1,4 +1,4 @@
-// src/components/PrestadorForm.js
+// src/components/form/PrestadorForm.js
 import React, { useEffect } from "react";
 import {
   VStack,
@@ -52,25 +52,32 @@ const PrestadorForm = () => {
     }
   }, [values.prestador.sid, setFieldValue, toast]);
 
+  // Determina se o prestador é Pessoa Física
+  const isPessoaFisica = values.prestador.tipo === "pf";
+
   return (
     <Accordion allowToggle defaultIndex={[0]}>
       <AccordionItem borderRadius="md">
         <h2>
           <AccordionButton>
             <Box flex="1" textAlign="left" fontWeight="bold">
-                            Informações do Prestador: <label style={{ fontWeight: "normal", fontStyle: "italic" }}>{values.prestador.nome} - SID {values.prestador.sid}</label>
+              Informações do Prestador:{" "}
+              <label style={{ fontWeight: "normal", fontStyle: "italic" }}>
+                {values.prestador.nome} - SID {values.prestador.sid}
+              </label>
             </Box>
             <AccordionIcon />
           </AccordionButton>
         </h2>
         <AccordionPanel>
           <VStack align="stretch">
-          <Text fontSize="lg" fontWeight="bold" mb={2}>  Cadastro  </Text>
-
+            <Text fontSize="lg" fontWeight="bold" mb={2}>
+              Cadastro
+            </Text>
 
             <HStack align="stretch">
-              <FormField dis label="ID" name="prestador._id" type="text" isReadOnly={true}/>
-              <FormField label="SID" name="prestador.sid" type="text" maxLength={7} />
+              <FormField label="ID" name="prestador._id" type="text" isReadOnly={true} />
+              <FormField label="SID" name="prestador.sid" type="text" />
               <FormField
                 label="Status"
                 name="prestador.status"
@@ -84,9 +91,6 @@ const PrestadorForm = () => {
                 ]}
               />
             </HStack>
-
-
-
 
             <HStack align="stretch">
               <FormField
@@ -102,29 +106,43 @@ const PrestadorForm = () => {
                 label="Documento (CPF/CNPJ)"
                 name="prestador.documento"
                 type="text"
-                maxLength={11}
+                mask={values.prestador.tipo === "pf" ? "999.999.999-99" : "99.999.999/9999-99"}
               />
               <FormField label="Nome" name="prestador.nome" type="text" />
               <FormField label="E-mail" name="prestador.email" type="email" />
             </HStack>
 
-            <HStack align="stretch">
-              <FormField
-                label="Data de Nascimento"
-                name="prestador.pessoaFisica.dataNascimento"
-                type="date"
-              />
-              <FormField label="PIS" name="prestador.pessoaFisica.pis" type="text" />
-              <FormField label="RG" name="prestador.pessoaFisica.rg.numero" type="text" />
-              <FormField label="Nome da Mãe" name="prestador.pessoaFisica.nomeMae" type="text" />
-              <FormField
-                label="Órgão Emissor do RG"
-                name="prestador.pessoaFisica.rg.orgaoEmissor"
-                type="text"
-              />
-            </HStack>
+            {isPessoaFisica && (
+              <HStack align="stretch">
+                <FormField
+                  label="Data de Nascimento"
+                  name="prestador.pessoaFisica.dataNascimento"
+                  type="date"
+                />
+                <FormField
+                  label="PIS"
+                  name="prestador.pessoaFisica.pis"
+                  type="text"
+                  mask="999.99999.99-9"
+                />
+                <FormField
+                  label="RG"
+                  name="prestador.pessoaFisica.rg.numero"
+                  type="text"
+                  mask="999999999"
+                />
+                <FormField label="Nome da Mãe" name="prestador.pessoaFisica.nomeMae" type="text" />
+                <FormField
+                  label="Órgão Emissor do RG"
+                  name="prestador.pessoaFisica.rg.orgaoEmissor"
+                  type="text"
+                />
+              </HStack>
+            )}
 
-            <Text fontSize="lg" fontWeight="bold" mb={2}>  Endereço  </Text>
+            <Text fontSize="lg" fontWeight="bold" mb={2}>
+              Endereço
+            </Text>
 
             <HStack align="stretch">
               <FormField label="CEP" name="prestador.endereco.cep" type="text" />
@@ -138,10 +156,11 @@ const PrestadorForm = () => {
               <FormField label="Estado" name="prestador.endereco.estado" type="text" />
             </HStack>
 
-
-            <Text fontSize="lg" fontWeight="bold" mb={2}>  Dados Bancarios  </Text>
+            <Text fontSize="lg" fontWeight="bold" mb={2}>
+              Dados Bancarios
+            </Text>
             <HStack align="stretch">
-            <FormField
+              <FormField
                 label="Tipo de Conta"
                 name="prestador.dadosBancarios.tipoConta"
                 type="select"
@@ -157,7 +176,6 @@ const PrestadorForm = () => {
             </HStack>
 
             <HStack align="stretch">
-
               <FormField
                 label="Comentários de Revisão"
                 name="prestador.comentariosRevisao"
