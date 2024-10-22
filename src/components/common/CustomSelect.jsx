@@ -1,19 +1,18 @@
 // src/components/common/CustomSelect.js
 import React from "react";
 import {
-  FormControl,
-  FormLabel,
   Menu,
   MenuButton,
   MenuList,
   MenuItem,
   Button,
+  FormControl,
   FormErrorMessage,
 } from "@chakra-ui/react";
 import { ChevronDownIcon } from "@chakra-ui/icons";
 import { useField, useFormikContext } from "formik";
 
-const CustomSelect = ({ label, name, options, ...props }) => {
+const CustomSelect = ({ name, options, ...props }) => {
   const { setFieldValue } = useFormikContext();
   const [field, meta] = useField(name);
   const isInvalid = meta.touched && meta.error;
@@ -24,11 +23,10 @@ const CustomSelect = ({ label, name, options, ...props }) => {
 
   const selectedLabel =
     options.find((option) => option.value === field.value)?.label ||
-    `Selecione ${label.toLowerCase()}`;
+    `Selecione`;
 
   return (
     <FormControl isInvalid={isInvalid} mb={4}>
-      {label && <FormLabel htmlFor={name}>{label}</FormLabel>}
       <Menu>
         <MenuButton
           as={Button}
