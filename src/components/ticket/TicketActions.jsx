@@ -16,7 +16,7 @@ import { FaCheck, FaTimes, FaTrash } from "react-icons/fa";
 import { useTicket } from "../../contexts/TicketContext";
 import { useFormikContext } from "formik";
 
-const TicketActions = ({ ticket, isEditMode, closeModal }) => {
+const TicketActions = ({ ticket, isEditMode, closeModal ,onCancel}) => {
   const formik = useFormikContext();
   const { salvarTicket, aprovarTicket, reprovarTicket } = useTicket();
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -109,7 +109,7 @@ const TicketActions = ({ ticket, isEditMode, closeModal }) => {
             </AlertDialogBody>
 
             <AlertDialogFooter>
-              <Button ref={cancelRef} onClick={onClose}>
+            <Button ref={cancelRef} onClick={onCancel}>
                 Cancelar
               </Button>
               <Button colorScheme="yellow" onClick={confirmArquivar} ml={3}>

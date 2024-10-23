@@ -14,5 +14,8 @@ export const prestadorValidationSchema = Yup.object({
       "Status inválido"
     )
     .required("Status é obrigatório"),
+    
   comentariosRevisao: Yup.string(),
+
+  
 });
