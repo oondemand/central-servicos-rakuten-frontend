@@ -61,7 +61,7 @@ const Header = () => {
       <Flex align="center">
         <Link to="/auth/home">
           <Box as="span" fontSize="xl" fontWeight="bold" color="brand.500">
-            Central de Serviços Rakuten
+            Central de Serviços Tomados: Comissões Publisher Rakuten
           </Box>
         </Link>
       </Flex>
