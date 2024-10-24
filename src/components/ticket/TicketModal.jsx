@@ -19,6 +19,9 @@ import {
   AlertDialogBody,
   AlertDialogFooter,
   useToast,
+  Input,
+  Text,
+  IconButton
 } from "@chakra-ui/react";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
@@ -38,6 +41,8 @@ import { useBaseOmie } from "../../contexts/BaseOmieContext";
 import { useEtapa } from "../../contexts/EtapaContext";
 import { salvarPrestador } from "../../services/prestadorService";
 import { salvarServico } from "../../services/servicoService";
+
+import { DeleteIcon, DownloadIcon  } from "@chakra-ui/icons";
 
 const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
   const isEditMode = Boolean(ticket);
@@ -98,6 +103,7 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
       observacao: "",
       prestador: prestadorInitValues,
       servicos: [],
+      arquivos: []
     };
 
     if (ticket) {
@@ -222,6 +228,7 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
   const abrirConfirmarRemoverServico = () =>
     setConfirmacao((prev) => ({ ...prev, removerServico: true }));
 
+
   // Funções para confirmar as ações
   const confirmarFechar = () => {
     setConfirmacao((prev) => ({ ...prev, fecharModal: false }));
@@ -237,6 +244,9 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
     setMostrarServico(false);
     setConfirmacao((prev) => ({ ...prev, removerServico: false }));
   };
+
+    
+  const inputFileRef = useRef(null);
 
   return (
     <>
@@ -318,7 +328,56 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
                             Remover Serviço
                           </Button>
                         )}
+
+                        {ticket &&
+                          <Box>
+                           <Button
+                           onClick={() => inputFileRef.current.click()} 
+                            colorScheme="teal"
+                            variant="outline"
+                          >
+                           Importar Arquivo
+                          </Button>
+                            <Input
+                            type="file"
+                            ref={inputFileRef}
+                            onChange={(e) => {
+                              formik.setFieldValue("arquivos", [...formik.values.arquivos, ...e.target.files]);
+                            }}
+                            style={{ display: "none" }}
+                            multiple={true}
+                            accept=".jpeg, .jpg, .png, .pdf, .xml, .txt"
+                            />
+                          </Box>
+                        }
                       </HStack>
+
+                      {formik.values.arquivos.length > 0 &&  (
+                        <Text mt={2} fontSize="lg" fontWeight="bold" mb={2}>
+                         Arquivos
+                       </Text>
+                      )}
+
+                      {formik.values.arquivos.length > 0 && 
+                      formik.values.arquivos.map((e) => {
+                        return <Flex key={`${e.name} + ${e.lastModified}`} justify="space-between" align="center">
+                          <Text>{e.name}</Text>
+                          <Flex gap={2} align="center">
+                          <a href={URL.createObjectURL(e)} download={e.name}>
+                          <IconButton size="xs" colorScheme="green">
+                            <DownloadIcon/>
+                          </IconButton>
+                          </a>
+                          <IconButton size="xs" colorScheme="red" onClick={
+                            () => {
+                              const files = formik.values.arquivos.filter((file) => file.name != e.name && file.lastModified !== e.lastModified)
+                              formik.setFieldValue("arquivos", files)
+                            }
+                          } ><DeleteIcon/></IconButton>
+                          </Flex>
+                        </Flex>
+                      })}
+
                       {mostrarPrestador && (
                         <Box mt={4}>
                           <PrestadorForm />
