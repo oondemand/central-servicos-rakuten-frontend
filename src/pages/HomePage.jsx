@@ -7,7 +7,9 @@ const HomePage = () => {
   return (
     <Flex direction="column">
       <Box flex="1" display="flex">
+
         <Esteira />
+        
       </Box>
     </Flex>
   );
