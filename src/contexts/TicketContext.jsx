@@ -1,14 +1,15 @@
+import { useToast } from "@chakra-ui/react";
 import React, { createContext, useState, useEffect, useCallback, useContext } from "react";
 import {
-  salvarTicket as salvarTicketService,
   alterarTicket,
   aprovarTicket as aprovarTicketService,
-  reprovarTicket as reprovarTicketService,
   carregarTicket,
+  listarArquivosDoTicket,
   listarTickets,
+  reprovarTicket as reprovarTicketService,
+  salvarTicket as salvarTicketService
 } from "../services/ticketService";
 import { useBaseOmie } from "./BaseOmieContext";
-import { useToast } from "@chakra-ui/react";
 
 const TicketContext = createContext();
 
@@ -271,6 +272,32 @@ export const TicketProvider = ({ children }) => {
     [toast]
   );
 
+  const buscarArquivosDoTicket = useCallback(
+    async (id) => {
+      setLoading(true);
+      try {
+        const response = await listarArquivosDoTicket(id);
+        setError(null);
+        return response;
+      } catch (err) {
+        console.error("Erro ao buscar arquivos do ticket pelo ID:", err);
+        const detalhes = err.response?.data?.detalhes || err.message;
+        setError("Erro ao buscar arquivos.");
+        toast({
+          title: "Erro ao buscar arquivos do ticket.",
+          description: detalhes,
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
+        return null;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [toast]
+  )
+
   useEffect(() => {
     carregarTickets();
   }, [carregarTickets]);
@@ -289,6 +316,7 @@ export const TicketProvider = ({ children }) => {
         alterarStatusTicket,
         filtrarTickets,
         buscarTicketPorId,
+        buscarArquivosDoTicket
       }}
     >
       {children}

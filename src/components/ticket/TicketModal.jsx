@@ -1,513 +1,525 @@
+import {
+	AlertDialog,
+	AlertDialogBody,
+	AlertDialogContent,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogOverlay,
+	Box,
+	Button,
+	Flex,
+	HStack,
+	IconButton,
+	Input,
+	Modal,
+	ModalBody,
+	ModalCloseButton,
+	ModalContent,
+	ModalFooter,
+	ModalHeader,
+	ModalOverlay,
+	Text,
+	useToast,
+} from "@chakra-ui/react";
+import { Form, Formik } from "formik";
 // src/components/ticket/TicketModal.js
 import React, { useMemo, useState, useRef } from "react";
-import {
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalCloseButton,
-  ModalBody,
-  ModalFooter,
-  Flex,
-  Box,
-  HStack,
-  Button,
-  AlertDialog,
-  AlertDialogOverlay,
-  AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogBody,
-  AlertDialogFooter,
-  useToast,
-  Input,
-  Text,
-  IconButton
-} from "@chakra-ui/react";
-import { Formik, Form } from "formik";
 import * as Yup from "yup";
 
-import TicketFields from "./TicketFields";
-import TicketActions from "./TicketActions";
-import PrestadorForm from "../form/PrestadorForm";
-import ServicoForm from "../form/ServicoForm";
-import TicketStatusButtons from "./TicketStatusButtons";
-import { ticketValidationSchema } from "../../validation/ticketValidationSchema";
-import { prestadorValidationSchema } from "../../validation/prestadorValidationSchema";
-import { servicoValidationSchema } from "../../validation/servicoValidationSchema";
-import { prestadorInitValues } from "../../initValues/prestadorInitValues";
-import { servicoInitValues } from "../../initValues/servicoInitValues";
-import { useTicket } from "../../contexts/TicketContext";
 import { useBaseOmie } from "../../contexts/BaseOmieContext";
 import { useEtapa } from "../../contexts/EtapaContext";
+import { useTicket } from "../../contexts/TicketContext";
+import { prestadorInitValues } from "../../initValues/prestadorInitValues";
+import { servicoInitValues } from "../../initValues/servicoInitValues";
 import { salvarPrestador } from "../../services/prestadorService";
 import { salvarServico } from "../../services/servicoService";
+import { prestadorValidationSchema } from "../../validation/prestadorValidationSchema";
+import { servicoValidationSchema } from "../../validation/servicoValidationSchema";
+import { ticketValidationSchema } from "../../validation/ticketValidationSchema";
+import PrestadorForm from "../form/PrestadorForm";
+import ServicoForm from "../form/ServicoForm";
+import TicketActions from "./TicketActions";
+import TicketFields from "./TicketFields";
+import TicketStatusButtons from "./TicketStatusButtons";
 
-import { DeleteIcon, DownloadIcon  } from "@chakra-ui/icons";
+import { DeleteIcon, DownloadIcon } from "@chakra-ui/icons";
+import { uploadFiles } from "../../services/ticketService";
+
+import { ArquivosPreview } from "./ArquivosPreview";
+import { ArquivosImport } from "./ArquivosImport";
 
 const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
-  const isEditMode = Boolean(ticket);
-  const { salvarTicket } = useTicket();
-  const { baseOmie } = useBaseOmie();
-  const { listaEtapas } = useEtapa();
-  const toast = useToast();
+	const isEditMode = Boolean(ticket);
+	const { salvarTicket } = useTicket();
+	const { baseOmie } = useBaseOmie();
+	const { listaEtapas } = useEtapa();
+	const toast = useToast();
 
-  // Estados para controlar a exibição dos formulários
-  const [mostrarPrestador, setMostrarPrestador] = useState(ticket?.prestador ? true : false);
-  const [mostrarServico, setMostrarServico] = useState(ticket?.servicos ? true : false);
+	// Estados para controlar a exibição dos formulários
+	const [mostrarPrestador, setMostrarPrestador] = useState(
+		ticket?.prestador ? true : false,
+	);
+	const [mostrarServico, setMostrarServico] = useState(
+		ticket?.servicos ? true : false,
+	);
 
-  // Estados para controlar os diálogos de confirmação
-  const [confirmacao, setConfirmacao] = useState({
-    fecharModal: false,
-    removerPrestador: false,
-    removerServico: false,
-  });
+	// Estados para controlar os diálogos de confirmação
+	const [confirmacao, setConfirmacao] = useState({
+		fecharModal: false,
+		removerPrestador: false,
+		removerServico: false,
+	});
 
-  // Referências para os AlertDialogs
-  const cancelRefFechar = useRef();
-  const cancelRefRemoverPrestador = useRef();
-  const cancelRefRemoverServico = useRef();
+	// Referências para os AlertDialogs
+	const cancelRefFechar = useRef();
+	const cancelRefRemoverPrestador = useRef();
+	const cancelRefRemoverServico = useRef();
 
-  // Esquema de validação combinado
-  const combinedValidationSchema = useMemo(() => {
-    let schema = ticketValidationSchema;
+	// Esquema de validação combinado
+	const combinedValidationSchema = useMemo(() => {
+		let schema = ticketValidationSchema;
 
-    if (mostrarPrestador) {
-      schema = schema.shape({
-        prestador: prestadorValidationSchema,
-      });
-    } else {
-      schema = schema.shape({
-        prestador: Yup.object().nullable(),
-      });
-    }
+		if (mostrarPrestador) {
+			schema = schema.shape({
+				prestador: prestadorValidationSchema,
+			});
+		} else {
+			schema = schema.shape({
+				prestador: Yup.object().nullable(),
+			});
+		}
 
-    if (mostrarServico) {
-      schema = schema.shape({
-        servicos: Yup.array()
-          .of(servicoValidationSchema)
-          .min(1, "É necessário adicionar pelo menos um serviço"),
-      });
-    } else {
-      schema = schema.shape({
-        servicos: Yup.array().of(Yup.object().nullable()),
-      });
-    }
+		if (mostrarServico) {
+			schema = schema.shape({
+				servicos: Yup.array()
+					.of(servicoValidationSchema)
+					.min(1, "É necessário adicionar pelo menos um serviço"),
+			});
+		} else {
+			schema = schema.shape({
+				servicos: Yup.array().of(Yup.object().nullable()),
+			});
+		}
 
-    return schema;
-  }, [mostrarPrestador, mostrarServico]);
+		return schema;
+	}, [mostrarPrestador, mostrarServico]);
 
-  // Valores iniciais combinados
-  const combinedInitValues = useMemo(() => {
-    let initValues = {
-      titulo: "",
-      observacao: "",
-      prestador: prestadorInitValues,
-      servicos: [],
-      arquivos: []
-    };
+	// Valores iniciais combinados
+	const combinedInitValues = useMemo(() => {
+		let initValues = {
+			titulo: "",
+			observacao: "",
+			prestador: prestadorInitValues,
+			servicos: [],
+			arquivos: [],
+		};
 
-    if (ticket) {
-      initValues = {
-        ...initValues,
-        titulo: ticket.titulo,
-        observacao: ticket.observacao,
-        prestador: ticket.prestador || prestadorInitValues,
-        servicos: ticket.servicos
-          ? ticket.servicos.map((servico) => ({
-              ...servicoInitValues,
-              ...servico,
-            }))
-          : [],
-      };
-    }
+		if (ticket) {
+			initValues = {
+				...initValues,
+				titulo: ticket.titulo,
+				arquivos: ticket.arquivos,
+				observacao: ticket.observacao,
+				prestador: ticket.prestador || prestadorInitValues,
+				servicos: ticket.servicos
+					? ticket.servicos.map((servico) => ({
+							...servicoInitValues,
+							...servico,
+						}))
+					: [],
+			};
+		}
 
-    return initValues;
-  }, [ticket]);
+		return initValues;
+	}, [ticket]);
 
-  // Handler de submissão
-  const handleSubmit = async (values, { setSubmitting }) => {
-    setSubmitting(true);
-    try {
-      let prestadorId = null;
-      let servicosIds = [];
+	// Handler de submissão
+	const handleSubmit = async (values, { setSubmitting }) => {
+		setSubmitting(true);
+		try {
+			let prestadorId = null;
+			const servicosIds = [];
 
-      if (mostrarPrestador && values.prestador) {
-        const documentoLimpo = values.prestador.documento
-          ? values.prestador.documento.replace(/[^\d]/g, "")
-          : "";
+			if (values.arquivos.length > 0) {
+				await uploadFiles(ticket._id, values.arquivos);
+			}
 
-        const prestadorDados = {
-          ...values.prestador,
-          documento: documentoLimpo,
-        };
+			if (mostrarPrestador && values.prestador) {
+				const documentoLimpo = values.prestador.documento
+					? values.prestador.documento.replace(/[^\d]/g, "")
+					: "";
 
-        if (isEditMode && ticket.prestador) {
-          prestadorId = ticket.prestador._id;
-          const prestadorResponse = await salvarPrestador({
-            ...prestadorDados,
-            _id: prestadorId,
-          });
-          prestadorId = prestadorResponse.prestador._id;
-        } else {
-          const prestadorResponse = await salvarPrestador(prestadorDados);
-          prestadorId = prestadorResponse.prestador._id;
-        }
-      }
+				const prestadorDados = {
+					...values.prestador,
+					documento: documentoLimpo,
+				};
 
-      if (mostrarServico && values.servicos.length > 0) {
-        for (let i = 0; i < values.servicos.length; i++) {
-          const servico = values.servicos[i];
-          if (servico) {
-            let servicoId = null;
-            if (isEditMode && ticket.servicos && ticket.servicos[i]) {
-              servicoId = ticket.servicos[i]._id;
-              const servicoResponse = await salvarServico({
-                ...servico,
-                _id: servicoId,
-              });
-              servicoId = servicoResponse.servico._id;
-            } else {
-              const servicoResponse = await salvarServico(servico);
-              servicoId = servicoResponse.servico._id;
-            }
-            servicosIds.push(servicoId);
-          }
-        }
-      }
+				if (isEditMode && ticket.prestador) {
+					prestadorId = ticket.prestador._id;
+					const prestadorResponse = await salvarPrestador({
+						...prestadorDados,
+						_id: prestadorId,
+					});
+					prestadorId = prestadorResponse.prestador._id;
+				} else {
+					const prestadorResponse = await salvarPrestador(prestadorDados);
+					prestadorId = prestadorResponse.prestador._id;
+				}
+			}
 
-      const ticketData = isEditMode
-        ? {
-            _id: ticket._id,
-            titulo: values.titulo,
-            observacao: values.observacao,
-            status: values.status,
-            prestadorId,
-            servicosIds,
-          }
-        : {
-            baseOmieId: baseOmie?._id,
-            etapa: listaEtapas[0]?.codigo || "",
-            titulo: values.titulo,
-            observacao: values.observacao,
-            status: "aguardando-inicio",
-            prestadorId,
-            servicosIds,
-          };
+			if (mostrarServico && values.servicos.length > 0) {
+				for (let i = 0; i < values.servicos.length; i++) {
+					const servico = values.servicos[i];
+					if (servico) {
+						let servicoId = null;
+						if (isEditMode && ticket.servicos && ticket.servicos[i]) {
+							servicoId = ticket.servicos[i]._id;
+							const servicoResponse = await salvarServico({
+								...servico,
+								_id: servicoId,
+							});
+							servicoId = servicoResponse.servico._id;
+						} else {
+							const servicoResponse = await salvarServico(servico);
+							servicoId = servicoResponse.servico._id;
+						}
+						servicosIds.push(servicoId);
+					}
+				}
+			}
 
-      const sucessoTicket = await salvarTicket(ticketData);
+			const ticketData = isEditMode
+				? {
+						_id: ticket._id,
+						titulo: values.titulo,
+						observacao: values.observacao,
+						status: values.status,
+						prestadorId,
+						servicosIds,
+					}
+				: {
+						baseOmieId: baseOmie?._id,
+						etapa: listaEtapas[0]?.codigo || "",
+						titulo: values.titulo,
+						observacao: values.observacao,
+						status: "aguardando-inicio",
+						prestadorId,
+						servicosIds,
+					};
 
-      if (sucessoTicket.ticket?._id) {
-        closeModal();
-        toast({
-          title: "Ticket salvo com sucesso.",
-          status: "success",
-          duration: 5000,
-          isClosable: true,
-        });
-      } else {
-        throw new Error("Erro ao salvar ticket.");
-      }
-    } catch (error) {
-      console.error("Erro ao salvar ticket:", error);
-      toast({
-        title: "Erro ao salvar ticket.",
-        description: error.message || "Ocorreu um erro inesperado.",
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-      });
-    } finally {
-      setSubmitting(false);
-    }
-  };
+			const sucessoTicket = await salvarTicket(ticketData);
 
-  // Funções para abrir os diálogos de confirmação
-  const abrirConfirmarFechar = () => setConfirmacao((prev) => ({ ...prev, fecharModal: true }));
-  const abrirConfirmarRemoverPrestador = () =>
-    setConfirmacao((prev) => ({ ...prev, removerPrestador: true }));
-  const abrirConfirmarRemoverServico = () =>
-    setConfirmacao((prev) => ({ ...prev, removerServico: true }));
+			if (sucessoTicket.ticket?._id) {
+				closeModal();
+				toast({
+					title: "Ticket salvo com sucesso.",
+					status: "success",
+					duration: 5000,
+					isClosable: true,
+				});
+			} else {
+				throw new Error("Erro ao salvar ticket.");
+			}
+		} catch (error) {
+			console.error("Erro ao salvar ticket:", error);
+			if (error.status === 413) {
+				return toast({
+					title: "Erro ao salvar ticket.",
+					description: "Arquivo muito grande, máximo permitido é de 1MB.",
+					status: "error",
+					duration: 5000,
+					isClosable: true,
+				});
+			}
+			toast({
+				title: "Erro ao salvar ticket.",
+				description: error.message || "Ocorreu um erro inesperado.",
+				status: "error",
+				duration: 5000,
+				isClosable: true,
+			});
+		} finally {
+			setSubmitting(false);
+		}
+	};
+
+	// Funções para abrir os diálogos de confirmação
+	const abrirConfirmarFechar = () =>
+		setConfirmacao((prev) => ({ ...prev, fecharModal: true }));
+	const abrirConfirmarRemoverPrestador = () =>
+		setConfirmacao((prev) => ({ ...prev, removerPrestador: true }));
+	const abrirConfirmarRemoverServico = () =>
+		setConfirmacao((prev) => ({ ...prev, removerServico: true }));
+
+	// Funções para confirmar as ações
+	const confirmarFechar = () => {
+		setConfirmacao((prev) => ({ ...prev, fecharModal: false }));
+		closeModal();
+	};
+
+	const confirmarRemoverPrestador = () => {
+		setMostrarPrestador(false);
+		setConfirmacao((prev) => ({ ...prev, removerPrestador: false }));
+	};
+
+	const confirmarRemoverServico = () => {
+		setMostrarServico(false);
+		setConfirmacao((prev) => ({ ...prev, removerServico: false }));
+	};
 
 
-  // Funções para confirmar as ações
-  const confirmarFechar = () => {
-    setConfirmacao((prev) => ({ ...prev, fecharModal: false }));
-    closeModal();
-  };
+	return (
+		<>
+			{/* Modal Principal */}
+			<Modal
+				isOpen={isOpen}
+				onClose={abrirConfirmarFechar} // Abre o diálogo de confirmação ao tentar fechar
+				size="6xl"
+				isCentered
+				closeOnOverlayClick={false} // Evita fechar clicando fora
+			>
+				<ModalOverlay />
+				<Formik
+					initialValues={combinedInitValues}
+					validationSchema={combinedValidationSchema}
+					onSubmit={handleSubmit}
+					enableReinitialize
+					validateOnChange={false}
+				>
+					{(formik) => (
+						<Form>
+							<ModalContent
+								color="brand.800"
+								bg="brand.50"
+								height="90vh"
+								rounded="md"
+								shadow="lg"
+							>
+								<Flex direction="column" height="100%">
+									<Box
+										position="sticky"
+										top="0"
+										zIndex="1"
+										borderBottom="1px solid #e2e8f0"
+									>
+										<ModalHeader>
+											{isEditMode ? "Editar Ticket" : "Adicionar Novo Ticket"}
+										</ModalHeader>
+										<ModalCloseButton />
+									</Box>
+									<Box flex="1" overflowY="auto" p={2}>
+										<ModalBody>
+											<Flex direction={{ base: "column", md: "row" }} gap={4}>
+												<Box flex={{ base: "1", md: "3" }}>
+													<Flex direction="column" gap={4}>
+														<TicketFields />
+													</Flex>
+												</Box>
+												{isEditMode && (
+													<Box flex={{ base: "1", md: "1" }}>
+														<TicketStatusButtons ticket={ticket} />
+													</Box>
+												)}
+											</Flex>
+											<HStack spacing={4} mt={4}>
+												{/* Botão Adicionar/Remover Prestador */}
+												{!mostrarPrestador ? (
+													<Button
+														onClick={() => setMostrarPrestador(true)}
+														colorScheme="teal"
+														variant="outline"
+													>
+														Adicionar Prestador
+													</Button>
+												) : (
+													<Button
+														onClick={abrirConfirmarRemoverPrestador} // Abre confirmação no pai
+														colorScheme="red"
+														variant="outline"
+													>
+														Remover Prestador
+													</Button>
+												)}
 
-  const confirmarRemoverPrestador = () => {
-    setMostrarPrestador(false);
-    setConfirmacao((prev) => ({ ...prev, removerPrestador: false }));
-  };
+												{/* Botão Adicionar/Remover Serviço */}
+												{!mostrarServico ? (
+													<Button
+														onClick={() => setMostrarServico(true)}
+														colorScheme="teal"
+														variant="outline"
+													>
+														Adicionar Serviço
+													</Button>
+												) : (
+													<Button
+														onClick={abrirConfirmarRemoverServico} // Abre confirmação no pai
+														colorScheme="red"
+														variant="outline"
+													>
+														Remover Serviço
+													</Button>
+												)}
 
-  const confirmarRemoverServico = () => {
-    setMostrarServico(false);
-    setConfirmacao((prev) => ({ ...prev, removerServico: false }));
-  };
+												{isEditMode && (
+												<ArquivosImport/>
+												)}
+											</HStack>
 
-    
-  const inputFileRef = useRef(null);
+											{isEditMode && <ArquivosPreview />}
 
-  return (
-    <>
-      {/* Modal Principal */}
-      <Modal
-        isOpen={isOpen}
-        onClose={abrirConfirmarFechar} // Abre o diálogo de confirmação ao tentar fechar
-        size="6xl"
-        isCentered
-        closeOnOverlayClick={false} // Evita fechar clicando fora
-      >
-        <ModalOverlay />
-        <Formik
-          initialValues={combinedInitValues}
-          validationSchema={combinedValidationSchema}
-          onSubmit={handleSubmit}
-          enableReinitialize
-          validateOnChange={false}
-        >
-          {(formik) => (
-            <Form>
-              <ModalContent color="brand.800" bg="brand.50" height="90vh" rounded="md" shadow="lg">
-                <Flex direction="column" height="100%">
-                  <Box position="sticky" top="0" zIndex="1" borderBottom="1px solid #e2e8f0">
-                    <ModalHeader>
-                      {isEditMode ? "Editar Ticket" : "Adicionar Novo Ticket"}
-                    </ModalHeader>
-                    <ModalCloseButton />
-                  </Box>
-                  <Box flex="1" overflowY="auto" p={2}>
-                    <ModalBody>
-                      <Flex direction={{ base: "column", md: "row" }} gap={4}>
-                        <Box flex={{ base: "1", md: "3" }}>
-                          <Flex direction="column" gap={4}>
-                            <TicketFields />
-                          </Flex>
-                        </Box>
-                        {isEditMode && (
-                          <Box flex={{ base: "1", md: "1" }}>
-                            <TicketStatusButtons ticket={ticket} />
-                          </Box>
-                        )}
-                      </Flex>
-                      <HStack spacing={4} mt={4}>
-                        {/* Botão Adicionar/Remover Prestador */}
-                        {!mostrarPrestador ? (
-                          <Button
-                            onClick={() => setMostrarPrestador(true)}
-                            colorScheme="teal"
-                            variant="outline"
-                          >
-                            Adicionar Prestador
-                          </Button>
-                        ) : (
-                          <Button
-                            onClick={abrirConfirmarRemoverPrestador} // Abre confirmação no pai
-                            colorScheme="red"
-                            variant="outline"
-                          >
-                            Remover Prestador
-                          </Button>
-                        )}
+											{mostrarPrestador && (
+												<Box mt={4}>
+													<PrestadorForm />
+												</Box>
+											)}
+											{mostrarServico && (
+												<Box mt={4}>
+													<ServicoForm />
+												</Box>
+											)}
+										</ModalBody>
+									</Box>
+									<ModalFooter borderTop="1px solid #e2e8f0">
+										<Flex width="100%" justifyContent="space-between">
+											<TicketActions
+												ticket={ticket}
+												isEditMode={isEditMode}
+												closeModal={abrirConfirmarFechar} // Passa função para abrir confirmação
+												onCancel={abrirConfirmarFechar} // Passa função para cancelamento
+												// Adicione outras funções conforme necessário
+											/>
+										</Flex>
+									</ModalFooter>
+								</Flex>
+							</ModalContent>
+						</Form>
+					)}
+				</Formik>
+			</Modal>
 
-                        {/* Botão Adicionar/Remover Serviço */}
-                        {!mostrarServico ? (
-                          <Button
-                            onClick={() => setMostrarServico(true)}
-                            colorScheme="teal"
-                            variant="outline"
-                          >
-                            Adicionar Serviço
-                          </Button>
-                        ) : (
-                          <Button
-                            onClick={abrirConfirmarRemoverServico} // Abre confirmação no pai
-                            colorScheme="red"
-                            variant="outline"
-                          >
-                            Remover Serviço
-                          </Button>
-                        )}
+			{/* AlertDialog para confirmação de fechar o Modal Principal */}
+			<AlertDialog
+				isOpen={confirmacao.fecharModal}
+				leastDestructiveRef={cancelRefFechar}
+				onClose={() =>
+					setConfirmacao((prev) => ({ ...prev, fecharModal: false }))
+				}
+				isCentered
+			>
+				<AlertDialogOverlay>
+					<AlertDialogContent>
+						<AlertDialogHeader fontSize="lg" fontWeight="bold">
+							Confirmar Fechamento
+						</AlertDialogHeader>
 
-                        {ticket &&
-                          <Box>
-                           <Button
-                           onClick={() => inputFileRef.current.click()} 
-                            colorScheme="teal"
-                            variant="outline"
-                          >
-                           Importar Arquivo
-                          </Button>
-                            <Input
-                            type="file"
-                            ref={inputFileRef}
-                            onChange={(e) => {
-                              formik.setFieldValue("arquivos", [...formik.values.arquivos, ...e.target.files]);
-                            }}
-                            style={{ display: "none" }}
-                            multiple={true}
-                            accept=".jpeg, .jpg, .png, .pdf, .xml, .txt"
-                            />
-                          </Box>
-                        }
-                      </HStack>
+						<AlertDialogBody>
+							Tem certeza de que deseja fechar o modal? Todas as alterações não
+							salvas serão perdidas.
+						</AlertDialogBody>
 
-                      {formik.values.arquivos.length > 0 &&  (
-                        <Text mt={2} fontSize="lg" fontWeight="bold" mb={2}>
-                         Arquivos
-                       </Text>
-                      )}
+						<AlertDialogFooter>
+							<Button
+								ref={cancelRefFechar}
+								onClick={() =>
+									setConfirmacao((prev) => ({ ...prev, fecharModal: false }))
+								}
+							>
+								Cancelar
+							</Button>
+							<Button colorScheme="red" onClick={confirmarFechar} ml={3}>
+								Fechar
+							</Button>
+						</AlertDialogFooter>
+					</AlertDialogContent>
+				</AlertDialogOverlay>
+			</AlertDialog>
 
-                      {formik.values.arquivos.length > 0 && 
-                      formik.values.arquivos.map((e) => {
-                        return <Flex key={`${e.name} + ${e.lastModified}`} justify="space-between" align="center">
-                          <Text>{e.name}</Text>
-                          <Flex gap={2} align="center">
-                          <a href={URL.createObjectURL(e)} download={e.name}>
-                          <IconButton size="xs" colorScheme="green">
-                            <DownloadIcon/>
-                          </IconButton>
-                          </a>
-                          <IconButton size="xs" colorScheme="red" onClick={
-                            () => {
-                              const files = formik.values.arquivos.filter((file) => file.name != e.name && file.lastModified !== e.lastModified)
-                              formik.setFieldValue("arquivos", files)
-                            }
-                          } ><DeleteIcon/></IconButton>
-                          </Flex>
-                        </Flex>
-                      })}
+			{/* AlertDialog para confirmação de remover Prestador */}
+			<AlertDialog
+				isOpen={confirmacao.removerPrestador}
+				leastDestructiveRef={cancelRefRemoverPrestador}
+				onClose={() =>
+					setConfirmacao((prev) => ({ ...prev, removerPrestador: false }))
+				}
+				isCentered
+			>
+				<AlertDialogOverlay>
+					<AlertDialogContent>
+						<AlertDialogHeader fontSize="lg" fontWeight="bold">
+							Confirmar Remoção do Prestador
+						</AlertDialogHeader>
 
-                      {mostrarPrestador && (
-                        <Box mt={4}>
-                          <PrestadorForm />
-                        </Box>
-                      )}
-                      {mostrarServico && (
-                        <Box mt={4}>
-                          <ServicoForm />
-                        </Box>
-                      )}
-                    </ModalBody>
-                  </Box>
-                  <ModalFooter borderTop="1px solid #e2e8f0">
-                    <Flex width="100%" justifyContent="space-between">
-                      <TicketActions
-                        ticket={ticket}
-                        isEditMode={isEditMode}
-                        closeModal={abrirConfirmarFechar} // Passa função para abrir confirmação
-                        onCancel={abrirConfirmarFechar} // Passa função para cancelamento
-                        // Adicione outras funções conforme necessário
-                      />
-                    </Flex>
-                  </ModalFooter>
-                </Flex>
-              </ModalContent>
-            </Form>
-          )}
-        </Formik>
-      </Modal>
+						<AlertDialogBody>
+							Tem certeza de que deseja remover o prestador? Esta ação não pode
+							ser desfeita.
+						</AlertDialogBody>
 
-      {/* AlertDialog para confirmação de fechar o Modal Principal */}
-      <AlertDialog
-        isOpen={confirmacao.fecharModal}
-        leastDestructiveRef={cancelRefFechar}
-        onClose={() => setConfirmacao((prev) => ({ ...prev, fecharModal: false }))}
-        isCentered
-      >
-        <AlertDialogOverlay>
-          <AlertDialogContent>
-            <AlertDialogHeader fontSize="lg" fontWeight="bold">
-              Confirmar Fechamento
-            </AlertDialogHeader>
+						<AlertDialogFooter>
+							<Button
+								ref={cancelRefRemoverPrestador}
+								onClick={() =>
+									setConfirmacao((prev) => ({
+										...prev,
+										removerPrestador: false,
+									}))
+								}
+							>
+								Cancelar
+							</Button>
+							<Button
+								colorScheme="red"
+								onClick={confirmarRemoverPrestador}
+								ml={3}
+							>
+								Remover
+							</Button>
+						</AlertDialogFooter>
+					</AlertDialogContent>
+				</AlertDialogOverlay>
+			</AlertDialog>
 
-            <AlertDialogBody>
-              Tem certeza de que deseja fechar o modal? Todas as alterações não salvas serão perdidas.
-            </AlertDialogBody>
+			{/* AlertDialog para confirmação de remover Serviço */}
+			<AlertDialog
+				isOpen={confirmacao.removerServico}
+				leastDestructiveRef={cancelRefRemoverServico}
+				onClose={() =>
+					setConfirmacao((prev) => ({ ...prev, removerServico: false }))
+				}
+				isCentered
+			>
+				<AlertDialogOverlay>
+					<AlertDialogContent>
+						<AlertDialogHeader fontSize="lg" fontWeight="bold">
+							Confirmar Remoção do Serviço
+						</AlertDialogHeader>
 
-            <AlertDialogFooter>
-              <Button ref={cancelRefFechar} onClick={() => setConfirmacao((prev) => ({ ...prev, fecharModal: false }))}>
-                Cancelar
-              </Button>
-              <Button
-                colorScheme="red"
-                onClick={confirmarFechar}
-                ml={3}
-              >
-                Fechar
-              </Button>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialogOverlay>
-      </AlertDialog>
+						<AlertDialogBody>
+							Tem certeza de que deseja remover o(s) serviço(s)? Esta ação não
+							pode ser desfeita.
+						</AlertDialogBody>
 
-      {/* AlertDialog para confirmação de remover Prestador */}
-      <AlertDialog
-        isOpen={confirmacao.removerPrestador}
-        leastDestructiveRef={cancelRefRemoverPrestador}
-        onClose={() => setConfirmacao((prev) => ({ ...prev, removerPrestador: false }))}
-        isCentered
-      >
-        <AlertDialogOverlay>
-          <AlertDialogContent>
-            <AlertDialogHeader fontSize="lg" fontWeight="bold">
-              Confirmar Remoção do Prestador
-            </AlertDialogHeader>
-
-            <AlertDialogBody>
-              Tem certeza de que deseja remover o prestador? Esta ação não pode ser desfeita.
-            </AlertDialogBody>
-
-            <AlertDialogFooter>
-              <Button ref={cancelRefRemoverPrestador} onClick={() => setConfirmacao((prev) => ({ ...prev, removerPrestador: false }))}>
-                Cancelar
-              </Button>
-              <Button
-                colorScheme="red"
-                onClick={confirmarRemoverPrestador}
-                ml={3}
-              >
-                Remover
-              </Button>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialogOverlay>
-      </AlertDialog>
-
-      {/* AlertDialog para confirmação de remover Serviço */}
-      <AlertDialog
-        isOpen={confirmacao.removerServico}
-        leastDestructiveRef={cancelRefRemoverServico}
-        onClose={() => setConfirmacao((prev) => ({ ...prev, removerServico: false }))}
-        isCentered
-      >
-        <AlertDialogOverlay>
-          <AlertDialogContent>
-            <AlertDialogHeader fontSize="lg" fontWeight="bold">
-              Confirmar Remoção do Serviço
-            </AlertDialogHeader>
-
-            <AlertDialogBody>
-              Tem certeza de que deseja remover o(s) serviço(s)? Esta ação não pode ser desfeita.
-            </AlertDialogBody>
-
-            <AlertDialogFooter>
-              <Button ref={cancelRefRemoverServico} onClick={() => setConfirmacao((prev) => ({ ...prev, removerServico: false }))}>
-                Cancelar
-              </Button>
-              <Button
-                colorScheme="red"
-                onClick={confirmarRemoverServico}
-                ml={3}
-              >
-                Remover
-              </Button>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialogOverlay>
-      </AlertDialog>
-    </>
-  );
+						<AlertDialogFooter>
+							<Button
+								ref={cancelRefRemoverServico}
+								onClick={() =>
+									setConfirmacao((prev) => ({ ...prev, removerServico: false }))
+								}
+							>
+								Cancelar
+							</Button>
+							<Button
+								colorScheme="red"
+								onClick={confirmarRemoverServico}
+								ml={3}
+							>
+								Remover
+							</Button>
+						</AlertDialogFooter>
+					</AlertDialogContent>
+				</AlertDialogOverlay>
+			</AlertDialog>
+		</>
+	);
 };
 
 export default TicketModal;
