@@ -17,8 +17,42 @@ import FormField from "@/components/common/FormField";
 import { carregarPrestadorPorSid } from "../../services/prestadorService";
 
 const PrestadorForm = () => {
-  const { setFieldValue, values } = useFormikContext();
+  const { setFieldValue, values, dirty } = useFormikContext();
+
   const toast = useToast();
+
+  const buscarCep = async (cep, setFieldValue, toast) => {
+    try {
+      const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+      const data = await response.json();
+
+      if (data.erro) {
+        throw new Error("CEP não encontrado");
+      }
+
+      setFieldValue("prestador.endereco.rua", data.logradouro);
+      setFieldValue("prestador.endereco.bairro", data.bairro);
+      setFieldValue("prestador.endereco.cidade", data.localidade);
+      setFieldValue("prestador.endereco.estado", data.uf);
+    } catch (error) {
+      console.error("Erro ao buscar CEP:", error);
+      toast({
+        title: "Erro ao buscar CEP",
+        description: "Não foi possível buscar o CEP informado.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+  };
+
+  useEffect(() => {
+    const cepNumerico = values.prestador.endereco.cep.replace(/\D/g, "");
+
+    if (cepNumerico.length === 8) {
+      buscarCep(cepNumerico, setFieldValue, toast);
+    }
+  }, [values.prestador.endereco.cep, setFieldValue, toast]);
 
   useEffect(() => {
     // Função para buscar prestador pelo SID
@@ -38,7 +72,8 @@ const PrestadorForm = () => {
         console.error("Erro ao buscar prestador por SID:", error);
         toast({
           title: "Erro ao carregar prestador",
-          description: "Não foi possível encontrar o prestador com o SID fornecido.",
+          description:
+            "Não foi possível encontrar o prestador com o SID fornecido.",
           status: "error",
           duration: 5000,
           isClosable: true,
@@ -76,7 +111,12 @@ const PrestadorForm = () => {
             </Text>
 
             <HStack align="stretch">
-              <FormField label="ID" name="prestador._id" type="text" isReadOnly={true} />
+              <FormField
+                label="ID"
+                name="prestador._id"
+                type="text"
+                isReadOnly={true}
+              />
               <FormField label="SID" name="prestador.sid" type="text" />
               <FormField
                 label="Status"
@@ -85,7 +125,10 @@ const PrestadorForm = () => {
                 options={[
                   { value: "ativo", label: "Ativo" },
                   { value: "em-analise", label: "Em Análise" },
-                  { value: "pendente-de-revisao", label: "Pendente de Revisão" },
+                  {
+                    value: "pendente-de-revisao",
+                    label: "Pendente de Revisão",
+                  },
                   { value: "inativo", label: "Inativo" },
                   { value: "arquivado", label: "Arquivado" },
                 ]}
@@ -106,7 +149,11 @@ const PrestadorForm = () => {
                 label="Documento (CPF/CNPJ)"
                 name="prestador.documento"
                 type="text"
-                mask={values.prestador.tipo === "pf" ? "999.999.999-99" : "99.999.999/9999-99"}
+                mask={
+                  values.prestador.tipo === "pf"
+                    ? "999.999.999-99"
+                    : "99.999.999/9999-99"
+                }
               />
               <FormField label="Nome" name="prestador.nome" type="text" />
               <FormField label="E-mail" name="prestador.email" type="email" />
@@ -131,7 +178,16 @@ const PrestadorForm = () => {
                   type="text"
                   mask="999999999"
                 />
-                <FormField label="Nome da Mãe" name="prestador.pessoaFisica.nomeMae" type="text" />
+              </HStack>
+            )}
+
+            {isPessoaFisica && (
+              <HStack align="stretch">
+                <FormField
+                  label="Nome da Mãe"
+                  name="prestador.pessoaFisica.nomeMae"
+                  type="text"
+                />
                 <FormField
                   label="Órgão Emissor do RG"
                   name="prestador.pessoaFisica.rg.orgaoEmissor"
@@ -145,15 +201,40 @@ const PrestadorForm = () => {
             </Text>
 
             <HStack align="stretch">
-              <FormField label="CEP" name="prestador.endereco.cep" type="text" />
-              <FormField label="Rua" name="prestador.endereco.rua" type="text" />
-              <FormField label="Número" name="prestador.endereco.numero" type="text" />
+              <FormField
+                label="CEP"
+                name="prestador.endereco.cep"
+                type="text"
+                mask="99999-999"
+              />
+              <FormField
+                label="Rua"
+                name="prestador.endereco.rua"
+                type="text"
+              />
+              <FormField
+                label="Número"
+                name="prestador.endereco.numero"
+                type="text"
+              />
             </HStack>
 
             <HStack align="stretch">
-              <FormField label="Complemento" name="prestador.endereco.complemento" type="text" />
-              <FormField label="Cidade" name="prestador.endereco.cidade" type="text" />
-              <FormField label="Estado" name="prestador.endereco.estado" type="text" />
+              <FormField
+                label="Complemento"
+                name="prestador.endereco.complemento"
+                type="text"
+              />
+              <FormField
+                label="Cidade"
+                name="prestador.endereco.cidade"
+                type="text"
+              />
+              <FormField
+                label="Estado"
+                name="prestador.endereco.estado"
+                type="text"
+              />
             </HStack>
 
             <Text fontSize="lg" fontWeight="bold" mb={2}>
@@ -170,9 +251,21 @@ const PrestadorForm = () => {
                   { value: "poupanca", label: "Poupança" },
                 ]}
               />
-              <FormField label="Banco" name="prestador.dadosBancarios.banco" type="text" />
-              <FormField label="Agência" name="prestador.dadosBancarios.agencia" type="text" />
-              <FormField label="Conta" name="prestador.dadosBancarios.conta" type="text" />
+              <FormField
+                label="Banco"
+                name="prestador.dadosBancarios.banco"
+                type="text"
+              />
+              <FormField
+                label="Agência"
+                name="prestador.dadosBancarios.agencia"
+                type="text"
+              />
+              <FormField
+                label="Conta"
+                name="prestador.dadosBancarios.conta"
+                type="text"
+              />
             </HStack>
 
             <HStack align="stretch">

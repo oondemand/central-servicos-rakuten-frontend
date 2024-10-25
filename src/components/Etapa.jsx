@@ -41,6 +41,7 @@ const Etapa = ({ index, etapa }) => {
           {etapa.nome}
         </Heading>
       </Flex>
+      
       <AcoesEtapa etapa={etapa} setIsAddModalOpen={setIsAddModalOpen} />
 
       {listaTickets

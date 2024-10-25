@@ -15,6 +15,7 @@ import {
   MenuButton,
   MenuList,
   MenuItem,
+  Text,
 } from "@chakra-ui/react";
 
 import { useTicket } from "../../contexts/TicketContext";
@@ -57,7 +58,14 @@ const Header = () => {
   // }, [listaBases]);
 
   return (
-    <Flex shadow="md" p={4} align="center" justify="space-between" bg="brand.50" color="white">
+    <Flex
+      shadow="md"
+      p={4}
+      align="center"
+      justify="space-between"
+      bg="brand.50"
+      color="white"
+    >
       <Flex align="center">
         <Link to="/auth/home">
           <Box as="span" fontSize="xl" fontWeight="bold" color="brand.500">
@@ -103,7 +111,12 @@ const Header = () => {
             <Avatar name="MF" bg="brand.500" size="sm" ml={2} />
           </MenuButton>
           <MenuList bg="brand.50">
-            <MenuItem onClick={handleLogout}>Logout</MenuItem>
+            <MenuItem onClick={handleLogout}>
+            <p>
+
+            </p>
+              <Text color="black">Logout</Text>
+            </MenuItem>
           </MenuList>
         </Menu>
       </Flex>

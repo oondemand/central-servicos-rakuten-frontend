@@ -68,11 +68,15 @@ const AcoesEtapa = ({ etapa, setIsAddModalOpen }) => {
       >
         <ModalOverlay />
         <ModalContent color="brand.800" bg="brand.50" height="90vh" rounded="md" shadow="lg">
+
           <ModalHeader>Importar Comissões</ModalHeader>
+
           <ModalCloseButton />
+
           <ModalBody>
             <ImportacaoComissoes />
           </ModalBody>
+          
           <ModalFooter>
             <Button colorScheme="blue" mr={3} onClick={onCloseImportarComissoes}>
               Fechar
