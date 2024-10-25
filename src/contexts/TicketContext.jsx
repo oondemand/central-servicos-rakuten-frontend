@@ -326,8 +326,20 @@ export const TicketProvider = ({ children }) => {
         });
         return response;
       } catch (err) {
-        const detalhes = err.response?.data?.detalhes || err.message;
         setError("Erro ao importar arquivo.");
+
+        if (err.status === 413) {
+          toast({
+            title: "Erro ao importar arquivo",
+            description: "Arquivo muito grande.",
+            status: "error",
+            duration: 5000,
+            isClosable: true,
+          });
+          return null;
+        }
+
+        const detalhes = err.response?.data?.detalhes || err.message;
         toast({
           title: "Erro ao importar arquivo do ticket.",
           description: detalhes,
