@@ -1,8 +1,8 @@
 // src/components/PrivateRoute.js
-import React from 'react';
-import { Navigate, Outlet } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
-import { Spinner, Center } from '@chakra-ui/react';
+import React from "react";
+import { Navigate, Outlet } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
+import { Spinner, Center, Flex } from "@chakra-ui/react";
 
 const PrivateRoute = () => {
   const { usuario, loading } = useAuth();
@@ -10,7 +10,10 @@ const PrivateRoute = () => {
   if (loading) {
     return (
       <Center h="100vh">
-        <Spinner color="brand.500" size="xl" />
+        <Flex direction="column" align="center">
+          <Spinner color="brand.500" size="xl" />
+          <p>Por favor, Aguarde...</p>
+        </Flex>
       </Center>
     );
   }

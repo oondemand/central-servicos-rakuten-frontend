@@ -7,7 +7,13 @@ const ImportacaoComissoes = () => {
         <label>
           Selecione a Planilha de <i>Payment Control</i>:
         </label>
-        <div>
+
+        <div
+          style={{
+            display: "block",
+            margin: "50px 0",
+          }}
+        >
           <input type="file" />
         </div>
       </div>

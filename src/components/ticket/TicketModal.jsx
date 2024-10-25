@@ -1,5 +1,7 @@
 // src/components/ticket/TicketModal.js
 import React, { useMemo, useState, useRef } from "react";
+import _ from "lodash";
+import { motion } from "framer-motion";
 import {
   Modal,
   ModalOverlay,
@@ -39,6 +41,8 @@ import { useEtapa } from "../../contexts/EtapaContext";
 import { salvarPrestador } from "../../services/prestadorService";
 import { salvarServico } from "../../services/servicoService";
 
+const MotionModalContent = motion(ModalContent);
+
 const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
   const isEditMode = Boolean(ticket);
   const { salvarTicket } = useTicket();
@@ -47,8 +51,12 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
   const toast = useToast();
 
   // Estados para controlar a exibição dos formulários
-  const [mostrarPrestador, setMostrarPrestador] = useState(ticket?.prestador ? true : false);
-  const [mostrarServico, setMostrarServico] = useState(ticket?.servicos ? true : false);
+  const [mostrarPrestador, setMostrarPrestador] = useState(
+    ticket?.prestador ? true : false
+  );
+  const [mostrarServico, setMostrarServico] = useState(
+    ticket?.servicos.length > 0 ? true : false
+  );
 
   // Estados para controlar os diálogos de confirmação
   const [confirmacao, setConfirmacao] = useState({
@@ -120,6 +128,7 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
 
   // Handler de submissão
   const handleSubmit = async (values, { setSubmitting }) => {
+    console.log("entrou");
     setSubmitting(true);
     try {
       let prestadorId = null;
@@ -130,10 +139,22 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
           ? values.prestador.documento.replace(/[^\d]/g, "")
           : "";
 
+        const cepLimpo = values.prestador.endereco.cep
+          ? values.prestador.endereco.cep.replace(/[^\d]/g, "")
+          : "";
+
         const prestadorDados = {
           ...values.prestador,
           documento: documentoLimpo,
+          endereco: {
+            ...values.prestador.endereco,
+            cep: cepLimpo,
+          },
         };
+
+        if (prestadorDados.endereco && prestadorDados.endereco.bairro) {
+          delete prestadorDados.endereco.bairro;
+        }
 
         if (isEditMode && ticket.prestador) {
           prestadorId = ticket.prestador._id;
@@ -216,11 +237,135 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
   };
 
   // Funções para abrir os diálogos de confirmação
-  const abrirConfirmarFechar = () => setConfirmacao((prev) => ({ ...prev, fecharModal: true }));
-  const abrirConfirmarRemoverPrestador = () =>
-    setConfirmacao((prev) => ({ ...prev, removerPrestador: true }));
-  const abrirConfirmarRemoverServico = () =>
-    setConfirmacao((prev) => ({ ...prev, removerServico: true }));
+  const abrirConfirmarFechar = (formik) => {
+    const formAlterado =
+      formik.values.titulo !== formik.initialValues.titulo ||
+      formik.values.observacao !== formik.initialValues.observacao ||
+      verificarAlteracoesPrestador(
+        formik.values.prestador,
+        formik.initialValues.prestador
+      ) ||
+      verificarAlteracoesServicos(
+        formik.values.servicos,
+        formik.initialValues.servicos
+      );
+
+    if (formAlterado) {
+      setConfirmacao((prev) => ({ ...prev, fecharModal: true }));
+    } else {
+      confirmarFechar();
+    }
+  };
+
+  const verificarAlteracoesPrestador = (prestadorAtual, prestadorInicial) => {
+    return (
+      prestadorAtual.nome !== prestadorInicial.nome ||
+      prestadorAtual.tipo !== prestadorInicial.tipo ||
+      prestadorAtual.documento !== prestadorInicial.documento ||
+      prestadorAtual.email !== prestadorInicial.email ||
+      prestadorAtual.comentariosRevisao !==
+        prestadorInicial.comentariosRevisao ||
+      prestadorAtual.status !== prestadorInicial.status ||
+      // Verificação dos campos de pessoa física
+      verificarAlteracoesPessoaFisica(
+        prestadorAtual.pessoaFisica,
+        prestadorInicial.pessoaFisica
+      ) ||
+      // Verificação dos dados bancários
+      verificarAlteracoesDadosBancarios(
+        prestadorAtual.dadosBancarios,
+        prestadorInicial.dadosBancarios
+      ) ||
+      // Verificação do endereço
+      verificarAlteracoesEndereco(
+        prestadorAtual.endereco,
+        prestadorInicial.endereco
+      )
+    );
+  };
+
+  const verificarAlteracoesPessoaFisica = (
+    pessoaFisicaAtual,
+    pessoaFisicaInicial
+  ) => {
+    if (!pessoaFisicaAtual || !pessoaFisicaInicial) return false;
+    return (
+      pessoaFisicaAtual.rg.numero !== pessoaFisicaInicial.rg.numero ||
+      pessoaFisicaAtual.rg.orgaoEmissor !==
+        pessoaFisicaInicial.rg.orgaoEmissor ||
+      pessoaFisicaAtual.dataNascimento !== pessoaFisicaInicial.dataNascimento ||
+      pessoaFisicaAtual.pis !== pessoaFisicaInicial.pis ||
+      pessoaFisicaAtual.nomeMae !== pessoaFisicaInicial.nomeMae
+    );
+  };
+
+  const verificarAlteracoesDadosBancarios = (
+    bancariosAtual,
+    bancariosInicial
+  ) => {
+    if (!bancariosAtual || !bancariosInicial) return false;
+    return (
+      bancariosAtual.banco !== bancariosInicial.banco ||
+      bancariosAtual.agencia !== bancariosInicial.agencia ||
+      bancariosAtual.conta !== bancariosInicial.conta ||
+      bancariosAtual.tipoConta !== bancariosInicial.tipoConta
+    );
+  };
+
+  const verificarAlteracoesEndereco = (enderecoAtual, enderecoInicial) => {
+    if (!enderecoAtual || !enderecoInicial) return false;
+    return (
+      enderecoAtual.cep !== enderecoInicial.cep ||
+      enderecoAtual.rua !== enderecoInicial.rua ||
+      enderecoAtual.numero !== enderecoInicial.numero ||
+      enderecoAtual.complemento !== enderecoInicial.complemento ||
+      enderecoAtual.cidade !== enderecoInicial.cidade ||
+      enderecoAtual.estado !== enderecoInicial.estado
+    );
+  };
+
+  const verificarAlteracoesServicos = (servicosAtuais, servicosIniciais) => {
+    if (servicosAtuais.length !== servicosIniciais.length) return true;
+
+    for (let i = 0; i < servicosAtuais.length; i++) {
+      const servicoAtual = servicosAtuais[i];
+      const servicoInicial = servicosIniciais[i];
+
+      if (
+        servicoAtual.mesCompetencia !== servicoInicial.mesCompetencia ||
+        servicoAtual.anoCompetencia !== servicoInicial.anoCompetencia ||
+        servicoAtual.valorPrincipal !== servicoInicial.valorPrincipal ||
+        servicoAtual.valorBonus !== servicoInicial.valorBonus ||
+        servicoAtual.valorAjusteComercial !==
+          servicoInicial.valorAjusteComercial ||
+        servicoAtual.valorHospedagemAnuncio !==
+          servicoInicial.valorHospedagemAnuncio ||
+        servicoAtual.valorTotal !== servicoInicial.valorTotal ||
+        servicoAtual.status !== servicoInicial.status ||
+        servicoAtual.correcao !== servicoInicial.correcao
+      ) {
+        return true; // Houve alteração no serviço
+      }
+    }
+
+    return false; // Nenhuma alteração
+  };
+
+  const abrirConfirmarRemoverPrestador = (formik) => {
+    if (formik.dirty) {
+      setConfirmacao((prev) => ({ ...prev, removerPrestador: true }));
+    } else {
+      confirmarRemoverPrestador();
+    }
+  };
+
+  const abrirConfirmarRemoverServico = (formik) => {
+    if (formik.dirty) {
+      setConfirmacao((prev) => ({ ...prev, removerServico: true }));
+    } else {
+      confirmarRemoverServico();
+    }
+  };
 
   // Funções para confirmar as ações
   const confirmarFechar = () => {
@@ -239,33 +384,55 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
   };
 
   return (
-    <>
-      {/* Modal Principal */}
-      <Modal
-        isOpen={isOpen}
-        onClose={abrirConfirmarFechar} // Abre o diálogo de confirmação ao tentar fechar
-        size="6xl"
-        isCentered
-        closeOnOverlayClick={false} // Evita fechar clicando fora
-      >
-        <ModalOverlay />
-        <Formik
-          initialValues={combinedInitValues}
-          validationSchema={combinedValidationSchema}
-          onSubmit={handleSubmit}
-          enableReinitialize
-          validateOnChange={false}
-        >
-          {(formik) => (
+    <Formik
+      initialValues={combinedInitValues}
+      validationSchema={combinedValidationSchema}
+      onSubmit={handleSubmit}
+      enableReinitialize
+      validateOnChange={false}
+    >
+      {(formik) => (
+        <>
+          {/* Modal Principal */}
+          <Modal
+            isOpen={isOpen}
+            onClose={() => abrirConfirmarFechar(formik)} // Abre o diálogo de confirmação ao tentar fechar
+            size="6xl"
+            isCentered
+            closeOnOverlayClick={false} // Evita fechar clicando fora
+          >
+            <ModalOverlay />
             <Form>
-              <ModalContent color="brand.800" bg="brand.50" height="90vh" rounded="md" shadow="lg">
+              <MotionModalContent
+                color="brand.800"
+                bg="brand.50"
+                height="90vh"
+                rounded="md"
+                shadow="lg"
+                initial={{ opacity: 0, scale: 0.5 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.5 }}
+                transition={{
+                  duration: 0.4,
+                  ease: "easeInOut",
+                }}
+              >
                 <Flex direction="column" height="100%">
-                  <Box position="sticky" top="0" zIndex="1" borderBottom="1px solid #e2e8f0">
+                  <Box
+                    position="sticky"
+                    top="0"
+                    zIndex="1"
+                    borderBottom="1px solid #e2e8f0"
+                  >
                     <ModalHeader>
                       {isEditMode ? "Editar Ticket" : "Adicionar Novo Ticket"}
                     </ModalHeader>
-                    <ModalCloseButton />
+
+                    <ModalCloseButton
+                      onClick={() => abrirConfirmarFechar(formik)} // Aqui o formik está disponível
+                    />
                   </Box>
+
                   <Box flex="1" overflowY="auto" p={2}>
                     <ModalBody>
                       <Flex direction={{ base: "column", md: "row" }} gap={4}>
@@ -280,8 +447,8 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
                           </Box>
                         )}
                       </Flex>
+
                       <HStack spacing={4} mt={4}>
-                        {/* Botão Adicionar/Remover Prestador */}
                         {!mostrarPrestador ? (
                           <Button
                             onClick={() => setMostrarPrestador(true)}
@@ -292,7 +459,7 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
                           </Button>
                         ) : (
                           <Button
-                            onClick={abrirConfirmarRemoverPrestador} // Abre confirmação no pai
+                            onClick={abrirConfirmarRemoverPrestador}
                             colorScheme="red"
                             variant="outline"
                           >
@@ -300,7 +467,6 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
                           </Button>
                         )}
 
-                        {/* Botão Adicionar/Remover Serviço */}
                         {!mostrarServico ? (
                           <Button
                             onClick={() => setMostrarServico(true)}
@@ -311,7 +477,7 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
                           </Button>
                         ) : (
                           <Button
-                            onClick={abrirConfirmarRemoverServico} // Abre confirmação no pai
+                            onClick={abrirConfirmarRemoverServico}
                             colorScheme="red"
                             variant="outline"
                           >
@@ -319,11 +485,13 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
                           </Button>
                         )}
                       </HStack>
+
                       {mostrarPrestador && (
                         <Box mt={4}>
                           <PrestadorForm />
                         </Box>
                       )}
+
                       {mostrarServico && (
                         <Box mt={4}>
                           <ServicoForm />
@@ -331,123 +499,153 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
                       )}
                     </ModalBody>
                   </Box>
+
                   <ModalFooter borderTop="1px solid #e2e8f0">
                     <Flex width="100%" justifyContent="space-between">
                       <TicketActions
                         ticket={ticket}
                         isEditMode={isEditMode}
-                        closeModal={abrirConfirmarFechar} // Passa função para abrir confirmação
-                        onCancel={abrirConfirmarFechar} // Passa função para cancelamento
-                        // Adicione outras funções conforme necessário
+                        closeModal={abrirConfirmarFechar}
+                        onCancel={abrirConfirmarFechar}
                       />
                     </Flex>
                   </ModalFooter>
                 </Flex>
-              </ModalContent>
+              </MotionModalContent>
             </Form>
-          )}
-        </Formik>
-      </Modal>
+          </Modal>
 
-      {/* AlertDialog para confirmação de fechar o Modal Principal */}
-      <AlertDialog
-        isOpen={confirmacao.fecharModal}
-        leastDestructiveRef={cancelRefFechar}
-        onClose={() => setConfirmacao((prev) => ({ ...prev, fecharModal: false }))}
-        isCentered
-      >
-        <AlertDialogOverlay>
-          <AlertDialogContent>
-            <AlertDialogHeader fontSize="lg" fontWeight="bold">
-              Confirmar Fechamento
-            </AlertDialogHeader>
+          {/* AlertDialogs para confirmações */}
+          <AlertDialog
+            isOpen={confirmacao.fecharModal}
+            leastDestructiveRef={cancelRefFechar}
+            onClose={() =>
+              setConfirmacao((prev) => ({ ...prev, fecharModal: false }))
+            }
+            isCentered
+          >
+            <AlertDialogOverlay>
+              <AlertDialogContent>
+                <AlertDialogHeader fontSize="lg" fontWeight="bold">
+                  Confirmar Fechamento
+                </AlertDialogHeader>
 
-            <AlertDialogBody>
-              Tem certeza de que deseja fechar o modal? Todas as alterações não salvas serão perdidas.
-            </AlertDialogBody>
+                <AlertDialogBody>
+                  Tem certeza de que deseja fechar o modal? Todas as alterações
+                  não salvas serão perdidas.
+                </AlertDialogBody>
 
-            <AlertDialogFooter>
-              <Button ref={cancelRefFechar} onClick={() => setConfirmacao((prev) => ({ ...prev, fecharModal: false }))}>
-                Cancelar
-              </Button>
-              <Button
-                colorScheme="red"
-                onClick={confirmarFechar}
-                ml={3}
-              >
-                Fechar
-              </Button>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialogOverlay>
-      </AlertDialog>
+                <AlertDialogFooter>
+                  <Button
+                    ref={cancelRefFechar}
+                    onClick={() =>
+                      setConfirmacao((prev) => ({
+                        ...prev,
+                        fecharModal: false,
+                      }))
+                    }
+                  >
+                    Cancelar
+                  </Button>
+                  <Button colorScheme="red" onClick={confirmarFechar} ml={3}>
+                    Fechar
+                  </Button>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialogOverlay>
+          </AlertDialog>
 
-      {/* AlertDialog para confirmação de remover Prestador */}
-      <AlertDialog
-        isOpen={confirmacao.removerPrestador}
-        leastDestructiveRef={cancelRefRemoverPrestador}
-        onClose={() => setConfirmacao((prev) => ({ ...prev, removerPrestador: false }))}
-        isCentered
-      >
-        <AlertDialogOverlay>
-          <AlertDialogContent>
-            <AlertDialogHeader fontSize="lg" fontWeight="bold">
-              Confirmar Remoção do Prestador
-            </AlertDialogHeader>
+          {/* Outros AlertDialogs */}
+          {/* AlertDialog para confirmar remoção do prestador */}
+          <AlertDialog
+            isOpen={confirmacao.removerPrestador}
+            leastDestructiveRef={cancelRefRemoverPrestador}
+            onClose={() =>
+              setConfirmacao((prev) => ({ ...prev, removerPrestador: false }))
+            }
+            isCentered
+          >
+            <AlertDialogOverlay>
+              <AlertDialogContent>
+                <AlertDialogHeader fontSize="lg" fontWeight="bold">
+                  Confirmar Remoção do Prestador
+                </AlertDialogHeader>
 
-            <AlertDialogBody>
-              Tem certeza de que deseja remover o prestador? Esta ação não pode ser desfeita.
-            </AlertDialogBody>
+                <AlertDialogBody>
+                  Tem certeza de que deseja remover o prestador? Esta ação não
+                  pode ser desfeita.
+                </AlertDialogBody>
 
-            <AlertDialogFooter>
-              <Button ref={cancelRefRemoverPrestador} onClick={() => setConfirmacao((prev) => ({ ...prev, removerPrestador: false }))}>
-                Cancelar
-              </Button>
-              <Button
-                colorScheme="red"
-                onClick={confirmarRemoverPrestador}
-                ml={3}
-              >
-                Remover
-              </Button>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialogOverlay>
-      </AlertDialog>
+                <AlertDialogFooter>
+                  <Button
+                    ref={cancelRefRemoverPrestador}
+                    onClick={() =>
+                      setConfirmacao((prev) => ({
+                        ...prev,
+                        removerPrestador: false,
+                      }))
+                    }
+                  >
+                    Cancelar
+                  </Button>
+                  <Button
+                    colorScheme="red"
+                    onClick={confirmarRemoverPrestador}
+                    ml={3}
+                  >
+                    Remover
+                  </Button>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialogOverlay>
+          </AlertDialog>
 
-      {/* AlertDialog para confirmação de remover Serviço */}
-      <AlertDialog
-        isOpen={confirmacao.removerServico}
-        leastDestructiveRef={cancelRefRemoverServico}
-        onClose={() => setConfirmacao((prev) => ({ ...prev, removerServico: false }))}
-        isCentered
-      >
-        <AlertDialogOverlay>
-          <AlertDialogContent>
-            <AlertDialogHeader fontSize="lg" fontWeight="bold">
-              Confirmar Remoção do Serviço
-            </AlertDialogHeader>
+          {/* AlertDialog para confirmação de remover serviço */}
+          <AlertDialog
+            isOpen={confirmacao.removerServico}
+            leastDestructiveRef={cancelRefRemoverServico}
+            onClose={() =>
+              setConfirmacao((prev) => ({ ...prev, removerServico: false }))
+            }
+            isCentered
+          >
+            <AlertDialogOverlay>
+              <AlertDialogContent>
+                <AlertDialogHeader fontSize="lg" fontWeight="bold">
+                  Confirmar Remoção do Serviço
+                </AlertDialogHeader>
 
-            <AlertDialogBody>
-              Tem certeza de que deseja remover o(s) serviço(s)? Esta ação não pode ser desfeita.
-            </AlertDialogBody>
+                <AlertDialogBody>
+                  Tem certeza de que deseja remover o(s) serviço(s)? Esta ação
+                  não pode ser desfeita.
+                </AlertDialogBody>
 
-            <AlertDialogFooter>
-              <Button ref={cancelRefRemoverServico} onClick={() => setConfirmacao((prev) => ({ ...prev, removerServico: false }))}>
-                Cancelar
-              </Button>
-              <Button
-                colorScheme="red"
-                onClick={confirmarRemoverServico}
-                ml={3}
-              >
-                Remover
-              </Button>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialogOverlay>
-      </AlertDialog>
-    </>
+                <AlertDialogFooter>
+                  <Button
+                    ref={cancelRefRemoverServico}
+                    onClick={() =>
+                      setConfirmacao((prev) => ({
+                        ...prev,
+                        removerServico: false,
+                      }))
+                    }
+                  >
+                    Cancelar
+                  </Button>
+                  <Button
+                    colorScheme="red"
+                    onClick={confirmarRemoverServico}
+                    ml={3}
+                  >
+                    Remover
+                  </Button>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialogOverlay>
+          </AlertDialog>
+        </>
+      )}
+    </Formik>
   );
 };
 

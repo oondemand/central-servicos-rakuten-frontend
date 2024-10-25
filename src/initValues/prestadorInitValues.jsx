@@ -6,4 +6,12 @@ export const prestadorInitValues = {
   email: '',
   status: 'ativo',
   comentariosRevisao: '',
+  endereco: { 
+    cep: "",
+    rua: "",
+    numero: "",
+    complemento: "",
+    cidade: "",
+    estado: ""
+  }
 };
