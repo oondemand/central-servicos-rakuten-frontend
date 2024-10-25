@@ -27,9 +27,8 @@ const LoginSchema = Yup.object().shape({
 });
 
 const Login = () => {
-  // console.log("Login");
-
   const navigate = useNavigate();
+  
   const { login } = useAuth();
 
   return (
