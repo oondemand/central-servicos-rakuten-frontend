@@ -43,7 +43,7 @@ import TicketFields from "./TicketFields";
 import TicketStatusButtons from "./TicketStatusButtons";
 
 import { DeleteIcon, DownloadIcon } from "@chakra-ui/icons";
-import { uploadFiles } from "../../services/ticketService";
+
 
 import { ArquivosPreview } from "./ArquivosPreview";
 import { ArquivosImport } from "./ArquivosImport";
@@ -140,10 +140,6 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
 			let prestadorId = null;
 			const servicosIds = [];
 
-			if (values.arquivos.length > 0) {
-				await uploadFiles(ticket._id, values.arquivos);
-			}
-
 			if (mostrarPrestador && values.prestador) {
 				const documentoLimpo = values.prestador.documento
 					? values.prestador.documento.replace(/[^\d]/g, "")
@@ -222,15 +218,7 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
 			}
 		} catch (error) {
 			console.error("Erro ao salvar ticket:", error);
-			if (error.status === 413) {
-				return toast({
-					title: "Erro ao salvar ticket.",
-					description: "Arquivo muito grande, máximo permitido é de 1MB.",
-					status: "error",
-					duration: 5000,
-					isClosable: true,
-				});
-			}
+		
 			toast({
 				title: "Erro ao salvar ticket.",
 				description: error.message || "Ocorreu um erro inesperado.",
@@ -361,7 +349,7 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
 												)}
 
 												{isEditMode && (
-												<ArquivosImport/>
+												<ArquivosImport ticketId={ticket._id}/>
 												)}
 											</HStack>
 

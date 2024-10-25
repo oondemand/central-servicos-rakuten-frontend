@@ -1,56 +1,123 @@
 import { useFormikContext } from "formik";
 
-import { Box, Flex, IconButton, Text } from "@chakra-ui/react";
-import React from "react";
+import {
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogOverlay,
+  Box,
+  Button,
+  Flex,
+  IconButton,
+  Text,
+} from "@chakra-ui/react";
+
+import React, { useState } from "react";
 
 import { DeleteIcon, DownloadIcon } from "@chakra-ui/icons";
+import { useTicket } from "../../contexts/TicketContext";
 
 export const ArquivosPreview = () => {
-	// const arquivosDoTicket = await buscarArquivosDoTicket(ticket._id)
+  const { removerArquivoDoTicket } = useTicket();
+  const { values, setFieldValue } = useFormikContext();
 
-	const { values, setFieldValue } = useFormikContext();
-	if (values.length === 0) return;
-	return (
-		<Box my={2}>
-			<Text fontSize="lg" fontWeight="bold" mb={2}>
-				Arquivos
-			</Text>
+  const [deleteFileConfirmationDialog, setDeleteFileConfirmationDialog] =
+    useState({
+      isOpen: false,
+      fileId: "",
+    });
 
-			{values.arquivos.map((e, i) => {
-				const name = e.nomeOriginal ?? e.name;
-				const urlDoArquivo =
-					`${import.meta.env.VITE_API_URL}/${e.path}` ?? URL.createObjectURL(e);
+  const handleRemoveFileFromTicket = async () => {
+    const response = await removerArquivoDoTicket(
+      deleteFileConfirmationDialog.fileId
+    );
+    setDeleteFileConfirmationDialog({ fileId: "", isOpen: false });
+    if (response.status === 200) {
+      const fileWithoutDeleted = values.arquivos.filter(
+        (file) => file._id !== deleteFileConfirmationDialog.fileId
+      );
+      setFieldValue("arquivos", fileWithoutDeleted);
+    }
+  };
 
-				return (
-					<Flex key={`${e.name} + ${i}`} justify="space-between" align="center">
-						<Text>{name}</Text>
-						<Flex gap={2} align="center">
-							{e._id && (
-								<a href={urlDoArquivo} download={name}>
-									<IconButton size="xs" colorScheme="green">
-										<DownloadIcon />
-									</IconButton>
-								</a>
-							)}
+  if (values.length === 0) return;
 
-							{!e._id && (
-								<IconButton
-									size="xs"
-									colorScheme="red"
-									onClick={() => {
-										const files = values.arquivos.filter((file) => {
-											return file.name !== e.name;
-										});
-										setFieldValue("arquivos", files);
-									}}
-								>
-									<DeleteIcon />
-								</IconButton>
-							)}
-						</Flex>
-					</Flex>
-				);
-			})}
-		</Box>
-	);
+  return (
+    <Box my={2}>
+      <Text fontSize="lg" fontWeight="bold" mb={2}>
+        Arquivos
+      </Text>
+
+      {values.arquivos.map((e, i) => {
+        return (
+          <Flex key={e._id} justify="space-between" align="center">
+            <Text>{e.nomeOriginal}</Text>
+            <Flex gap={2} align="center">
+              <a
+                href={`${import.meta.env.VITE_API_URL}/${e.path}`}
+                download={e.nomeOriginal}
+              >
+                <IconButton size="xs" colorScheme="green">
+                  <DownloadIcon />
+                </IconButton>
+              </a>
+
+              <IconButton
+                size="xs"
+                colorScheme="red"
+                onClick={() => {
+                  setDeleteFileConfirmationDialog((prev) => ({
+                    isOpen: true,
+                    fileId: e._id,
+                  }));
+                }}
+              >
+                <DeleteIcon />
+              </IconButton>
+            </Flex>
+          </Flex>
+        );
+      })}
+
+      <AlertDialog
+        isOpen={deleteFileConfirmationDialog.isOpen}
+        onClose={() =>
+          setDeleteFileConfirmationDialog({ fileId: "", isOpen: false })
+        }
+        isCentered
+      >
+        <AlertDialogOverlay>
+          <AlertDialogContent>
+            <AlertDialogHeader fontSize="lg" fontWeight="bold">
+              Confirmar Remoção de Arquivo
+            </AlertDialogHeader>
+
+            <AlertDialogBody>
+              Tem certeza de que deseja remover o arquivo? Esta ação não pode
+              ser desfeita.
+            </AlertDialogBody>
+
+            <AlertDialogFooter>
+              <Button
+                onClick={() =>
+                  setDeleteFileConfirmationDialog({ fileId: "", isOpen: false })
+                }
+              >
+                Cancelar
+              </Button>
+              <Button
+                colorScheme="red"
+                onClick={handleRemoveFileFromTicket}
+                ml={3}
+              >
+                Remover
+              </Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialogOverlay>
+      </AlertDialog>
+    </Box>
+  );
 };

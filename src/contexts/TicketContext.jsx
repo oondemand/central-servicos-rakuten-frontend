@@ -1,5 +1,11 @@
 import { useToast } from "@chakra-ui/react";
-import React, { createContext, useState, useEffect, useCallback, useContext } from "react";
+import React, {
+  createContext,
+  useState,
+  useEffect,
+  useCallback,
+  useContext,
+} from "react";
 import {
   alterarTicket,
   aprovarTicket as aprovarTicketService,
@@ -7,9 +13,11 @@ import {
   listarArquivosDoTicket,
   listarTickets,
   reprovarTicket as reprovarTicketService,
-  salvarTicket as salvarTicketService
+  salvarTicket as salvarTicketService,
 } from "../services/ticketService";
 import { useBaseOmie } from "./BaseOmieContext";
+
+import { deleteFile, uploadFiles } from "../services/ticketService";
 
 const TicketContext = createContext();
 
@@ -72,9 +80,13 @@ export const TicketProvider = ({ children }) => {
       } catch (err) {
         console.error("Erro ao salvar ticket:", err);
         const detalhes = err.response?.data?.detalhes || err.message;
-        setError(ticket._id ? "Erro ao editar ticket." : "Erro ao adicionar ticket.");
+        setError(
+          ticket._id ? "Erro ao editar ticket." : "Erro ao adicionar ticket."
+        );
         toast({
-          title: ticket._id ? "Erro ao editar ticket." : "Erro ao adicionar ticket.",
+          title: ticket._id
+            ? "Erro ao editar ticket."
+            : "Erro ao adicionar ticket.",
           description: detalhes,
           status: "error",
           duration: 5000,
@@ -103,7 +115,8 @@ export const TicketProvider = ({ children }) => {
         });
         return true;
       } catch (err) {
-        const mensagem = err.response?.data?.message || "Erro ao aprovar ticket";
+        const mensagem =
+          err.response?.data?.message || "Erro ao aprovar ticket";
         const detalhes = err.response?.data?.detalhes || err.message;
         toast({
           title: mensagem,
@@ -136,7 +149,8 @@ export const TicketProvider = ({ children }) => {
         });
         return true;
       } catch (err) {
-        const mensagem = err.response?.data?.message || "Erro ao recusar ticket";
+        const mensagem =
+          err.response?.data?.message || "Erro ao recusar ticket";
         const detalhes = err.response?.data?.detalhes || err.message;
         toast({
           title: mensagem,
@@ -296,7 +310,69 @@ export const TicketProvider = ({ children }) => {
       }
     },
     [toast]
-  )
+  );
+
+  const uploadArquivoDoTicket = useCallback(
+    async (ticketId, file) => {
+      setLoading(true);
+      try {
+        const response = await uploadFiles(ticketId, file);
+        setError(null);
+        toast({
+          title: "Arquivo importado com sucesso!",
+          status: "success",
+          duration: 5000,
+          isClosable: true,
+        });
+        return response;
+      } catch (err) {
+        const detalhes = err.response?.data?.detalhes || err.message;
+        setError("Erro ao importar arquivo.");
+        toast({
+          title: "Erro ao importar arquivo do ticket.",
+          description: detalhes,
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
+        return null;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [toast]
+  );
+
+  const removerArquivoDoTicket = useCallback(
+    async (fileId) => {
+      setLoading(true);
+      try {
+        const response = await deleteFile(fileId);
+        setError(null);
+        toast({
+          title: "Arquivo removido com sucesso!",
+          status: "success",
+          duration: 5000,
+          isClosable: true,
+        });
+        return response;
+      } catch (err) {
+        const detalhes = err.response?.data?.detalhes || err.message;
+        setError("Erro ao remover arquivo.");
+        toast({
+          title: "Erro ao remover arquivo do ticket.",
+          description: detalhes,
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
+        return null;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [toast]
+  );
 
   useEffect(() => {
     carregarTickets();
@@ -316,7 +392,9 @@ export const TicketProvider = ({ children }) => {
         alterarStatusTicket,
         filtrarTickets,
         buscarTicketPorId,
-        buscarArquivosDoTicket
+        buscarArquivosDoTicket,
+        uploadArquivoDoTicket,
+        removerArquivoDoTicket,
       }}
     >
       {children}

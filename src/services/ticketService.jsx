@@ -37,7 +37,7 @@ export const carregarTicket = async (id) => {
 export const listarTickets = async (filtro) => {
   try {
     const response = await api.get("tickets", { params: filtro });
-    
+
     return response.data; // Retorna os dados da resposta
   } catch (error) {
     console.error("Erro ao listar tickets:", error);
@@ -65,7 +65,7 @@ export const reprovarTicket = async (id) => {
     console.error("Erro ao reprovar ticket:", error);
     throw error; // Repassa o erro para que o chamador possa tratá-lo
   }
-}; 
+};
 
 // Serviço para salvar um ticket (adicionar ou alterar)
 export const salvarTicket = async (ticket) => {
@@ -81,32 +81,39 @@ export const salvarTicket = async (ticket) => {
   }
 };
 
-export const uploadFiles = async(ticketId, files) => {
+export const uploadFiles = async (ticketId, files) => {
   const formData = new FormData();
   files.forEach((e, i) => {
-    formData.append("arquivos", files[i])
-  })
+    formData.append("arquivos", files[i]);
+  });
 
   try {
-    const response = await api.post(`/tickets/${ticketId}/upload`, formData, {
+    return await api.post(`/tickets/${ticketId}/upload`, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
     });
-
-    return response.data; 
   } catch (error) {
     console.error("Erro ao fazer upload de arquivos", error);
-    throw error; 
+    throw error;
   }
-}
+};
+
+export const deleteFile = async (fileId) => {
+  try {
+    return await api.delete(`/tickets/arquivo/${fileId}`);
+  } catch (error) {
+    console.error("Erro ao deletar arquivo", error);
+    throw error;
+  }
+};
 
 export const listarArquivosDoTicket = async (filtro) => {
   try {
     const response = await api.get(`/tickets/${filtro}/arquivos`);
-    return response.data; 
+    return response.data;
   } catch (error) {
     console.error("Erro", error);
-    throw error; 
+    throw error;
   }
-}
+};
