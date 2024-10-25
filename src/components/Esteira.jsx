@@ -45,7 +45,10 @@ const Esteira = () => {
             slidesPerView: 3.8,
           },
           1536: {
-            slidesPerView: 4.2,
+            slidesPerView: 4.4,
+          },
+          1920: {
+            slidesPerView: 5.2,
           }
         }}
       >
