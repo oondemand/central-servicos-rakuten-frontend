@@ -8,7 +8,7 @@ import { FaPlus } from "react-icons/fa";
 import AcoesEtapa from "./AcoesEtapa";
 
 const Etapa = ({ index, etapa }) => {
-  const { listaTickets, buscarTicketPorId } = useTicket();
+  const { listaTickets, buscarTicketPorId, buscarArquivosDoTicket } = useTicket();
   const [selectedTicket, setSelectedTicket] = useState(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [loadingTicket, setLoadingTicket] = useState(false);
@@ -17,10 +17,10 @@ const Etapa = ({ index, etapa }) => {
     setLoadingTicket(true);
     try {
       const fetchedTicket = await buscarTicketPorId(ticket._id);
-      // console.log(fetchedTicket, "fetchedTicket");
+      const arquivosDoTicket = await buscarArquivosDoTicket(ticket._id)
 
-      if (fetchedTicket) {
-        setSelectedTicket(fetchedTicket);
+      if (fetchedTicket && arquivosDoTicket) {
+        setSelectedTicket({...fetchedTicket, arquivos: arquivosDoTicket});
       }
     } catch (error) {
       console.error("Erro ao buscar ticket:", error);
