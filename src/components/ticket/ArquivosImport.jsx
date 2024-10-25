@@ -7,6 +7,20 @@ import {
 
 export const ArquivosImport = () => {
 	const inputFileRef = useRef(null);
+    // const {  } = useTicket();
+
+    const handleImportNewFile = () => {
+        try {
+            
+        } catch (e) {
+            toast({
+                title: "Erro ao anexar arquivo!",
+                description: error.message,
+                status: "error",
+                duration: 5000,
+              });
+        }
+    } 
 
     return (
         <Box>
