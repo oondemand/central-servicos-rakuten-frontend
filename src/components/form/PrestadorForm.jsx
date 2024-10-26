@@ -1,5 +1,7 @@
 // src/components/form/PrestadorForm.js
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import { toast } from "react-toastify";
+import axios from "axios";
 import {
   VStack,
   HStack,
@@ -14,45 +16,86 @@ import {
 } from "@chakra-ui/react";
 import { useFormikContext } from "formik";
 import FormField from "@/components/common/FormField";
+import CustomSelect from "../common/CustomSelect";
 import { carregarPrestadorPorSid } from "../../services/prestadorService";
 
 const PrestadorForm = () => {
   const { setFieldValue, values, dirty } = useFormikContext();
 
-  const toast = useToast();
+  const [cnpjValido, setCnpjValido] = useState(true);
+  const [sidValido, setSidValido] = useState(true);
+  const [estados, setEstados] = useState([]);
+  const [isAutoUpdating, setIsAutoUpdating] = useState(false);
+  const [displayNome, setDisplayNome] = useState(values.prestador.nome);
+  const [displaySid, setDisplaySid] = useState(values.prestador.sid);
+  const [isTyping, setIsTyping] = useState(false);
 
-  const buscarCep = async (cep, setFieldValue, toast) => {
+  const verificarCNPJ = async (cnpj) => {
     try {
-      const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
-      const data = await response.json();
-
-      if (data.erro) {
-        throw new Error("CEP não encontrado");
+      const response = await axios.get(
+        `https://brasilapi.com.br/api/cnpj/v1/${cnpj}`
+      );
+      if (response.data) {
+        setCnpjValido(true);
+        toast.success("CNPJ validado com sucesso!");
       }
-
-      setFieldValue("prestador.endereco.rua", data.logradouro);
-      setFieldValue("prestador.endereco.bairro", data.bairro);
-      setFieldValue("prestador.endereco.cidade", data.localidade);
-      setFieldValue("prestador.endereco.estado", data.uf);
+      return response.data;
     } catch (error) {
-      console.error("Erro ao buscar CEP:", error);
-      toast({
-        title: "Erro ao buscar CEP",
-        description: "Não foi possível buscar o CEP informado.",
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-      });
+      setCnpjValido(false);
+      toast.error("CNPJ inválido. Verifique o número e tente novamente.");
+      return null;
     }
   };
+
+  console.log(values);
+
+  useEffect(() => {
+    const cnpjNumerico = values.prestador.documento.replace(/\D/g, "");
+
+    if (
+      values.prestador.tipo === "pj" &&
+      cnpjNumerico.length === 14 &&
+      values.prestador.documento.includes("/")
+    ) {
+      verificarCNPJ(cnpjNumerico);
+    }
+  }, [values.prestador.documento, values.prestador.tipo, setFieldValue]);
 
   useEffect(() => {
     const cepNumerico = values.prestador.endereco.cep.replace(/\D/g, "");
 
+    const buscarCep = async (cep) => {
+      try {
+        setIsAutoUpdating(true); // Ativa o modo de atualização automática
+        const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+        const data = await response.json();
+
+        if (data.erro) {
+          throw new Error("CEP não encontrado");
+        }
+
+        setFieldValue("prestador.endereco.rua", data.logradouro);
+        setFieldValue("prestador.endereco.bairro", data.bairro);
+        setFieldValue("prestador.endereco.cidade", data.localidade);
+        setFieldValue("prestador.endereco.estado", data.uf);
+      } catch (error) {
+        console.error("Erro ao buscar CEP:", error);
+        toast({
+          title: "Erro ao buscar CEP",
+          description: "Não foi possível buscar o CEP informado.",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
+      } finally {
+        setIsAutoUpdating(false); // Desativa o modo de atualização automática após a busca
+      }
+    };
+
     if (cepNumerico.length === 8) {
-      buscarCep(cepNumerico, setFieldValue, toast);
+      buscarCep(cepNumerico);
     }
-  }, [values.prestador.endereco.cep, setFieldValue, toast]);
+  }, [values.prestador.endereco.cep, setFieldValue]);
 
   useEffect(() => {
     // Função para buscar prestador pelo SID
@@ -80,12 +123,43 @@ const PrestadorForm = () => {
         });
       }
     };
-
     // Executa a busca quando o SID for alterado e tiver um valor válido
-    if (values.prestador.sid && values.prestador.sid.length === 7) {
+    if (/^\d{7}$/.test(values.prestador.sid)) {
       buscarPrestador(values.prestador.sid);
     }
   }, [values.prestador.sid, setFieldValue, toast]);
+
+  useEffect(() => {
+    // estados da API BrasilAPI
+    const fetchEstados = async () => {
+      try {
+        const response = await axios.get(
+          "https://brasilapi.com.br/api/ibge/uf/v1"
+        );
+        const estadosData = response.data.map((estado) => ({
+          value: estado.sigla,
+          label: estado.nome,
+        }));
+        setEstados(estadosData);
+      } catch (error) {
+        console.error("Erro ao buscar estados:", error);
+      }
+    };
+
+    fetchEstados();
+  }, []);
+
+  useEffect(() => {
+    setIsTyping(true);
+
+    const handler = setTimeout(() => {
+      setDisplayNome(values.prestador.nome);
+      setDisplaySid(values.prestador.sid);
+      setIsTyping(false);
+    }, 1000);
+
+    return () => clearTimeout(handler);
+  }, [values.prestador.nome, values.prestador.sid]);
 
   // Determina se o prestador é Pessoa Física
   const isPessoaFisica = values.prestador.tipo === "pf";
@@ -98,7 +172,9 @@ const PrestadorForm = () => {
             <Box flex="1" textAlign="left" fontWeight="bold">
               Informações do Prestador:{" "}
               <label style={{ fontWeight: "normal", fontStyle: "italic" }}>
-                {values.prestador.nome} - SID {values.prestador.sid}
+                {isTyping
+                  ? "Carregando" + ".".repeat((Date.now() / 300) % 4)
+                  : `${displayNome} - SID ${displaySid}`}
               </label>
             </Box>
             <AccordionIcon />
@@ -111,13 +187,15 @@ const PrestadorForm = () => {
             </Text>
 
             <HStack align="stretch">
-              <FormField
-                label="ID"
-                name="prestador._id"
-                type="text"
-                isReadOnly={true}
-              />
-              <FormField label="SID" name="prestador.sid" type="text" />
+              <div>
+                <FormField
+                  label="SID"
+                  name="prestador.sid"
+                  type="text"
+                  mask="9999999"
+                />
+              </div>
+
               <FormField
                 label="Status"
                 name="prestador.status"
@@ -154,6 +232,16 @@ const PrestadorForm = () => {
                     ? "999.999.999-99"
                     : "99.999.999/9999-99"
                 }
+                style={{
+                  borderColor:
+                    !cnpjValido && values.prestador.tipo !== "pf"
+                      ? "red"
+                      : "#ccc",
+                  color:
+                    !cnpjValido && values.prestador.tipo !== "pf"
+                      ? "red"
+                      : "#8528CE",
+                }}
               />
               <FormField label="Nome" name="prestador.nome" type="text" />
               <FormField label="E-mail" name="prestador.email" type="email" />
@@ -162,10 +250,21 @@ const PrestadorForm = () => {
             {isPessoaFisica && (
               <HStack align="stretch">
                 <FormField
+                  label="Nome da Mãe"
+                  name="prestador.pessoaFisica.nomeMae"
+                  type="text"
+                />
+
+                <FormField
                   label="Data de Nascimento"
                   name="prestador.pessoaFisica.dataNascimento"
                   type="date"
                 />
+              </HStack>
+            )}
+
+            {isPessoaFisica && (
+              <HStack align="stretch">
                 <FormField
                   label="PIS"
                   name="prestador.pessoaFisica.pis"
@@ -177,16 +276,6 @@ const PrestadorForm = () => {
                   name="prestador.pessoaFisica.rg.numero"
                   type="text"
                   mask="999999999"
-                />
-              </HStack>
-            )}
-
-            {isPessoaFisica && (
-              <HStack align="stretch">
-                <FormField
-                  label="Nome da Mãe"
-                  name="prestador.pessoaFisica.nomeMae"
-                  type="text"
                 />
                 <FormField
                   label="Órgão Emissor do RG"
@@ -230,11 +319,51 @@ const PrestadorForm = () => {
                 name="prestador.endereco.cidade"
                 type="text"
               />
-              <FormField
+              {/* <FormField
                 label="Estado"
                 name="prestador.endereco.estado"
                 type="text"
-              />
+              /> */}
+
+              <div
+                style={{ width: "1040px", marginTop: "8px", fontWeight: "500" }}
+              >
+                <label htmlFor="prestador.endereco.estado">Estado</label>
+                <select
+                  id="prestador.endereco.estado"
+                  name="prestador.endereco.estado"
+                  value={values.prestador.endereco.estado}
+                  onChange={(e) => {
+                    if (!isAutoUpdating) {
+                      setFieldValue(
+                        "prestador.endereco.estado",
+                        e.target.value
+                      );
+                    }
+                  }}
+                  style={{
+                    height: "40px",
+                    maxHeight: "150px",
+                    overflowY: "auto",
+                    padding: "8px",
+                    borderRadius: "6px",
+                    width: "100%",
+                    border: "1px solid rgb(226, 232, 240)",
+                    backgroundColor: "#fff",
+                    fontSize: "16px",
+                    cursor: "pointer",
+                    outline: "none",
+                  }}
+                >
+                  <option value="">Selecione um estado</option>
+                  {estados &&
+                    estados.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                </select>
+              </div>
             </HStack>
 
             <Text fontSize="lg" fontWeight="bold" mb={2}>

@@ -128,7 +128,6 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
 
   // Handler de submissão
   const handleSubmit = async (values, { setSubmitting }) => {
-    console.log("entrou");
     setSubmitting(true);
     try {
       let prestadorId = null;
