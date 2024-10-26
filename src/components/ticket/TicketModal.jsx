@@ -71,6 +71,8 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
   const cancelRefRemoverServico = useRef();
 
   // Esquema de validação combinado
+
+  console.log(mostrarServico)
   const combinedValidationSchema = useMemo(() => {
     let schema = ticketValidationSchema;
 

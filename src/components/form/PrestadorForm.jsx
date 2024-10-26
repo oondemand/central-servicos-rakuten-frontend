@@ -1,5 +1,6 @@
 // src/components/form/PrestadorForm.js
 import React, { useEffect, useState } from "react";
+import Select from "react-select";
 import { toast } from "react-toastify";
 import axios from "axios";
 import {
@@ -29,6 +30,8 @@ const PrestadorForm = () => {
   const [displayNome, setDisplayNome] = useState(values.prestador.nome);
   const [displaySid, setDisplaySid] = useState(values.prestador.sid);
   const [isTyping, setIsTyping] = useState(false);
+  const [bancos, setBancos] = useState([]);
+  const [loadingBanks, setLoadingBanks] = useState(true);
 
   const verificarCNPJ = async (cnpj) => {
     try {
@@ -47,7 +50,12 @@ const PrestadorForm = () => {
     }
   };
 
-  console.log(values);
+  const handleChangeBanks = (selectedOption) => {
+    setFieldValue(
+      "prestador.dadosBancarios.banco",
+      selectedOption ? selectedOption.label : ""
+    );
+  };
 
   useEffect(() => {
     const cnpjNumerico = values.prestador.documento.replace(/\D/g, "");
@@ -161,6 +169,26 @@ const PrestadorForm = () => {
     return () => clearTimeout(handler);
   }, [values.prestador.nome, values.prestador.sid]);
 
+  useEffect(() => {
+    const fetchBancos = async () => {
+      try {
+        const response = await axios.get(
+          "https://brasilapi.com.br/api/banks/v1"
+        );
+        const bancosData = response.data.map((banco) => ({
+          value: banco.code,
+          label: banco.name,
+        }));
+        setBancos(bancosData);
+      } catch (error) {
+        console.error("Erro ao carregar bancos:", error);
+      } finally {
+        setLoadingBanks(false);
+      }
+    };
+    fetchBancos();
+  }, []);
+
   // Determina se o prestador é Pessoa Física
   const isPessoaFisica = values.prestador.tipo === "pf";
 
@@ -174,7 +202,9 @@ const PrestadorForm = () => {
               <label style={{ fontWeight: "normal", fontStyle: "italic" }}>
                 {isTyping
                   ? "Carregando" + ".".repeat((Date.now() / 300) % 4)
-                  : `${displayNome} - SID ${displaySid}`}
+                  : `${displayNome} - SID ${
+                      displaySid !== undefined ? displaySid : ""
+                    }`}
               </label>
             </Box>
             <AccordionIcon />
@@ -380,11 +410,61 @@ const PrestadorForm = () => {
                   { value: "poupanca", label: "Poupança" },
                 ]}
               />
-              <FormField
-                label="Banco"
-                name="prestador.dadosBancarios.banco"
-                type="text"
-              />
+
+              <div
+                style={{
+                  marginBottom: "2rem",
+                  width: "1050px",
+                  zIndex: '999999'
+                }}
+              >
+                <label
+                  style={{
+                    fontWeight: "500",
+                    display: "block",
+                    marginBottom: "8px",
+                  }}
+                >
+                  Banco
+                </label>
+                {loadingBanks ? (
+                  <p>Carregando bancos...</p>
+                ) : (
+                  <Select
+                    id="prestador.dadosBancarios.banco"
+                    name="prestador.dadosBancarios.banco"
+                    options={bancos}
+                    value={
+                      bancos.find(
+                        (option) =>
+                          option.label ===
+                          values.prestador?.dadosBancarios?.banco
+                      ) || null
+                    }
+                    onChange={handleChangeBanks}
+                    placeholder="Selecione ou digite o banco"
+                    isClearable
+                    menuPortalTarget={document.body}
+                    styles={{
+                      control: (base) => ({
+                        ...base,
+                        minHeight: "40px",
+                        borderRadius: "6px",
+                        borderColor: "#ccc",
+                        boxShadow: "none",
+                      }),
+                      menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                      menu: (base) => ({
+                        ...base,
+                        maxHeight: "auto",
+                        overflowY: "auto",
+                        zIndex: "999",
+                      }),
+                    }}
+                  />
+                )}
+              </div>
+
               <FormField
                 label="Agência"
                 name="prestador.dadosBancarios.agencia"
