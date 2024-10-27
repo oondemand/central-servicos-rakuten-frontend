@@ -72,7 +72,6 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
 
   // Esquema de validação combinado
 
-  console.log(mostrarServico)
   const combinedValidationSchema = useMemo(() => {
     let schema = ticketValidationSchema;
 

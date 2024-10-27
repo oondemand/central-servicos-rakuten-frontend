@@ -30,52 +30,6 @@ const TicketActions = ({
 
   const [acao, setAcao] = useState(null);
 
-  const handleApprove = async () => {
-    if (!isEditMode) return;
-    try {
-      const sucesso = await aprovarTicket(ticket._id);
-      if (sucesso) {
-        closeModal();
-      }
-    } catch (error) {
-      console.error("Erro ao aprovar ticket:", error);
-      // Opcional: Adicionar feedback ao usuário
-    }
-  };
-
-  const handleReject = async () => {
-    if (!isEditMode) return;
-    try {
-      const sucesso = await reprovarTicket(ticket._id);
-      if (sucesso) {
-        closeModal();
-      }
-    } catch (error) {
-      console.error("Erro ao recusar ticket:", error);
-      // Opcional: Adicionar feedback ao usuário
-    }
-  };
-
-  const handleArquivar = () => {
-    if (!isEditMode) return;
-    onOpen();
-  };
-
-  const confirmArquivar = async () => {
-    try {
-      const ticketUpdate = { _id: ticket._id, status: "arquivado" };
-      const sucesso = await salvarTicket(ticketUpdate);
-
-      if (sucesso) {
-        closeModal();
-      }
-      onClose();
-    } catch (error) {
-      console.error("Erro ao arquivar ticket:", error);
-      // Opcional: Adicionar feedback ao usuário
-    }
-  };
-
   const handleConfirmAction = async () => {
     if (!isEditMode || !acao) return;
 
