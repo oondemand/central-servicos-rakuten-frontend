@@ -353,19 +353,11 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
   };
 
   const abrirConfirmarRemoverPrestador = (formik) => {
-    if (formik.dirty) {
-      setConfirmacao((prev) => ({ ...prev, removerPrestador: true }));
-    } else {
-      confirmarRemoverPrestador();
-    }
+    setConfirmacao((prev) => ({ ...prev, removerPrestador: true }));
   };
 
   const abrirConfirmarRemoverServico = (formik) => {
-    if (formik.dirty) {
-      setConfirmacao((prev) => ({ ...prev, removerServico: true }));
-    } else {
-      confirmarRemoverServico();
-    }
+    setConfirmacao((prev) => ({ ...prev, removerServico: true }));
   };
 
   // Funções para confirmar as ações
@@ -375,8 +367,8 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
   };
 
   const confirmarRemoverPrestador = () => {
-    setMostrarPrestador(false);
     setConfirmacao((prev) => ({ ...prev, removerPrestador: false }));
+   setMostrarPrestador(false);
   };
 
   const confirmarRemoverServico = () => {
@@ -508,6 +500,7 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
                         isEditMode={isEditMode}
                         closeModal={abrirConfirmarFechar}
                         onCancel={abrirConfirmarFechar}
+                        cancelar={closeModal}
                       />
                     </Flex>
                   </ModalFooter>

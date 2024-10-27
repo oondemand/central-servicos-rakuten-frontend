@@ -33,22 +33,25 @@ const PrestadorForm = () => {
   const [bancos, setBancos] = useState([]);
   const [loadingBanks, setLoadingBanks] = useState(true);
 
-  const verificarCNPJ = async (cnpj) => {
-    try {
-      const response = await axios.get(
-        `https://brasilapi.com.br/api/cnpj/v1/${cnpj}`
-      );
-      if (response.data) {
-        setCnpjValido(true);
-        toast.success("CNPJ validado com sucesso!");
-      }
-      return response.data;
-    } catch (error) {
-      setCnpjValido(false);
-      toast.error("CNPJ inválido. Verifique o número e tente novamente.");
-      return null;
-    }
-  };
+  // const verificarCNPJ = async (cnpj) => {
+  //   try {
+  //     const response = await axios.get(
+  //       `https://www.receitaws.com.br/v1/cnpj/${cnpj}`
+  //     );
+  //     if (response.data && response.data.status === "OK") {
+  //       setCnpjValido(true);
+  //       toast.success("CNPJ validado com sucesso!");
+  //     } else {
+  //       setCnpjValido(false);
+  //       toast.error("CNPJ inválido.");
+  //     }
+  //     return response.data;
+  //   } catch (error) {
+  //     setCnpjValido(false);
+  //     toast.error("Erro ao validar o CNPJ.");
+  //     return null;
+  //   }
+  // };
 
   const handleChangeBanks = (selectedOption) => {
     setFieldValue(
@@ -57,17 +60,17 @@ const PrestadorForm = () => {
     );
   };
 
-  useEffect(() => {
-    const cnpjNumerico = values.prestador.documento.replace(/\D/g, "");
+  // useEffect(() => {
+  //   const cnpjNumerico = values.prestador.documento.replace(/\D/g, "");
 
-    if (
-      values.prestador.tipo === "pj" &&
-      cnpjNumerico.length === 14 &&
-      values.prestador.documento.includes("/")
-    ) {
-      verificarCNPJ(cnpjNumerico);
-    }
-  }, [values.prestador.documento, values.prestador.tipo, setFieldValue]);
+  //   if (
+  //     values.prestador.tipo === "pj" &&
+  //     cnpjNumerico.length === 14 &&
+  //     values.prestador.documento.includes("/")
+  //   ) {
+  //     verificarCNPJ(cnpjNumerico);
+  //   }
+  // }, [values.prestador.documento, values.prestador.tipo, setFieldValue]);
 
   useEffect(() => {
     const cepNumerico = values.prestador.endereco.cep.replace(/\D/g, "");
@@ -415,7 +418,7 @@ const PrestadorForm = () => {
                 style={{
                   marginBottom: "2rem",
                   width: "1050px",
-                  zIndex: '999999'
+                  zIndex: "999999",
                 }}
               >
                 <label

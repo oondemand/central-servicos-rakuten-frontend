@@ -18,9 +18,8 @@ const Esteira = () => {
   return (
     <Flex
       justifyContent="center" 
-      alignItems="center" 
       minHeight="calc(100vh - 200px)" 
-      width="80%" // 
+      width="100%" 
       margin="0 auto" 
     >
       <Swiper
@@ -28,7 +27,6 @@ const Esteira = () => {
         navigation={true}
         modules={[Navigation]}
         spaceBetween={0} 
-        slidesPerView={4.2}
         loop={false} 
         grabCursor={true} 
         breakpoints={{ 
@@ -36,10 +34,10 @@ const Esteira = () => {
             slidesPerView: 2.3,
           },
           768: {
-            slidesPerView: 3.3,
+            slidesPerView: 2.3,
           },
           1024: {
-            slidesPerView: 4.3,
+            slidesPerView: 3.1,
           },
           1366: {
             slidesPerView: 3.8,
@@ -54,13 +52,13 @@ const Esteira = () => {
       >
         {listaEtapas.map((etapa, index) => (
           <SwiperSlide key={etapa._id}>
-            <Box width="250px">
+            <Box width="300px">
               <Etapa etapa={etapa} index={index} />
             </Box>
           </SwiperSlide>
         ))}
         <SwiperSlide>
-          <Box width="220px">
+          <Box width="300px">
             <EtapaIntegracaoOmie />
           </Box>
         </SwiperSlide>
