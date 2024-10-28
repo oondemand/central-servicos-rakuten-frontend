@@ -1,7 +1,7 @@
 import React from "react";
 
 import { Box, Flex, IconButton } from "@chakra-ui/react";
-import { Swiper, SwiperSlide } from "swiper/react"; 
+import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
@@ -17,11 +17,11 @@ const Esteira = () => {
 
   return (
     <Flex
-      justifyContent="center" 
-      alignItems="center" 
-      minHeight="calc(100vh - 200px)" 
-      width="80%" // 
-      margin="0 auto" 
+      justifyContent="center"
+      alignItems="center"
+      minHeight="calc(100vh - 200px)"
+      width="80%" //
+      margin="0 auto"
     >
       <Swiper
         className="mySwiper"
@@ -52,18 +52,18 @@ const Esteira = () => {
           }
         }}
       >
-        {listaEtapas.map((etapa, index) => (
-          <SwiperSlide key={etapa._id}>
-            <Box width="250px">
-              <Etapa etapa={etapa} index={index} />
-            </Box>
-          </SwiperSlide>
-        ))}
-        <SwiperSlide>
-          <Box width="220px">
-            <EtapaIntegracaoOmie />
-          </Box>
-        </SwiperSlide>
+      {listaEtapas.map((etapa, index) => (
+        <SwiperSlide key={etapa._id}>
+        <Box width="250px">
+          <Etapa etapa={etapa} index={index} />
+        </Box>
+       </SwiperSlide>
+      ))}
+      <SwiperSlide> 
+      <Box width="220px">
+        <EtapaIntegracaoOmie />
+      </Box>
+      </SwiperSlide>
       </Swiper>
     </Flex>
   );
