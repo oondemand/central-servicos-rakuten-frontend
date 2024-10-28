@@ -25,21 +25,24 @@ import {
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
 
-import TicketFields from "./TicketFields";
-import TicketActions from "./TicketActions";
-import PrestadorForm from "../form/PrestadorForm";
-import ServicoForm from "../form/ServicoForm";
-import TicketStatusButtons from "./TicketStatusButtons";
-import { ticketValidationSchema } from "../../validation/ticketValidationSchema";
-import { prestadorValidationSchema } from "../../validation/prestadorValidationSchema";
-import { servicoValidationSchema } from "../../validation/servicoValidationSchema";
-import { prestadorInitValues } from "../../initValues/prestadorInitValues";
-import { servicoInitValues } from "../../initValues/servicoInitValues";
-import { useTicket } from "../../contexts/TicketContext";
 import { useBaseOmie } from "../../contexts/BaseOmieContext";
 import { useEtapa } from "../../contexts/EtapaContext";
+import { useTicket } from "../../contexts/TicketContext";
+import { prestadorInitValues } from "../../initValues/prestadorInitValues";
+import { servicoInitValues } from "../../initValues/servicoInitValues";
 import { salvarPrestador } from "../../services/prestadorService";
 import { salvarServico } from "../../services/servicoService";
+import { prestadorValidationSchema } from "../../validation/prestadorValidationSchema";
+import { servicoValidationSchema } from "../../validation/servicoValidationSchema";
+import { ticketValidationSchema } from "../../validation/ticketValidationSchema";
+import PrestadorForm from "../form/PrestadorForm";
+import ServicoForm from "../form/ServicoForm";
+import TicketActions from "./TicketActions";
+import TicketFields from "./TicketFields";
+import TicketStatusButtons from "./TicketStatusButtons";
+
+import { FilesViewComponent } from "./FilesViewComponent";
+import { ImportFilesComponent } from "./ImportFilesComponent";
 
 const MotionModalContent = motion(ModalContent);
 
@@ -107,12 +110,14 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
       observacao: "",
       prestador: prestadorInitValues,
       servicos: [],
+      arquivos: [],
     };
 
     if (ticket) {
       initValues = {
         ...initValues,
         titulo: ticket.titulo,
+        arquivos: ticket.arquivos,
         observacao: ticket.observacao,
         prestador: ticket.prestador || prestadorInitValues,
         servicos: ticket.servicos
@@ -224,6 +229,7 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
       }
     } catch (error) {
       console.error("Erro ao salvar ticket:", error);
+
       toast({
         title: "Erro ao salvar ticket.",
         description: error.message || "Ocorreu um erro inesperado.",
@@ -476,7 +482,12 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
                             Remover Serviço
                           </Button>
                         )}
+                        {isEditMode && (
+                          <ImportFilesComponent ticketId={ticket._id} />
+                        )}
                       </HStack>
+
+                      {isEditMode && <FilesViewComponent />}
 
                       {mostrarPrestador && (
                         <Box mt={4}>

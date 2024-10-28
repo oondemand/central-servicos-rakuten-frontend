@@ -1,7 +1,7 @@
 import React from "react";
 
 import { Box, Flex, IconButton } from "@chakra-ui/react";
-import { Swiper, SwiperSlide } from "swiper/react"; 
+import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
