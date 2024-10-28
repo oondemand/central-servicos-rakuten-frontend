@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import Select from "react-select";
 import { toast } from "react-toastify";
+import { isCPF, isCNPJ, isPIS } from "validation-br";
 import axios from "axios";
 import {
   VStack,
@@ -23,7 +24,8 @@ import { carregarPrestadorPorSid } from "../../services/prestadorService";
 const PrestadorForm = () => {
   const { setFieldValue, values, dirty } = useFormikContext();
 
-  const [cnpjValido, setCnpjValido] = useState(true);
+  const toast = useToast();
+
   const [sidValido, setSidValido] = useState(true);
   const [estados, setEstados] = useState([]);
   const [isAutoUpdating, setIsAutoUpdating] = useState(false);
@@ -32,26 +34,69 @@ const PrestadorForm = () => {
   const [isTyping, setIsTyping] = useState(false);
   const [bancos, setBancos] = useState([]);
   const [loadingBanks, setLoadingBanks] = useState(true);
+  const [cnpjValido, setCnpjValido] = useState(null);
+  const [cpfValido, setCpfValido] = useState(null);
+  const [pisValido, setPisValido] = useState(true);
 
-  // const verificarCNPJ = async (cnpj) => {
-  //   try {
-  //     const response = await axios.get(
-  //       `https://www.receitaws.com.br/v1/cnpj/${cnpj}`
-  //     );
-  //     if (response.data && response.data.status === "OK") {
-  //       setCnpjValido(true);
-  //       toast.success("CNPJ validado com sucesso!");
-  //     } else {
-  //       setCnpjValido(false);
-  //       toast.error("CNPJ inválido.");
-  //     }
-  //     return response.data;
-  //   } catch (error) {
-  //     setCnpjValido(false);
-  //     toast.error("Erro ao validar o CNPJ.");
-  //     return null;
-  //   }
-  // };
+  const verificarCNPJ = (cnpjValue) => {
+    if (isCNPJ(cnpjValue)) {
+      setCnpjValido(true);
+      toast({
+        title: "CNPJ validado com sucesso!",
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+      });
+    } else {
+      setCnpjValido(false);
+      toast({
+        title: "CNPJ inválido.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+  };
+
+  const verificarCPF = (cpfValue) => {
+    if (isCPF(cpfValue)) {
+      setCpfValido(true);
+      toast({
+        title: "CPF validado com sucesso!",
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+      });
+    } else {
+      setCpfValido(false);
+      toast({
+        title: "CPF inválido.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+  };
+
+  const verificarPIS = (pisValue) => {
+    const valido = isPIS(pisValue);
+    setPisValido(valido);
+    if (valido) {
+      toast({
+        title: "PIS validado com sucesso!",
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+      });
+    } else {
+      toast({
+        title: "PIS inválido.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+  };
 
   const handleChangeBanks = (selectedOption) => {
     setFieldValue(
@@ -60,17 +105,18 @@ const PrestadorForm = () => {
     );
   };
 
-  // useEffect(() => {
-  //   const cnpjNumerico = values.prestador.documento.replace(/\D/g, "");
+  useEffect(() => {
+    const documentoNumerico = values.prestador.documento.replace(/\D/g, "");
 
-  //   if (
-  //     values.prestador.tipo === "pj" &&
-  //     cnpjNumerico.length === 14 &&
-  //     values.prestador.documento.includes("/")
-  //   ) {
-  //     verificarCNPJ(cnpjNumerico);
-  //   }
-  // }, [values.prestador.documento, values.prestador.tipo, setFieldValue]);
+    if (values.prestador.tipo === "pj" && documentoNumerico.length === 14) {
+      verificarCNPJ(documentoNumerico);
+    } else if (
+      values.prestador.tipo === "pf" &&
+      documentoNumerico.length === 11
+    ) {
+      verificarCPF(documentoNumerico);
+    }
+  }, [values.prestador.documento, values.prestador.tipo, setFieldValue]);
 
   useEffect(() => {
     const cepNumerico = values.prestador.endereco.cep.replace(/\D/g, "");
@@ -192,6 +238,19 @@ const PrestadorForm = () => {
     fetchBancos();
   }, []);
 
+  useEffect(() => {
+    const pisNumerico = values.prestador.pessoaFisica?.pis?.replace(/\D/g, "");
+    if (pisNumerico && pisNumerico.length === 11) {
+      verificarPIS(pisNumerico);
+    }
+  }, [values.prestador.pessoaFisica?.pis]);
+
+  useEffect(() => {
+    setFieldValue("prestador.documento", "");
+    setCnpjValido(true);
+    setCpfValido(true);
+  }, [values.prestador.tipo, setFieldValue]);
+
   // Determina se o prestador é Pessoa Física
   const isPessoaFisica = values.prestador.tipo === "pf";
 
@@ -267,11 +326,13 @@ const PrestadorForm = () => {
                 }
                 style={{
                   borderColor:
-                    !cnpjValido && values.prestador.tipo !== "pf"
+                    (values.prestador.tipo === "pj" && !cnpjValido) ||
+                    (values.prestador.tipo === "pf" && !cpfValido)
                       ? "red"
                       : "#ccc",
                   color:
-                    !cnpjValido && values.prestador.tipo !== "pf"
+                    (values.prestador.tipo === "pj" && !cnpjValido) ||
+                    (values.prestador.tipo === "pf" && !cpfValido)
                       ? "red"
                       : "#8528CE",
                 }}
@@ -303,6 +364,10 @@ const PrestadorForm = () => {
                   name="prestador.pessoaFisica.pis"
                   type="text"
                   mask="999.99999.99-9"
+                  style={{
+                    borderColor: !pisValido ? "red" : "#ccc",
+                    color: !pisValido ? "red" : "#8528CE",
+                  }}
                 />
                 <FormField
                   label="RG"
