@@ -15,6 +15,7 @@ import "../styles/esteira/esteira.css";
 const Esteira = () => {
   const { listaEtapas } = useEtapa();
 
+  
   return (
     <Flex
       justifyContent="center" 
