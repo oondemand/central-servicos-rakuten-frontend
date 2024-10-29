@@ -1,5 +1,5 @@
 // src/components/form/ServicoForm.jsx
-import React from "react";
+import React, { useEffect } from "react";
 import {
   VStack,
   HStack,
@@ -16,33 +16,43 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { CloseIcon } from "@chakra-ui/icons";
-import { Field, FieldArray, useFormikContext } from "formik";
-import FormField from "@/components/common/FormField";
+import { FieldArray, useFormikContext } from "formik";
+import FormFieldTooltip from "../common/FormFildTooltip";
+import FormField from "../common/FormField";
 
 const ServicoForm = () => {
-  const { values } = useFormikContext();
+  const { values, setFieldValue } = useFormikContext();
 
-  const calcularTotais = () => {
-    const totais = {
-      valorPrincipal: 0,
-      valorBonus: 0,
-      valorAjusteComercial: 0,
-      valorHospedagemAnuncio: 0,
-      valorTotal: 0,
-    };
+  const atualizarTotalLinha = (index) => {
+    const servico = values.servicos[index];
+    const {
+      valorPrincipal,
+      valorBonus,
+      valorAjusteComercial,
+      valorHospedagemAnuncio,
+    } = servico;
 
-    values.servicos?.forEach((servico) => {
-      totais.valorPrincipal += Number(servico.valorPrincipal) || 0;
-      totais.valorBonus += Number(servico.valorBonus) || 0;
-      totais.valorAjusteComercial += Number(servico.valorAjusteComercial) || 0;
-      totais.valorHospedagemAnuncio += Number(servico.valorHospedagemAnuncio) || 0;
-      totais.valorTotal += Number(servico.valorTotal) || 0;
-    });
+    if (
+      valorPrincipal !== "" &&
+      valorBonus !== "" &&
+      valorAjusteComercial !== "" &&
+      valorHospedagemAnuncio !== ""
+    ) {
+      const total =
+        (Number(valorPrincipal) || 0) +
+        (Number(valorBonus) || 0) +
+        (Number(valorAjusteComercial) || 0) +
+        (Number(valorHospedagemAnuncio) || 0);
 
-    return totais;
+      setFieldValue(`servicos.${index}.valorTotal`, Number(total.toFixed(2)));
+    }
   };
 
-  const totais = calcularTotais();
+  useEffect(() => {
+    values.servicos?.forEach((_, index) => {
+      atualizarTotalLinha(index);
+    });
+  }, [values.servicos, setFieldValue]);
 
   return (
     <Box mt={2}>
@@ -69,9 +79,10 @@ const ServicoForm = () => {
                   form.values.servicos.map((servico, index) => (
                     <Tr key={index}>
                       <Td>
-                        <HStack spacing={1}>
-                          <Box width="55px">
-                            <FormField
+                        {/* Competência: Mês e Ano */}
+                        <HStack spacing={2}>
+                          <Box width="60px">
+                            <FormFieldTooltip
                               name={`servicos.${index}.mesCompetencia`}
                               type="number"
                               min={1}
@@ -80,7 +91,7 @@ const ServicoForm = () => {
                             />
                           </Box>
                           <Box width="70px">
-                            <FormField
+                            <FormFieldTooltip
                               name={`servicos.${index}.anoCompetencia`}
                               type="number"
                               min={2000}
@@ -90,7 +101,7 @@ const ServicoForm = () => {
                         </HStack>
                       </Td>
                       <Td>
-                        <FormField
+                        <FormFieldTooltip
                           name={`servicos.${index}.valorPrincipal`}
                           type="number"
                           min={0}
@@ -99,7 +110,7 @@ const ServicoForm = () => {
                         />
                       </Td>
                       <Td>
-                        <FormField
+                        <FormFieldTooltip
                           name={`servicos.${index}.valorBonus`}
                           type="number"
                           min={0}
@@ -108,7 +119,7 @@ const ServicoForm = () => {
                         />
                       </Td>
                       <Td>
-                        <FormField
+                        <FormFieldTooltip
                           name={`servicos.${index}.valorAjusteComercial`}
                           type="number"
                           min={0}
@@ -117,7 +128,7 @@ const ServicoForm = () => {
                         />
                       </Td>
                       <Td>
-                        <FormField
+                        <FormFieldTooltip
                           name={`servicos.${index}.valorHospedagemAnuncio`}
                           type="number"
                           min={0}
@@ -126,12 +137,13 @@ const ServicoForm = () => {
                         />
                       </Td>
                       <Td>
-                        <FormField
+                        <FormFieldTooltip
                           name={`servicos.${index}.valorTotal`}
                           type="number"
                           min={0}
                           step="0.01"
                           placeholder="0.00"
+                          isDisabled={true} // Desabilita o campo "Valor Total"
                         />
                       </Td>
                       <Td>
@@ -152,27 +164,6 @@ const ServicoForm = () => {
                     </Td>
                   </Tr>
                 )}
-                {form.values.servicos && form.values.servicos.length > 0 && (
-                  <Tr>
-                    <Td fontWeight="bold">Total</Td>
-                    <Td isNumeric fontWeight="bold">
-                      {totais.valorPrincipal.toFixed(2)}
-                    </Td>
-                    <Td isNumeric fontWeight="bold">
-                      {totais.valorBonus.toFixed(2)}
-                    </Td>
-                    <Td isNumeric fontWeight="bold">
-                      {totais.valorAjusteComercial.toFixed(2)}
-                    </Td>
-                    <Td isNumeric fontWeight="bold">
-                      {totais.valorHospedagemAnuncio.toFixed(2)}
-                    </Td>
-                    <Td isNumeric fontWeight="bold">
-                      {totais.valorTotal.toFixed(2)}
-                    </Td>
-                    <Td></Td>
-                  </Tr>
-                )}
               </Tbody>
             </Table>
             <Button
@@ -185,7 +176,7 @@ const ServicoForm = () => {
                   valorBonus: "",
                   valorAjusteComercial: "",
                   valorHospedagemAnuncio: "",
-                  valorTotal: "",
+                  valorTotal: 0, // Define o valor como número
                   correcao: false,
                   status: "ativo",
                 })

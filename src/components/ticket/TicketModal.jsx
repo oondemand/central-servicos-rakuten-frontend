@@ -74,6 +74,7 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
   const cancelRefRemoverServico = useRef();
 
   // Esquema de validação combinado
+
   const combinedValidationSchema = useMemo(() => {
     let schema = ticketValidationSchema;
 
@@ -133,7 +134,6 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
 
   // Handler de submissão
   const handleSubmit = async (values, { setSubmitting }) => {
-    console.log("entrou");
     setSubmitting(true);
     try {
       let prestadorId = null;
@@ -358,19 +358,11 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
   };
 
   const abrirConfirmarRemoverPrestador = (formik) => {
-    if (formik.dirty) {
-      setConfirmacao((prev) => ({ ...prev, removerPrestador: true }));
-    } else {
-      confirmarRemoverPrestador();
-    }
+    setConfirmacao((prev) => ({ ...prev, removerPrestador: true }));
   };
 
   const abrirConfirmarRemoverServico = (formik) => {
-    if (formik.dirty) {
-      setConfirmacao((prev) => ({ ...prev, removerServico: true }));
-    } else {
-      confirmarRemoverServico();
-    }
+    setConfirmacao((prev) => ({ ...prev, removerServico: true }));
   };
 
   // Funções para confirmar as ações
@@ -380,8 +372,8 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
   };
 
   const confirmarRemoverPrestador = () => {
-    setMostrarPrestador(false);
     setConfirmacao((prev) => ({ ...prev, removerPrestador: false }));
+   setMostrarPrestador(false);
   };
 
   const confirmarRemoverServico = () => {
@@ -518,6 +510,7 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
                         isEditMode={isEditMode}
                         closeModal={abrirConfirmarFechar}
                         onCancel={abrirConfirmarFechar}
+                        cancelar={closeModal}
                       />
                     </Flex>
                   </ModalFooter>

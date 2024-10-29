@@ -6,6 +6,8 @@ import ErrorBoundary from "./components/common/ErrorBoundary";
 import Layout from "./components/Layout/Layout";
 import PrivateRoute from "./components/PrivateRoute";
 import { AuthProvider } from "./contexts/AuthContext";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const LoginPage = lazy(() => import("./pages/LoginPage"));
 const HomePage = lazy(() => import("./pages/HomePage"));
@@ -15,6 +17,7 @@ const NotFoundPage = lazy(() => import("./pages/NotFoundPage"));
 function App() {
   return (
     <AuthProvider>
+      <ToastContainer />
       <ErrorBoundary>
         <Suspense fallback={<Spinner size="xl" />}>
           <Routes>

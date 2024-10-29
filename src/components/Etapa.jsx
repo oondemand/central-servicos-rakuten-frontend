@@ -65,8 +65,8 @@ const Etapa = ({ index, etapa }) => {
       {/* Exibe um indicativo de carregamento se o ticket estiver sendo buscado */}
       {loadingTicket && (
         <Flex justify="center" mt={4}>
-          <Spinner />
-          <Text ml={2}>Carregando ticket...</Text>
+          <Spinner color="white" mt={5}/>
+          <Text color="white" ml={2} mt={5}>Carregando ticket...</Text>
         </Flex>
       )}
     </Box>
