@@ -272,17 +272,17 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
       prestadorAtual.comentariosRevisao !==
         prestadorInicial.comentariosRevisao ||
       prestadorAtual.status !== prestadorInicial.status ||
-      // Verificação dos campos de pessoa física
+      //Aqui estou fazendo a Verificacao dos campos de pf
       verificarAlteracoesPessoaFisica(
         prestadorAtual.pessoaFisica,
         prestadorInicial.pessoaFisica
       ) ||
-      // Verificação dos dados bancários
+      //Aqui estou fazendo Verificacao dos dados bancários
       verificarAlteracoesDadosBancarios(
         prestadorAtual.dadosBancarios,
         prestadorInicial.dadosBancarios
       ) ||
-      // Verificação do endereço
+      // Verificacao do endereco
       verificarAlteracoesEndereco(
         prestadorAtual.endereco,
         prestadorInicial.endereco
@@ -350,11 +350,11 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
         servicoAtual.status !== servicoInicial.status ||
         servicoAtual.correcao !== servicoInicial.correcao
       ) {
-        return true; // Houve alteração no serviço
+        return true; 
       }
     }
 
-    return false; // Nenhuma alteração
+    return false; 
   };
 
   const abrirConfirmarRemoverPrestador = (formik) => {
@@ -394,10 +394,10 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
           {/* Modal Principal */}
           <Modal
             isOpen={isOpen}
-            onClose={() => abrirConfirmarFechar(formik)} // Abre o diálogo de confirmação ao tentar fechar
+            onClose={() => abrirConfirmarFechar(formik)}
             size="6xl"
             isCentered
-            closeOnOverlayClick={false} // Evita fechar clicando fora
+            closeOnOverlayClick={false} 
           >
             <ModalOverlay />
             <Form>
@@ -427,7 +427,7 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
                     </ModalHeader>
 
                     <ModalCloseButton
-                      onClick={() => abrirConfirmarFechar(formik)} // Aqui o formik está disponível
+                      onClick={() => abrirConfirmarFechar(formik)} 
                     />
                   </Box>
 
