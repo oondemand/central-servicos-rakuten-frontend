@@ -44,8 +44,6 @@ export const FilesViewComponent = () => {
 
   if (values.length === 0) return;
 
-  console.log(values);
-
   return (
     <Box my={2}>
       {values.arquivos.length > 0 && (

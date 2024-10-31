@@ -66,6 +66,10 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
     ticket?.servicos.length > 0 ? true : false
   );
 
+  console.log("mostrarPrestador " + mostrarPrestador);
+
+  console.log("servico " + mostrarServico);
+
   // Estados para controlar os diálogos de confirmação
   const [confirmacao, setConfirmacao] = useState({
     fecharModal: false,
@@ -386,8 +390,6 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
     setConfirmacao((prev) => ({ ...prev, removerServico: false }));
   };
 
-  console.log(mostrarPrestador)
-
   return (
     <Formik
       initialValues={combinedInitValues}
@@ -456,15 +458,22 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
                         )}
                       </Flex>
 
-                      <Accordion allowMultiple mt={4}>
+                      <Accordion
+                        allowMultiple
+                        mt={4}
+                        defaultIndex={[
+                          mostrarPrestador ? 0 : -1, // Abre o primeiro item se mostrarPrestador for true
+                          mostrarServico ? 1 : -1, // Abre o segundo item se mostrarServico for true
+                        ]}
+                      >
                         {/* Accordion para Prestador */}
                         <AccordionItem border="none" my="30px">
                           <h2>
                             <AccordionButton
                               onClick={() =>
-                                setMostrarPrestador(true)
+                                setMostrarPrestador((prev) => !prev)
                               }
-                              bg="transparent"
+                              bg={mostrarPrestador ? "#f8f7f7" : "transparent"}
                               _hover={{ bg: "#f8f7f7" }}
                               rounded="md"
                               minH="50px"
@@ -474,16 +483,18 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
                                 flex="1"
                                 textAlign="left"
                                 color="#3D1C4F"
-                                fontWeight={600}
-                                fontSize={'18px'}
-                                textDecoration="underline"
+                                fontWeight={500}
+                                fontSize="17px"
                               >
                                 Prestador
                               </Box>
                               <AccordionIcon />
                             </AccordionButton>
                           </h2>
-                          <AccordionPanel pb={4}>
+                          <AccordionPanel
+                            pb={4}
+                            bg={mostrarPrestador ? "#f8f7f7" : "transparent"}
+                          >
                             {mostrarPrestador && (
                               <Box mt={4}>
                                 <PrestadorForm />
@@ -496,8 +507,8 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
                         <AccordionItem border="none" my="30px">
                           <h2>
                             <AccordionButton
-                              onClick={() => setMostrarServico(true)}
-                              bg="transparent"
+                              onClick={() => setMostrarServico((prev) => !prev)}
+                              bg={mostrarServico ? "#f8f7f7" : "transparent"}
                               _hover={{ bg: "#f8f7f7" }}
                               rounded="md"
                               minH="50px"
@@ -507,16 +518,18 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
                                 flex="1"
                                 textAlign="left"
                                 color="#3D1C4F"
-                                fontWeight={600}
-                                fontSize={'18px'}
-                                textDecoration="underline"
+                                fontWeight={500}
+                                fontSize="17px"
                               >
                                 Serviço
                               </Box>
                               <AccordionIcon />
                             </AccordionButton>
                           </h2>
-                          <AccordionPanel pb={4}>
+                          <AccordionPanel
+                            pb={4}
+                            bg={mostrarServico ? "#f8f7f7" : "transparent"}
+                          >
                             {mostrarServico && (
                               <Box mt={4}>
                                 <ServicoForm />
@@ -526,7 +539,7 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
                         </AccordionItem>
                       </Accordion>
 
-                      <Box flex="1"px={2}>
+                      <Box flex="1" px={2}>
                         {isEditMode && (
                           <>
                             <ImportFilesComponent ticketId={ticket._id} />

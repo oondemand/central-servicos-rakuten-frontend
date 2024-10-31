@@ -89,13 +89,11 @@ const Header = () => {
             name="prestador.dadosBancarios.banco"
             options={[
               { value: "", label: "Selecione a base Omie", isDisabled: true },
-              { value: "option1", label: "Opção 1" },
-              { value: "option2", label: "Opção 2" },
             ]}
             value={baseOmieSelecionado} 
             onChange={handleBaseOmie}
             isClearable
-            placeholder="Selecione ou digite o banco"
+            placeholder="Selecione a base Omie"
             styles={{
               container: (base) => ({
                 ...base,
