@@ -21,6 +21,11 @@ import {
   AlertDialogBody,
   AlertDialogFooter,
   useToast,
+  Accordion,
+  AccordionItem,
+  AccordionButton,
+  AccordionPanel,
+  AccordionIcon,
 } from "@chakra-ui/react";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
@@ -350,11 +355,11 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
         servicoAtual.status !== servicoInicial.status ||
         servicoAtual.correcao !== servicoInicial.correcao
       ) {
-        return true; 
+        return true;
       }
     }
 
-    return false; 
+    return false;
   };
 
   const abrirConfirmarRemoverPrestador = (formik) => {
@@ -373,13 +378,15 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
 
   const confirmarRemoverPrestador = () => {
     setConfirmacao((prev) => ({ ...prev, removerPrestador: false }));
-   setMostrarPrestador(false);
+    setMostrarPrestador(false);
   };
 
   const confirmarRemoverServico = () => {
     setMostrarServico(false);
     setConfirmacao((prev) => ({ ...prev, removerServico: false }));
   };
+
+  console.log(mostrarPrestador)
 
   return (
     <Formik
@@ -397,13 +404,13 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
             onClose={() => abrirConfirmarFechar(formik)}
             size="6xl"
             isCentered
-            closeOnOverlayClick={false} 
+            closeOnOverlayClick={false}
           >
             <ModalOverlay />
             <Form>
               <MotionModalContent
-                color="brand.800"
-                bg="brand.50"
+                color="brand.500"
+                bg="brand.25"
                 height="90vh"
                 rounded="md"
                 shadow="lg"
@@ -422,12 +429,15 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
                     zIndex="1"
                     borderBottom="1px solid #e2e8f0"
                   >
-                    <ModalHeader>
-                      {isEditMode ? "Editar Ticket" : "Adicionar Novo Ticket"}
+                    <ModalHeader color="brand.350">
+                      {isEditMode
+                        ? "Detalhe do Ticket"
+                        : "Adicionar Novo Ticket"}
                     </ModalHeader>
 
                     <ModalCloseButton
-                      onClick={() => abrirConfirmarFechar(formik)} 
+                      color="brand.500"
+                      onClick={() => abrirConfirmarFechar(formik)}
                     />
                   </Box>
 
@@ -446,60 +456,84 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
                         )}
                       </Flex>
 
-                      <HStack spacing={4} mt={4}>
-                        {!mostrarPrestador ? (
-                          <Button
-                            onClick={() => setMostrarPrestador(true)}
-                            colorScheme="teal"
-                            variant="outline"
-                          >
-                            Adicionar Prestador
-                          </Button>
-                        ) : (
-                          <Button
-                            onClick={abrirConfirmarRemoverPrestador}
-                            colorScheme="red"
-                            variant="outline"
-                          >
-                            Remover Prestador
-                          </Button>
-                        )}
+                      <Accordion allowMultiple mt={4}>
+                        {/* Accordion para Prestador */}
+                        <AccordionItem border="none" my="30px">
+                          <h2>
+                            <AccordionButton
+                              onClick={() =>
+                                setMostrarPrestador(true)
+                              }
+                              bg="transparent"
+                              _hover={{ bg: "#f8f7f7" }}
+                              rounded="md"
+                              minH="50px"
+                            >
+                              <Box
+                                as="span"
+                                flex="1"
+                                textAlign="left"
+                                color="#3D1C4F"
+                                fontWeight={600}
+                                fontSize={'18px'}
+                                textDecoration="underline"
+                              >
+                                Prestador
+                              </Box>
+                              <AccordionIcon />
+                            </AccordionButton>
+                          </h2>
+                          <AccordionPanel pb={4}>
+                            {mostrarPrestador && (
+                              <Box mt={4}>
+                                <PrestadorForm />
+                              </Box>
+                            )}
+                          </AccordionPanel>
+                        </AccordionItem>
 
-                        {!mostrarServico ? (
-                          <Button
-                            onClick={() => setMostrarServico(true)}
-                            colorScheme="teal"
-                            variant="outline"
-                          >
-                            Adicionar Serviço
-                          </Button>
-                        ) : (
-                          <Button
-                            onClick={abrirConfirmarRemoverServico}
-                            colorScheme="red"
-                            variant="outline"
-                          >
-                            Remover Serviço
-                          </Button>
-                        )}
+                        {/* Accordion para Serviço */}
+                        <AccordionItem border="none" my="30px">
+                          <h2>
+                            <AccordionButton
+                              onClick={() => setMostrarServico(true)}
+                              bg="transparent"
+                              _hover={{ bg: "#f8f7f7" }}
+                              rounded="md"
+                              minH="50px"
+                            >
+                              <Box
+                                as="span"
+                                flex="1"
+                                textAlign="left"
+                                color="#3D1C4F"
+                                fontWeight={600}
+                                fontSize={'18px'}
+                                textDecoration="underline"
+                              >
+                                Serviço
+                              </Box>
+                              <AccordionIcon />
+                            </AccordionButton>
+                          </h2>
+                          <AccordionPanel pb={4}>
+                            {mostrarServico && (
+                              <Box mt={4}>
+                                <ServicoForm />
+                              </Box>
+                            )}
+                          </AccordionPanel>
+                        </AccordionItem>
+                      </Accordion>
+
+                      <Box flex="1"px={2}>
                         {isEditMode && (
-                          <ImportFilesComponent ticketId={ticket._id} />
+                          <>
+                            <ImportFilesComponent ticketId={ticket._id} />
+                            <FilesViewComponent />
+                          </>
                         )}
-                      </HStack>
-
-                      {isEditMode && <FilesViewComponent />}
-
-                      {mostrarPrestador && (
-                        <Box mt={4}>
-                          <PrestadorForm />
-                        </Box>
-                      )}
-
-                      {mostrarServico && (
-                        <Box mt={4}>
-                          <ServicoForm />
-                        </Box>
-                      )}
+                      </Box>
                     </ModalBody>
                   </Box>
 

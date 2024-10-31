@@ -4,15 +4,19 @@ import { color } from "framer-motion";
 
 const colors = {
   brand: {
+    25: "#FBFBFB",
     50: "#FAF3FF", // Tom claro (branco suave)
+    75: "#eee8f3", // Tom claro (branco suave)
     100: "#EAD1FC", // Interpolado entre 50 e 500
     200: "#D9B0F9", // Interpolado entre 50 e 500
     300: "#C08AEF", // Interpolado entre 50 e 500
+    350: "#9013FE", 
     400: "#8528CE", // Interpolado entre 50 e 500
     500: "#8528CE", // Tom predominante (roxo vibrante)
     600: "#7200e6", // Interpolado entre 500 e 700
     700: "#5e00b3", // Tom médio
     800: "#4a0080", // Interpolado entre 700 e 900
+    850: "#3D1C4F",
     900: "#2e0033", // Tom escuro (roxo profundo)
   },
 
@@ -21,8 +25,21 @@ const colors = {
   },
 
   blue: {
-    400: "#0BC5EA"
-  }
+    500: "#2C71F6",
+    400: "#0BC5EA",
+    200: '#1BF7E5'
+  },
+
+  yellow: {
+    400: '#F7B21B'
+  },
+
+  green: {
+    400: '#198754',
+    'success': '#17B530'
+  },
+
+
 };
 
 const shadows = {

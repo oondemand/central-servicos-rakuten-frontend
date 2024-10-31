@@ -44,17 +44,17 @@ const AcoesEtapa = ({ etapa, setIsAddModalOpen }) => {
     <>
       {etapa.codigo === "requisicao" && (
         <Box mt={4}>
-          <Button onClick={handleCadastrarTicket} bg="#5DC3DC" color="white" width="100%" mb={1}>
-            Novo Ticket
-          </Button>
-          <Button onClick={handleImportarComissoes} bg="#5DC3DC" color="white" width="100%" mb={1}>
+          <Button onClick={handleImportarComissoes} bg="blue.400" color="white" width="100%" fontWeight={700} mb={3}>
             Importar Comissões
+          </Button>
+          <Button onClick={handleCadastrarTicket} bg="blue.400" color="white" width="100%" mb={3} fontWeight={700}>
+            Novo Ticket
           </Button>
         </Box>
       )}
       {etapa.codigo === "integracao-unico" && (
         <Box mt={4}>
-          <Button onClick={handleIntegracaoRPAs} bg="#5DC3DC" color="white" width="100%" mb={1}>
+          <Button onClick={handleIntegracaoRPAs} bg="blue.400" color="white" width="100%" mb={3} fontWeight={700}>
             Integração RPAs
           </Button>
         </Box>

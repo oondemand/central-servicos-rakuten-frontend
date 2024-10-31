@@ -22,7 +22,7 @@ import CustomSelect from "../common/CustomSelect";
 import { carregarPrestadorPorSid } from "../../services/prestadorService";
 
 const PrestadorForm = () => {
-  const { setFieldValue, values, dirty } = useFormikContext();
+  const { setFieldValue, values, dirty, isSubmitting } = useFormikContext();
 
   const toast = useToast();
 
@@ -37,9 +37,44 @@ const PrestadorForm = () => {
   const [cnpjValido, setCnpjValido] = useState(null);
   const [cpfValido, setCpfValido] = useState(null);
   const [pisValido, setPisValido] = useState(true);
+  const [hasInteracted, setHasInteracted] = useState(false);
+
+  const verificarDocumento = (documentoValue) => {
+    const isCPFValido =
+      values.prestador.tipo === "pf" &&
+      documentoValue.length === 11 &&
+      isCPF(documentoValue);
+    const isCNPJValido =
+      values.prestador.tipo === "pj" &&
+      documentoValue.length === 14 &&
+      isCNPJ(documentoValue);
+
+    setCpfValido(isCPFValido);
+    setCnpjValido(isCNPJValido);
+  };
+
+  const verificarPIS = (pisValue) => {
+    const valido = isPIS(pisValue);
+    setPisValido(valido);
+    if (valido && !isSubmitting && hasInteracted) {
+      toast({
+        title: "PIS validado com sucesso!",
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+      });
+    } else if(!valido) {
+      toast({
+        title: "PIS inválido.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+  };
 
   const verificarCNPJ = (cnpjValue) => {
-    if (isCNPJ(cnpjValue)) {
+    if (isCNPJ(cnpjValue) && !isSubmitting) {
       setCnpjValido(true);
       toast({
         title: "CNPJ validado com sucesso!",
@@ -59,39 +94,14 @@ const PrestadorForm = () => {
   };
 
   const verificarCPF = (cpfValue) => {
-    if (isCPF(cpfValue)) {
-      setCpfValido(true);
-      toast({
-        title: "CPF validado com sucesso!",
-        status: "success",
-        duration: 5000,
-        isClosable: true,
-      });
-    } else {
-      setCpfValido(false);
-      toast({
-        title: "CPF inválido.",
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-      });
-    }
-  };
+    const cpfEhValido = isCPF(cpfValue);
 
-  const verificarPIS = (pisValue) => {
-    const valido = isPIS(pisValue);
-    setPisValido(valido);
-    if (valido) {
+    setCpfValido(cpfEhValido);
+
+    if (hasInteracted && !isSubmitting) {
       toast({
-        title: "PIS validado com sucesso!",
-        status: "success",
-        duration: 5000,
-        isClosable: true,
-      });
-    } else {
-      toast({
-        title: "PIS inválido.",
-        status: "error",
+        title: cpfEhValido ? "CPF validado com sucesso!" : "CPF inválido.",
+        status: cpfEhValido ? "success" : "error",
         duration: 5000,
         isClosable: true,
       });
@@ -103,6 +113,23 @@ const PrestadorForm = () => {
       "prestador.dadosBancarios.banco",
       selectedOption ? selectedOption.label : ""
     );
+  };
+
+  const handleDocumentoChange = (e) => {
+    const documentoValue = e.target.value.replace(/\D/g, ""); 
+    setFieldValue("prestador.documento", documentoValue);
+    if (documentoValue.length === 11 || documentoValue.length === 14) {
+      verificarDocumento(documentoValue);
+      setHasInteracted(true);
+    }
+  };
+
+  const handlePISChange = (e) => {
+    const pisValue = e.target.value.replace(/\D/g, ""); 
+    if (pisValue.length === 11) {
+      verificarPIS(pisValue);
+      setHasInteracted(true);
+    }
   };
 
   useEffect(() => {
@@ -255,307 +282,297 @@ const PrestadorForm = () => {
   const isPessoaFisica = values.prestador.tipo === "pf";
 
   return (
-    <Accordion allowToggle defaultIndex={[0]}>
-      <AccordionItem borderRadius="md">
-        <h2>
-          <AccordionButton>
-            <Box flex="1" textAlign="left" fontWeight="bold">
-              Informações do Prestador:{" "}
-              <label style={{ fontWeight: "normal", fontStyle: "italic" }}>
-                {isTyping
-                  ? "Carregando" + ".".repeat((Date.now() / 300) % 4)
-                  : `${displayNome} - SID ${
-                      displaySid !== undefined ? displaySid : ""
-                    }`}
-              </label>
-            </Box>
-            <AccordionIcon />
-          </AccordionButton>
-        </h2>
-        <AccordionPanel>
-          <VStack align="stretch">
-            <Text fontSize="lg" fontWeight="bold" mb={2}>
-              Cadastro
-            </Text>
+    <div>
+      <h2>
+        <Box flex="1" textAlign="left" fontWeight="bold">
+          Informações do Prestador:{" "}
+          <label style={{ fontWeight: "normal", fontStyle: "italic" }}>
+            {isTyping
+              ? "Carregando" + ".".repeat((Date.now() / 300) % 4)
+              : `${displayNome} - SID ${
+                  displaySid !== undefined ? displaySid : ""
+                }`}
+          </label>
+        </Box>
+      </h2>
 
+      <Box mt={8}>
+        <VStack align="stretch">
+          <Text fontSize="lg" fontWeight="bold" mb={2}>
+            Cadastro
+          </Text>
+
+          <HStack align="stretch">
+            <div>
+              <FormField
+                label="SID"
+                name="prestador.sid"
+                type="text"
+                mask="9999999"
+              />
+            </div>
+
+            <FormField
+              label="Status"
+              name="prestador.status"
+              type="select"
+              options={[
+                { value: "ativo", label: "Ativo" },
+                { value: "em-analise", label: "Em Análise" },
+                {
+                  value: "pendente-de-revisao",
+                  label: "Pendente de Revisão",
+                },
+                { value: "inativo", label: "Inativo" },
+                { value: "arquivado", label: "Arquivado" },
+              ]}
+            />
+          </HStack>
+
+          <HStack align="stretch">
+            <FormField
+              label="Tipo"
+              name="prestador.tipo"
+              type="select"
+              options={[
+                { value: "pf", label: "Pessoa Física (CPF)" },
+                { value: "pj", label: "Pessoa Jurídica (CNPJ)" },
+              ]}
+            />
+            <FormField
+              label="Documento (CPF/CNPJ)"
+              name="prestador.documento"
+              type="text"
+              onChange={handleDocumentoChange}
+              mask={
+                values.prestador.tipo === "pf"
+                  ? "999.999.999-99"
+                  : "99.999.999/9999-99"
+              }
+              style={{
+                borderColor:
+                  (values.prestador.tipo === "pj" && !cnpjValido) ||
+                  (values.prestador.tipo === "pf" && !cpfValido)
+                    ? "red"
+                    : "#ccc",
+                color:
+                  (values.prestador.tipo === "pj" && !cnpjValido) ||
+                  (values.prestador.tipo === "pf" && !cpfValido)
+                    ? "red"
+                    : "#8528CE",
+              }}
+            />
+            <FormField label="Nome" name="prestador.nome" type="text" />
+            <FormField label="E-mail" name="prestador.email" type="email" />
+          </HStack>
+
+          {isPessoaFisica && (
             <HStack align="stretch">
-              <div>
-                <FormField
-                  label="SID"
-                  name="prestador.sid"
-                  type="text"
-                  mask="9999999"
-                />
-              </div>
+              <FormField
+                label="Nome da Mãe"
+                name="prestador.pessoaFisica.nomeMae"
+                type="text"
+              />
 
               <FormField
-                label="Status"
-                name="prestador.status"
-                type="select"
-                options={[
-                  { value: "ativo", label: "Ativo" },
-                  { value: "em-analise", label: "Em Análise" },
-                  {
-                    value: "pendente-de-revisao",
-                    label: "Pendente de Revisão",
-                  },
-                  { value: "inativo", label: "Inativo" },
-                  { value: "arquivado", label: "Arquivado" },
-                ]}
+                label="Data de Nascimento"
+                name="prestador.pessoaFisica.dataNascimento"
+                type="date"
               />
             </HStack>
+          )}
 
+          {isPessoaFisica && (
             <HStack align="stretch">
               <FormField
-                label="Tipo"
-                name="prestador.tipo"
-                type="select"
-                options={[
-                  { value: "pf", label: "Pessoa Física (CPF)" },
-                  { value: "pj", label: "Pessoa Jurídica (CNPJ)" },
-                ]}
-              />
-              <FormField
-                label="Documento (CPF/CNPJ)"
-                name="prestador.documento"
+                label="PIS"
+                name="prestador.pessoaFisica.pis"
                 type="text"
-                mask={
-                  values.prestador.tipo === "pf"
-                    ? "999.999.999-99"
-                    : "99.999.999/9999-99"
-                }
+                mask="999.99999.99-9"
+                onChange={handlePISChange}
                 style={{
-                  borderColor:
-                    (values.prestador.tipo === "pj" && !cnpjValido) ||
-                    (values.prestador.tipo === "pf" && !cpfValido)
-                      ? "red"
-                      : "#ccc",
-                  color:
-                    (values.prestador.tipo === "pj" && !cnpjValido) ||
-                    (values.prestador.tipo === "pf" && !cpfValido)
-                      ? "red"
-                      : "#8528CE",
+                  borderColor: !pisValido ? "red" : "#ccc",
+                  color: !pisValido ? "red" : "#8528CE",
                 }}
               />
-              <FormField label="Nome" name="prestador.nome" type="text" />
-              <FormField label="E-mail" name="prestador.email" type="email" />
-            </HStack>
-
-            {isPessoaFisica && (
-              <HStack align="stretch">
-                <FormField
-                  label="Nome da Mãe"
-                  name="prestador.pessoaFisica.nomeMae"
-                  type="text"
-                />
-
-                <FormField
-                  label="Data de Nascimento"
-                  name="prestador.pessoaFisica.dataNascimento"
-                  type="date"
-                />
-              </HStack>
-            )}
-
-            {isPessoaFisica && (
-              <HStack align="stretch">
-                <FormField
-                  label="PIS"
-                  name="prestador.pessoaFisica.pis"
-                  type="text"
-                  mask="999.99999.99-9"
-                  style={{
-                    borderColor: !pisValido ? "red" : "#ccc",
-                    color: !pisValido ? "red" : "#8528CE",
-                  }}
-                />
-                <FormField
-                  label="RG"
-                  name="prestador.pessoaFisica.rg.numero"
-                  type="text"
-                  mask="999999999"
-                />
-                <FormField
-                  label="Órgão Emissor do RG"
-                  name="prestador.pessoaFisica.rg.orgaoEmissor"
-                  type="text"
-                />
-              </HStack>
-            )}
-
-            <Text fontSize="lg" fontWeight="bold" mb={2}>
-              Endereço
-            </Text>
-
-            <HStack align="stretch">
               <FormField
-                label="CEP"
-                name="prestador.endereco.cep"
+                label="RG"
+                name="prestador.pessoaFisica.rg.numero"
                 type="text"
-                mask="99999-999"
+                mask="999999999"
               />
               <FormField
-                label="Rua"
-                name="prestador.endereco.rua"
-                type="text"
-              />
-              <FormField
-                label="Número"
-                name="prestador.endereco.numero"
+                label="Órgão Emissor do RG"
+                name="prestador.pessoaFisica.rg.orgaoEmissor"
                 type="text"
               />
             </HStack>
+          )}
 
-            <HStack align="stretch">
-              <FormField
-                label="Complemento"
-                name="prestador.endereco.complemento"
-                type="text"
-              />
-              <FormField
-                label="Cidade"
-                name="prestador.endereco.cidade"
-                type="text"
-              />
-              {/* <FormField
+          <Text fontSize="lg" fontWeight="bold" mb={2}>
+            Endereço
+          </Text>
+
+          <HStack align="stretch">
+            <FormField
+              label="CEP"
+              name="prestador.endereco.cep"
+              type="text"
+              mask="99999-999"
+            />
+            <FormField label="Rua" name="prestador.endereco.rua" type="text" />
+            <FormField
+              label="Número"
+              name="prestador.endereco.numero"
+              type="text"
+            />
+          </HStack>
+
+          <HStack align="stretch">
+            <FormField
+              label="Complemento"
+              name="prestador.endereco.complemento"
+              type="text"
+            />
+            <FormField
+              label="Cidade"
+              name="prestador.endereco.cidade"
+              type="text"
+            />
+            {/* <FormField
                 label="Estado"
                 name="prestador.endereco.estado"
                 type="text"
               /> */}
 
-              <div
-                style={{ width: "1040px", marginTop: "8px", fontWeight: "500" }}
-              >
-                <label htmlFor="prestador.endereco.estado">Estado</label>
-                <select
-                  id="prestador.endereco.estado"
-                  name="prestador.endereco.estado"
-                  value={values.prestador.endereco.estado}
-                  onChange={(e) => {
-                    if (!isAutoUpdating) {
-                      setFieldValue(
-                        "prestador.endereco.estado",
-                        e.target.value
-                      );
-                    }
-                  }}
-                  style={{
-                    height: "40px",
-                    maxHeight: "150px",
-                    overflowY: "auto",
-                    padding: "8px",
-                    borderRadius: "6px",
-                    width: "100%",
-                    border: "1px solid rgb(226, 232, 240)",
-                    backgroundColor: "#fff",
-                    fontSize: "16px",
-                    cursor: "pointer",
-                    outline: "none",
-                  }}
-                >
-                  <option value="">Selecione um estado</option>
-                  {estados &&
-                    estados.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                </select>
-              </div>
-            </HStack>
-
-            <Text fontSize="lg" fontWeight="bold" mb={2}>
-              Dados Bancarios
-            </Text>
-            <HStack align="stretch">
-              <FormField
-                label="Tipo de Conta"
-                name="prestador.dadosBancarios.tipoConta"
-                type="select"
-                options={[
-                  { value: "", label: "Selecione o tipo de conta" },
-                  { value: "corrente", label: "Corrente" },
-                  { value: "poupanca", label: "Poupança" },
-                ]}
-              />
-
-              <div
+            <div
+              style={{ width: "1040px", marginTop: "8px", fontWeight: "500" }}
+            >
+              <label htmlFor="prestador.endereco.estado">Estado</label>
+              <select
+                id="prestador.endereco.estado"
+                name="prestador.endereco.estado"
+                value={values.prestador.endereco.estado}
+                onChange={(e) => {
+                  if (!isAutoUpdating) {
+                    setFieldValue("prestador.endereco.estado", e.target.value);
+                  }
+                }}
                 style={{
-                  marginBottom: "2rem",
-                  width: "1050px",
-                  zIndex: "999999",
+                  height: "40px",
+                  maxHeight: "150px",
+                  overflowY: "auto",
+                  padding: "8px",
+                  borderRadius: "6px",
+                  width: "100%",
+                  border: "1px solid rgb(226, 232, 240)",
+                  backgroundColor: "#fff",
+                  fontSize: "16px",
+                  cursor: "pointer",
+                  outline: "none",
                 }}
               >
-                <label
-                  style={{
-                    fontWeight: "500",
-                    display: "block",
-                    marginBottom: "8px",
+                <option value="">Selecione um estado</option>
+                {estados &&
+                  estados.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+              </select>
+            </div>
+          </HStack>
+
+          <Text fontSize="lg" fontWeight="bold" mb={2}>
+            Dados Bancarios
+          </Text>
+          <HStack align="stretch">
+            <FormField
+              label="Tipo de Conta"
+              name="prestador.dadosBancarios.tipoConta"
+              type="select"
+              options={[
+                { value: "", label: "Selecione o tipo de conta" },
+                { value: "corrente", label: "Corrente" },
+                { value: "poupanca", label: "Poupança" },
+              ]}
+            />
+
+            <div
+              style={{
+                marginBottom: "2rem",
+                width: "1050px",
+                zIndex: "999999",
+              }}
+            >
+              <label
+                style={{
+                  fontWeight: "500",
+                  display: "block",
+                  marginBottom: "8px",
+                }}
+              >
+                Banco
+              </label>
+              {loadingBanks ? (
+                <p>Carregando bancos...</p>
+              ) : (
+                <Select
+                  id="prestador.dadosBancarios.banco"
+                  name="prestador.dadosBancarios.banco"
+                  options={bancos}
+                  value={
+                    bancos.find(
+                      (option) =>
+                        option.label === values.prestador?.dadosBancarios?.banco
+                    ) || null
+                  }
+                  onChange={handleChangeBanks}
+                  placeholder="Selecione ou digite o banco"
+                  isClearable
+                  menuPortalTarget={document.body}
+                  styles={{
+                    control: (base) => ({
+                      ...base,
+                      minHeight: "40px",
+                      borderRadius: "6px",
+                      borderColor: "#ccc",
+                      boxShadow: "none",
+                    }),
+                    menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                    menu: (base) => ({
+                      ...base,
+                      maxHeight: "auto",
+                      overflowY: "auto",
+                      zIndex: "999",
+                    }),
                   }}
-                >
-                  Banco
-                </label>
-                {loadingBanks ? (
-                  <p>Carregando bancos...</p>
-                ) : (
-                  <Select
-                    id="prestador.dadosBancarios.banco"
-                    name="prestador.dadosBancarios.banco"
-                    options={bancos}
-                    value={
-                      bancos.find(
-                        (option) =>
-                          option.label ===
-                          values.prestador?.dadosBancarios?.banco
-                      ) || null
-                    }
-                    onChange={handleChangeBanks}
-                    placeholder="Selecione ou digite o banco"
-                    isClearable
-                    menuPortalTarget={document.body}
-                    styles={{
-                      control: (base) => ({
-                        ...base,
-                        minHeight: "40px",
-                        borderRadius: "6px",
-                        borderColor: "#ccc",
-                        boxShadow: "none",
-                      }),
-                      menuPortal: (base) => ({ ...base, zIndex: 9999 }),
-                      menu: (base) => ({
-                        ...base,
-                        maxHeight: "auto",
-                        overflowY: "auto",
-                        zIndex: "999",
-                      }),
-                    }}
-                  />
-                )}
-              </div>
+                />
+              )}
+            </div>
 
-              <FormField
-                label="Agência"
-                name="prestador.dadosBancarios.agencia"
-                type="text"
-              />
-              <FormField
-                label="Conta"
-                name="prestador.dadosBancarios.conta"
-                type="text"
-              />
-            </HStack>
+            <FormField
+              label="Agência"
+              name="prestador.dadosBancarios.agencia"
+              type="text"
+            />
+            <FormField
+              label="Conta"
+              name="prestador.dadosBancarios.conta"
+              type="text"
+            />
+          </HStack>
 
-            <HStack align="stretch">
-              <FormField
-                label="Comentários de Revisão"
-                name="prestador.comentariosRevisao"
-                type="textarea"
-              />
-            </HStack>
-          </VStack>
-        </AccordionPanel>
-      </AccordionItem>
-    </Accordion>
+          <HStack align="stretch">
+            <FormField
+              label="Comentários de Revisão"
+              name="prestador.comentariosRevisao"
+              type="textarea"
+            />
+          </HStack>
+        </VStack>
+      </Box>
+    </div>
   );
 };
 

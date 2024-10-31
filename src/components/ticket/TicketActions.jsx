@@ -13,6 +13,7 @@ import {
   Flex,
 } from "@chakra-ui/react";
 import { FaCheck, FaTimes, FaTrash } from "react-icons/fa";
+import { IoFileTrayStacked } from "react-icons/io5";
 import { useTicket } from "../../contexts/TicketContext";
 import { useFormikContext } from "formik";
 
@@ -72,37 +73,47 @@ const TicketActions = ({
               <Button
                 onClick={() => handleActionClick("aprovar")}
                 colorScheme="green"
-                leftIcon={<FaCheck />}
+                _hover={{ bg: "green.400" }} 
+                bg="green.success"
+                rightIcon={<FaCheck />}
               >
-                Aprovar Ticket
+                Aprovar NFSe
               </Button>
               <Button
                 onClick={() => handleActionClick("reprovar")}
                 colorScheme="red"
-                leftIcon={<FaTimes />}
+                rightIcon={<FaTimes />}
               >
-                Recusar Ticket
+                Recusar NFSe
               </Button>
               <Button
                 onClick={() => handleActionClick("arquivar")}
-                colorScheme="yellow"
-                leftIcon={<FaTrash />}
+                _hover={{ bg: "#5a6268" }}
+                colorScheme="white"
+                bg="#6C757D"
+                rightIcon={<IoFileTrayStacked />}
               >
-                Arquivar Ticket
+                Arquivar
               </Button>
             </>
           )}
         </ButtonGroup>
         <ButtonGroup spacing={4}>
-          <Button bg="gray.500" color="white" onClick={cancelar}>
+          <Button 
+            bg="#89898B" 
+            color="white" 
+            _hover={{ bg: "#808080" }}
+            onClick={cancelar}
+            >
             Cancelar
           </Button>
           <Button
             type="submit"
             colorScheme="brand"
+            bg="blue.500"
             isLoading={formik.isSubmitting}
           >
-            {isEditMode ? "Salvar Alterações" : "Salvar"}
+            {isEditMode ? "Salvar" : "Salvar"}
           </Button>
         </ButtonGroup>
       </Flex>
