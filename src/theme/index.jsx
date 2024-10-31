@@ -4,17 +4,42 @@ import { color } from "framer-motion";
 
 const colors = {
   brand: {
+    25: "#FBFBFB",
     50: "#FAF3FF", // Tom claro (branco suave)
+    75: "#eee8f3", // Tom claro (branco suave)
     100: "#EAD1FC", // Interpolado entre 50 e 500
     200: "#D9B0F9", // Interpolado entre 50 e 500
     300: "#C08AEF", // Interpolado entre 50 e 500
+    350: "#9013FE", 
     400: "#8528CE", // Interpolado entre 50 e 500
     500: "#8528CE", // Tom predominante (roxo vibrante)
     600: "#7200e6", // Interpolado entre 500 e 700
     700: "#5e00b3", // Tom médio
     800: "#4a0080", // Interpolado entre 700 e 900
+    850: "#3D1C4F",
     900: "#2e0033", // Tom escuro (roxo profundo)
   },
+
+  gray: {
+    400: "#A0AEC0",
+  },
+
+  blue: {
+    500: "#2C71F6",
+    400: "#0BC5EA",
+    200: '#1BF7E5'
+  },
+
+  yellow: {
+    400: '#F7B21B'
+  },
+
+  green: {
+    400: '#198754',
+    'success': '#17B530'
+  },
+
+
 };
 
 const shadows = {
@@ -48,18 +73,8 @@ const theme = extendTheme({
         margin: "2",
       },
       "input, textarea, select": {
-        borderColor: "brand.300",
-        bg: "brand.50",
+        borderColor: "gray.400",
         color: "brand.500",
-        _hover: {
-          borderColor: "brand.400",
-          bg: "brand.100",
-        },
-        _focus: {
-          borderColor: "brand.500",
-          boxShadow: "0 0 0 1px brand.500",
-          bg: "brand.100",
-        },
         _expanded: {
           bg: "brand.100",
           option: {
@@ -92,8 +107,9 @@ const theme = extendTheme({
       variants: {
         outline: {
           field: {
+            borderColor: "gray.400",
             _focus: {
-              borderColor: "brand.500",
+              borderColor: "gray.500",
               boxShadow: "0 0 0 1px rgba(133, 40, 206, 0.6)",
             },
           },

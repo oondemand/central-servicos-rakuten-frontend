@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { toast, ToastContainer } from 'react-toastify';
+import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Formik, Form, Field } from "formik";
 import {
@@ -28,7 +28,6 @@ const LoginSchema = Yup.object().shape({
 
 const Login = () => {
   const navigate = useNavigate();
-  
   const { login } = useAuth();
 
   return (
@@ -40,6 +39,7 @@ const Login = () => {
     >
       <Box
         width={{ base: "90%", md: "800px" }}
+        height={{ base: "595px" }}
         display="flex"
         boxShadow="lg"
         borderRadius="md"
@@ -54,26 +54,34 @@ const Login = () => {
           justifyContent="center"
           alignItems="center"
         >
-          <Text as="div" fontSize="md" textAlign="center">
-            Central de Serviços
-          </Text>
-          <Heading color="white" size="lg" mb={6} textAlign="center">
-            Rakuten
-          </Heading>
+          <Flex gap="4" align="center" justify="flex-center">
+            <Text as="div" fontSize="md" color="white">
+              Central de Serviços
+            </Text>
+
+            <img src="/logo_rakuten.png" alt="RAKUTEN" />
+          </Flex>
         </Box>
 
-        <Box flex="1" p={10} bg="white">
+        <Flex
+          direction={"column"}
+          flex="1"
+          p={10}
+          bg="white"
+          justifyContent={"center"}
+        >
           <Box
             display="flex"
             flexDirection="column"
             alignItems="center"
             justifyContent="center"
           >
-            <Heading mb={6} color="brand.500" size="md" textAlign="center">
+            <Heading mb={2} color="brand.500" size="md" textAlign="center">
               Que bom ter você por aqui! :)
             </Heading>
-            <Text mb={4} color="gray.600" textAlign="center">
-              Vamos juntos transformar sua rotina com tecnologia.
+            <Text mb={4} color="brand.500" textAlign="center">
+              Vamos juntos transformar sua <br />
+              rotina com tecnologia.
             </Text>
           </Box>
 
@@ -84,6 +92,8 @@ const Login = () => {
               general: "",
             }}
             validationSchema={LoginSchema}
+            validateOnBlur={false}
+            validateOnChange={false}
             onSubmit={async (values, actions) => {
               try {
                 const response = await loginService(values);
@@ -112,29 +122,30 @@ const Login = () => {
                     progress: undefined,
                   });
                 }
-              }, [errors.general]); 
+              }, [errors.general]);
 
               return (
                 <Form>
-                  <VStack spacing={6} align="flex-start">
+                  <VStack spacing={5} align="flex-start">
                     <FormControl
                       isInvalid={errors.email && touched.email}
                       position="relative"
                     >
-                      <FormLabel htmlFor="email" color="gray.700">
+                      <FormLabel
+                        htmlFor="email"
+                        color="brand.500"
+                        fontWeight={400}
+                      >
                         Seu E-mail
                       </FormLabel>
+
                       <Field
                         as={Input}
                         id="email"
                         name="email"
                         type="email"
-                        bg="brand.100"
-                        _focus={{
-                          borderColor: "brand.500",
-                          boxShadow: "0 0 0 1px brand.500",
-                        }}
                       />
+
                       <FormErrorMessage
                         position="absolute"
                         top="100%"
@@ -151,7 +162,11 @@ const Login = () => {
                       isInvalid={errors.senha && touched.senha}
                       position="relative"
                     >
-                      <FormLabel htmlFor="senha" color="gray.700">
+                      <FormLabel
+                        htmlFor="senha"
+                        color="brand.500"
+                        fontWeight={400}
+                      >
                         Sua Senha
                       </FormLabel>
                       <Field
@@ -159,11 +174,6 @@ const Login = () => {
                         id="senha"
                         name="senha"
                         type="password"
-                        bg="brand.100"
-                        _focus={{
-                          borderColor: "brand.500",
-                          boxShadow: "0 0 0 1px brand.500",
-                        }}
                       />
                       <FormErrorMessage
                         position="absolute"
@@ -179,18 +189,19 @@ const Login = () => {
 
                     <Button
                       type="submit"
-                      colorScheme="brand"
                       isLoading={isSubmitting}
                       width="full"
+                      color={"white"}
+                      background={'#0BC5EA'}
                     >
                       Login
                     </Button>
 
                     <Flex justifyContent="space-between" w="full">
-                      <Link color="brand.500" href="#">
+                      <Link color="brand.500" href="#" textDecoration="underline">
                         Esqueci minha senha
                       </Link>
-                      <Link color="brand.500" href="#">
+                      <Link color="brand.500" href="#"  textDecoration="underline">
                         Cadastrar
                       </Link>
                     </Flex>
@@ -202,7 +213,7 @@ const Login = () => {
 
           {/* O ToastContainer deve estar aqui, fora do Form */}
           <ToastContainer />
-        </Box>
+        </Flex>
       </Box>
     </Flex>
   );

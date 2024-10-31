@@ -21,6 +21,11 @@ import {
   AlertDialogBody,
   AlertDialogFooter,
   useToast,
+  Accordion,
+  AccordionItem,
+  AccordionButton,
+  AccordionPanel,
+  AccordionIcon,
 } from "@chakra-ui/react";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
@@ -60,6 +65,10 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
   const [mostrarServico, setMostrarServico] = useState(
     ticket?.servicos.length > 0 ? true : false
   );
+
+  console.log("mostrarPrestador " + mostrarPrestador);
+
+  console.log("servico " + mostrarServico);
 
   // Estados para controlar os diálogos de confirmação
   const [confirmacao, setConfirmacao] = useState({
@@ -272,17 +281,17 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
       prestadorAtual.comentariosRevisao !==
         prestadorInicial.comentariosRevisao ||
       prestadorAtual.status !== prestadorInicial.status ||
-      // Verificação dos campos de pessoa física
+      //Aqui estou fazendo a Verificacao dos campos de pf
       verificarAlteracoesPessoaFisica(
         prestadorAtual.pessoaFisica,
         prestadorInicial.pessoaFisica
       ) ||
-      // Verificação dos dados bancários
+      //Aqui estou fazendo Verificacao dos dados bancários
       verificarAlteracoesDadosBancarios(
         prestadorAtual.dadosBancarios,
         prestadorInicial.dadosBancarios
       ) ||
-      // Verificação do endereço
+      // Verificacao do endereco
       verificarAlteracoesEndereco(
         prestadorAtual.endereco,
         prestadorInicial.endereco
@@ -350,11 +359,11 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
         servicoAtual.status !== servicoInicial.status ||
         servicoAtual.correcao !== servicoInicial.correcao
       ) {
-        return true; // Houve alteração no serviço
+        return true;
       }
     }
 
-    return false; // Nenhuma alteração
+    return false;
   };
 
   const abrirConfirmarRemoverPrestador = (formik) => {
@@ -373,7 +382,7 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
 
   const confirmarRemoverPrestador = () => {
     setConfirmacao((prev) => ({ ...prev, removerPrestador: false }));
-   setMostrarPrestador(false);
+    setMostrarPrestador(false);
   };
 
   const confirmarRemoverServico = () => {
@@ -394,16 +403,16 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
           {/* Modal Principal */}
           <Modal
             isOpen={isOpen}
-            onClose={() => abrirConfirmarFechar(formik)} // Abre o diálogo de confirmação ao tentar fechar
+            onClose={() => abrirConfirmarFechar(formik)}
             size="6xl"
             isCentered
-            closeOnOverlayClick={false} // Evita fechar clicando fora
+            closeOnOverlayClick={false}
           >
             <ModalOverlay />
             <Form>
               <MotionModalContent
-                color="brand.800"
-                bg="brand.50"
+                color="brand.500"
+                bg="brand.25"
                 height="90vh"
                 rounded="md"
                 shadow="lg"
@@ -422,12 +431,15 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
                     zIndex="1"
                     borderBottom="1px solid #e2e8f0"
                   >
-                    <ModalHeader>
-                      {isEditMode ? "Editar Ticket" : "Adicionar Novo Ticket"}
+                    <ModalHeader color="brand.350">
+                      {isEditMode
+                        ? "Detalhe do Ticket"
+                        : "Adicionar Novo Ticket"}
                     </ModalHeader>
 
                     <ModalCloseButton
-                      onClick={() => abrirConfirmarFechar(formik)} // Aqui o formik está disponível
+                      color="brand.500"
+                      onClick={() => abrirConfirmarFechar(formik)}
                     />
                   </Box>
 
@@ -446,60 +458,95 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
                         )}
                       </Flex>
 
-                      <HStack spacing={4} mt={4}>
-                        {!mostrarPrestador ? (
-                          <Button
-                            onClick={() => setMostrarPrestador(true)}
-                            colorScheme="teal"
-                            variant="outline"
+                      <Accordion
+                        allowMultiple
+                        mt={4}
+                        defaultIndex={[
+                          mostrarPrestador ? 0 : -1, // Abre o primeiro item se mostrarPrestador for true
+                          mostrarServico ? 1 : -1, // Abre o segundo item se mostrarServico for true
+                        ]}
+                      >
+                        {/* Accordion para Prestador */}
+                        <AccordionItem border="none" my="30px">
+                          <h2>
+                            <AccordionButton
+                              onClick={() =>
+                                setMostrarPrestador((prev) => !prev)
+                              }
+                              bg={mostrarPrestador ? "#f8f7f7" : "transparent"}
+                              _hover={{ bg: "#f8f7f7" }}
+                              rounded="md"
+                              minH="50px"
+                            >
+                              <Box
+                                as="span"
+                                flex="1"
+                                textAlign="left"
+                                color="#3D1C4F"
+                                fontWeight={500}
+                                fontSize="17px"
+                              >
+                                Prestador
+                              </Box>
+                              <AccordionIcon />
+                            </AccordionButton>
+                          </h2>
+                          <AccordionPanel
+                            pb={4}
+                            bg={mostrarPrestador ? "#f8f7f7" : "transparent"}
                           >
-                            Adicionar Prestador
-                          </Button>
-                        ) : (
-                          <Button
-                            onClick={abrirConfirmarRemoverPrestador}
-                            colorScheme="red"
-                            variant="outline"
-                          >
-                            Remover Prestador
-                          </Button>
-                        )}
+                            {mostrarPrestador && (
+                              <Box mt={4}>
+                                <PrestadorForm />
+                              </Box>
+                            )}
+                          </AccordionPanel>
+                        </AccordionItem>
 
-                        {!mostrarServico ? (
-                          <Button
-                            onClick={() => setMostrarServico(true)}
-                            colorScheme="teal"
-                            variant="outline"
+                        {/* Accordion para Serviço */}
+                        <AccordionItem border="none" my="30px">
+                          <h2>
+                            <AccordionButton
+                              onClick={() => setMostrarServico((prev) => !prev)}
+                              bg={mostrarServico ? "#f8f7f7" : "transparent"}
+                              _hover={{ bg: "#f8f7f7" }}
+                              rounded="md"
+                              minH="50px"
+                            >
+                              <Box
+                                as="span"
+                                flex="1"
+                                textAlign="left"
+                                color="#3D1C4F"
+                                fontWeight={500}
+                                fontSize="17px"
+                              >
+                                Serviço
+                              </Box>
+                              <AccordionIcon />
+                            </AccordionButton>
+                          </h2>
+                          <AccordionPanel
+                            pb={4}
+                            bg={mostrarServico ? "#f8f7f7" : "transparent"}
                           >
-                            Adicionar Serviço
-                          </Button>
-                        ) : (
-                          <Button
-                            onClick={abrirConfirmarRemoverServico}
-                            colorScheme="red"
-                            variant="outline"
-                          >
-                            Remover Serviço
-                          </Button>
-                        )}
+                            {mostrarServico && (
+                              <Box mt={4}>
+                                <ServicoForm />
+                              </Box>
+                            )}
+                          </AccordionPanel>
+                        </AccordionItem>
+                      </Accordion>
+
+                      <Box flex="1" px={2}>
                         {isEditMode && (
-                          <ImportFilesComponent ticketId={ticket._id} />
+                          <>
+                            <ImportFilesComponent ticketId={ticket._id} />
+                            <FilesViewComponent />
+                          </>
                         )}
-                      </HStack>
-
-                      {isEditMode && <FilesViewComponent />}
-
-                      {mostrarPrestador && (
-                        <Box mt={4}>
-                          <PrestadorForm />
-                        </Box>
-                      )}
-
-                      {mostrarServico && (
-                        <Box mt={4}>
-                          <ServicoForm />
-                        </Box>
-                      )}
+                      </Box>
                     </ModalBody>
                   </Box>
 

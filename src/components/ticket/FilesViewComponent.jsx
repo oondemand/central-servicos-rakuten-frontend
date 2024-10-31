@@ -46,9 +46,11 @@ export const FilesViewComponent = () => {
 
   return (
     <Box my={2}>
-      <Text fontSize="lg" fontWeight="bold" mb={2}>
-        Arquivos
-      </Text>
+      {values.arquivos.length > 0 && (
+        <Text fontSize="md" fontWeight="normal" mt={5} mb={5}>
+          Arquivos
+        </Text>
+      )}
 
       {values.arquivos.map((e, i) => {
         return (
