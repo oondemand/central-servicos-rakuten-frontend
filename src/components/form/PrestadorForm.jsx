@@ -21,8 +21,9 @@ import FormField from "@/components/common/FormField";
 import CustomSelect from "../common/CustomSelect";
 import { carregarPrestadorPorSid } from "../../services/prestadorService";
 
-const PrestadorForm = () => {
-  const { setFieldValue, values, dirty, isSubmitting } = useFormikContext();
+const PrestadorForm = ({ onDocumentoValido }) => {
+  const { setFieldValue, values, errors, dirty, isSubmitting, setFieldError } =
+    useFormikContext();
 
   const toast = useToast();
 
@@ -38,6 +39,7 @@ const PrestadorForm = () => {
   const [cpfValido, setCpfValido] = useState(null);
   const [pisValido, setPisValido] = useState(true);
   const [hasInteracted, setHasInteracted] = useState(false);
+  const [hasInteractedCNPJ, setHasInteractedCNPJ] = useState(false);
 
   const verificarDocumento = (documentoValue) => {
     const isCPFValido =
@@ -49,8 +51,15 @@ const PrestadorForm = () => {
       documentoValue.length === 14 &&
       isCNPJ(documentoValue);
 
+    const validationDocumentSchema = isCPFValido || isCNPJValido;
+
     setCpfValido(isCPFValido);
     setCnpjValido(isCNPJValido);
+    onDocumentoValido(validationDocumentSchema, values.prestador.tipo);
+
+    if (validationDocumentSchema) {
+      setFieldError("prestador.documento", "");
+    }
   };
 
   const verificarPIS = (pisValue) => {
@@ -63,7 +72,7 @@ const PrestadorForm = () => {
         duration: 5000,
         isClosable: true,
       });
-    } else if(!valido) {
+    } else if (!valido) {
       toast({
         title: "PIS inválido.",
         status: "error",
@@ -74,19 +83,13 @@ const PrestadorForm = () => {
   };
 
   const verificarCNPJ = (cnpjValue) => {
-    if (isCNPJ(cnpjValue) && !isSubmitting) {
-      setCnpjValido(true);
+    const cnpjEhValido = isCNPJ(cnpjValue);
+    setCnpjValido(cnpjEhValido);
+
+    if (hasInteractedCNPJ && !isSubmitting) {
       toast({
-        title: "CNPJ validado com sucesso!",
-        status: "success",
-        duration: 5000,
-        isClosable: true,
-      });
-    } else {
-      setCnpjValido(false);
-      toast({
-        title: "CNPJ inválido.",
-        status: "error",
+        title: cnpjEhValido ? "CNPJ validado com sucesso!" : "CNPJ inválido.",
+        status: cnpjEhValido ? "success" : "error",
         duration: 5000,
         isClosable: true,
       });
@@ -116,16 +119,17 @@ const PrestadorForm = () => {
   };
 
   const handleDocumentoChange = (e) => {
-    const documentoValue = e.target.value.replace(/\D/g, ""); 
+    const documentoValue = e.target.value.replace(/\D/g, "");
     setFieldValue("prestador.documento", documentoValue);
     if (documentoValue.length === 11 || documentoValue.length === 14) {
       verificarDocumento(documentoValue);
       setHasInteracted(true);
+      setHasInteractedCNPJ(true);
     }
   };
 
   const handlePISChange = (e) => {
-    const pisValue = e.target.value.replace(/\D/g, ""); 
+    const pisValue = e.target.value.replace(/\D/g, "");
     if (pisValue.length === 11) {
       verificarPIS(pisValue);
       setHasInteracted(true);
@@ -164,15 +168,8 @@ const PrestadorForm = () => {
         setFieldValue("prestador.endereco.estado", data.uf);
       } catch (error) {
         console.error("Erro ao buscar CEP:", error);
-        toast({
-          title: "Erro ao buscar CEP",
-          description: "Não foi possível buscar o CEP informado.",
-          status: "error",
-          duration: 5000,
-          isClosable: true,
-        });
       } finally {
-        setIsAutoUpdating(false); // Desativa o modo de atualização automática após a busca
+        setIsAutoUpdating(false); 
       }
     };
 
@@ -198,10 +195,10 @@ const PrestadorForm = () => {
       } catch (error) {
         console.error("Erro ao buscar prestador por SID:", error);
         toast({
-          title: "Erro ao carregar prestador",
+          title: "Verifique o SID informado",
           description:
-            "Não foi possível encontrar o prestador com o SID fornecido.",
-          status: "error",
+            "Houve um problema ao localizar os dados do prestador para o SID informado. Verifique e tente novamente.",
+          status: "warning",
           duration: 5000,
           isClosable: true,
         });
@@ -273,7 +270,6 @@ const PrestadorForm = () => {
   }, [values.prestador.pessoaFisica?.pis]);
 
   useEffect(() => {
-    setFieldValue("prestador.documento", "");
     setCnpjValido(true);
     setCpfValido(true);
   }, [values.prestador.tipo, setFieldValue]);

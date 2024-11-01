@@ -56,6 +56,7 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
   const { salvarTicket } = useTicket();
   const { baseOmie } = useBaseOmie();
   const { listaEtapas } = useEtapa();
+
   const toast = useToast();
 
   // Estados para controlar a exibição dos formulários
@@ -66,9 +67,7 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
     ticket?.servicos.length > 0 ? true : false
   );
 
-  console.log("mostrarPrestador " + mostrarPrestador);
-
-  console.log("servico " + mostrarServico);
+  console.log(ticket !== null);
 
   // Estados para controlar os diálogos de confirmação
   const [confirmacao, setConfirmacao] = useState({
@@ -76,6 +75,8 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
     removerPrestador: false,
     removerServico: false,
   });
+  const [cnpjValido, setCnpjValido] = useState(null);
+  const [cpfValido, setCpfValido] = useState(null);
 
   // Referências para os AlertDialogs
   const cancelRefFechar = useRef();
@@ -87,9 +88,19 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
   const combinedValidationSchema = useMemo(() => {
     let schema = ticketValidationSchema;
 
+    // Adiciona a validação do prestador, dependendo do estado "mostrarPrestador"
     if (mostrarPrestador) {
       schema = schema.shape({
-        prestador: prestadorValidationSchema,
+        prestador: prestadorValidationSchema.shape({
+          // Validação do documento com base nos estados cnpjValido e cpfValido
+          documento: Yup.string()
+            .required("Documento é obrigatório")
+            .test("documento-valido", "Documento inválido", function () {
+              const { tipo } = this.parent;
+              if (ticket) return true;
+              return tipo === "pf" ? cpfValido : cnpjValido;
+            }),
+        }),
       });
     } else {
       schema = schema.shape({
@@ -97,6 +108,7 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
       });
     }
 
+    // Adiciona a validação dos serviços, dependendo do estado "mostrarServico"
     if (mostrarServico) {
       schema = schema.shape({
         servicos: Yup.array()
@@ -110,7 +122,7 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
     }
 
     return schema;
-  }, [mostrarPrestador, mostrarServico]);
+  }, [mostrarPrestador, mostrarServico, cpfValido, cnpjValido]);
 
   // Valores iniciais combinados
   const combinedInitValues = useMemo(() => {
@@ -128,7 +140,15 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
         titulo: ticket.titulo,
         arquivos: ticket.arquivos,
         observacao: ticket.observacao,
-        prestador: ticket.prestador || prestadorInitValues,
+        prestador: {
+          ...ticket.prestador,
+          pessoaFisica: {
+            ...ticket.prestador.pessoaFisica,
+            dataNascimento: ticket?.prestador?.pessoaFisica?.dataNascimento
+              ? ticket.prestador?.pessoaFisica?.dataNascimento?.slice(0, 10)
+              : "",
+          },
+        },
         servicos: ticket.servicos
           ? ticket.servicos.map((servico) => ({
               ...servicoInitValues,
@@ -227,12 +247,12 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
 
       if (sucessoTicket.ticket?._id) {
         closeModal();
-        toast({
-          title: "Ticket salvo com sucesso.",
-          status: "success",
-          duration: 5000,
-          isClosable: true,
-        });
+        // toast({
+        //   title: "Ticket salvo com sucesso.",
+        //   status: "success",
+        //   duration: 5000,
+        //   isClosable: true,
+        // });
       } else {
         throw new Error("Erro ao salvar ticket.");
       }
@@ -241,7 +261,7 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
 
       toast({
         title: "Erro ao salvar ticket.",
-        description: error.message || "Ocorreu um erro inesperado.",
+        description: error.response.data.detalhes || "Ocorreu um erro inesperado.",
         status: "error",
         duration: 5000,
         isClosable: true,
@@ -249,6 +269,11 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const handleDocumentoValido = (isValid, tipo) => {
+    if (tipo === "pj") setCnpjValido(isValid);
+    if (tipo === "pf") setCpfValido(isValid);
   };
 
   // Funções para abrir os diálogos de confirmação
@@ -497,7 +522,9 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
                           >
                             {mostrarPrestador && (
                               <Box mt={4}>
-                                <PrestadorForm />
+                                <PrestadorForm
+                                  onDocumentoValido={handleDocumentoValido}
+                                />
                               </Box>
                             )}
                           </AccordionPanel>
