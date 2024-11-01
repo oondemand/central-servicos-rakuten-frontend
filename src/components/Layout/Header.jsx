@@ -73,9 +73,7 @@ const Header = () => {
       justify="space-between"
       bg="white"
       color="white"
-      boxShadow={
-        "0px 20px 25px -5px rgba(0, 0, 0, 0.10), 0px 10px 10px -5px rgba(0, 0, 0, 0.04)"
-      }
+      boxShadow={"0px 20px 25px -5px rgba(0, 0, 0, 0.10), 0px 10px 10px -5px rgba(0, 0, 0, 0.04)"}
     >
       <Flex align="center" gap={14}>
         <Link to="/auth/home">
@@ -83,45 +81,6 @@ const Header = () => {
             <img src="/logo_rakuten_purple.png" alt="RAKUTEN" />
           </Box>
         </Link>
-        <Box>
-          <SelectReact
-            id="prestador.dadosBancarios.banco"
-            name="prestador.dadosBancarios.banco"
-            options={[
-              { value: "", label: "Selecione a base Omie", isDisabled: true },
-            ]}
-            value={baseOmieSelecionado} 
-            onChange={handleBaseOmie}
-            isClearable
-            placeholder="Selecione a base Omie"
-            styles={{
-              container: (base) => ({
-                ...base,
-                width: "320px",
-              }),
-              control: (base, state) => ({
-                ...base,
-                height: "37px",
-                minHeight: "37px",
-                borderRadius: "6px",
-                borderColor: state.isFocused ? "#8528CE" : "#ccc",
-                color: "#8528CE",
-                boxShadow: state.isFocused ? "0 0 0 1px #8528CE" : "none", 
-                "&:hover": {
-                  borderColor: "#8528CE", 
-                },
-              }),
-              menuPortal: (base) => ({ ...base, zIndex: 9999 }),
-              menu: (base) => ({
-                ...base,
-                maxHeight: "auto",
-                overflowY: "auto",
-                zIndex: "999",
-                color: "#8528CE",
-              }),
-            }}
-          />
-        </Box>
       </Flex>
 
       <Flex align="center">
@@ -162,7 +121,7 @@ const Header = () => {
 
         <Menu>
           <MenuButton>
-            <Avatar  bg="gray.400" size="sm" ml={2} />
+            <Avatar bg="gray.400" size="sm" ml={2} />
           </MenuButton>
           <MenuList bg="brand.50">
             <MenuItem onClick={handleLogout}>
