@@ -13,8 +13,8 @@ const CartaoContaPagarOmie = ({ ticket }) => {
   useEffect(() => {
     const fetchContaPagar = async () => {
       try {
-        // const response = await api.get(`/contas-pagar/${ticket.contaPagarOmie}`);
-        // setContaPagar(response.data);
+        const response = await api.get(`/contas-pagar/${ticket.contaPagarOmie}`);
+        setContaPagar(response.data);
       } catch (err) {
         console.error("Erro ao buscar conta a pagar:", err);
         setError("Erro ao buscar conta a pagar. Tentando novamente em 30 segundos...");
@@ -36,7 +36,7 @@ const CartaoContaPagarOmie = ({ ticket }) => {
   const bg = useColorModeValue("gray.200", "gray.600");
   const errorBg = useColorModeValue("red.100", "red.600");
   const warningBg = useColorModeValue("yellow.100", "yellow.600");
-  // const successBg = useColorModeValue('green.100', 'green.600');
+  const successBg = useColorModeValue("green.100", "green.600");
 
   if (loading) {
     return (
@@ -54,13 +54,13 @@ const CartaoContaPagarOmie = ({ ticket }) => {
     );
   }
 
-  // if (!contaPagar) {
-  //   return (
-  //     <Box p={4} bg={warningBg} rounded="md" shadow="sm">
-  //       <Text>Conta a pagar não encontrada.</Text>
-  //     </Box>
-  //   );
-  // }
+  if (!contaPagar) {
+    return (
+      <Box p={4} bg={warningBg} rounded="md" shadow="sm">
+        <Text>Conta a pagar não encontrada.</Text>
+      </Box>
+    );
+  }
 
   return (
     <Box
@@ -72,30 +72,15 @@ const CartaoContaPagarOmie = ({ ticket }) => {
       my={2}
       borderWidth="1px"
       borderColor="brand.200"
-      color="brand.900" 
+      color="brand.900"
     >
       <Text fontWeight="bold">{ticket.titulo}</Text>
-      {/* <Text>Documento: {contaPagar?.numero_documento}</Text> */}
-      {/* <Text>Valor: R$ {contaPagar?.valor_documento?.toFixed(2)}</Text> */}
-      {/* <Text>Vencimento: {formatDate(contaPagar?.data_vencimento)}</Text> */}
-      {/* <Badge colorScheme={getColorScheme(contaPagar?.status_titulo)}>
-        {contaPagar?.status_titulo}
-      </Badge> */}
+      <Text>Documento: {contaPagar?.numero_documento}</Text>
+      <Text>Valor: R$ {contaPagar?.valor_documento?.toFixed(2)}</Text>
+      <Text>Vencimento: {formatDate(contaPagar?.data_vencimento)}</Text>
+      <Text>{contaPagar?.status_titulo}</Text>
     </Box>
   );
-};
-
-const getColorScheme = (status) => {
-  switch (status.toLowerCase()) {
-    case "pago":
-      return "green";
-    case "pendente":
-      return "yellow";
-    case "vencido":
-      return "red";
-    default:
-      return "gray";
-  }
 };
 
 export default CartaoContaPagarOmie;
