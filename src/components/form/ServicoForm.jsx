@@ -1,5 +1,6 @@
 // src/components/form/ServicoForm.jsx
 import React, { useEffect } from "react";
+import { NumericFormat } from "react-number-format";
 import {
   VStack,
   HStack,
@@ -101,49 +102,97 @@ const ServicoForm = () => {
                         </HStack>
                       </Td>
                       <Td>
-                        <FormFieldTooltip
+                        <NumericFormat
                           name={`servicos.${index}.valorPrincipal`}
-                          type="number"
-                          min={0}
-                          step="0.01"
-                          placeholder="0.00"
+                          thousandSeparator="."
+                          decimalSeparator=","
+                          decimalScale={2}
+                          fixedDecimalScale
+                          allowNegative
+                          prefix="R$ "
+                          placeholder="R$ 0,00"
+                          customInput={FormFieldTooltip}
+                          onValueChange={(values) => {
+                            setFieldValue(
+                              `servicos.${index}.valorPrincipal`,
+                              values.floatValue
+                            );
+                            atualizarTotalLinha(index);
+                          }}
                         />
                       </Td>
                       <Td>
-                        <FormFieldTooltip
+                        <NumericFormat
                           name={`servicos.${index}.valorBonus`}
-                          type="number"
-                          min={0}
-                          step="0.01"
-                          placeholder="0.00"
+                          thousandSeparator="."
+                          decimalSeparator=","
+                          decimalScale={2}
+                          fixedDecimalScale
+                          allowNegative
+                          prefix="R$ "
+                          placeholder="R$ 0,00"
+                          customInput={FormFieldTooltip}
+                          onValueChange={(values) => {
+                            setFieldValue(
+                              `servicos.${index}.valorBonus`,
+                              values.floatValue
+                            );
+                            atualizarTotalLinha(index);
+                          }}
                         />
                       </Td>
                       <Td>
-                        <FormFieldTooltip
+                        <NumericFormat
                           name={`servicos.${index}.valorAjusteComercial`}
-                          type="number"
-                          min={0}
-                          step="0.01"
-                          placeholder="0.00"
+                          thousandSeparator="."
+                          decimalSeparator=","
+                          decimalScale={2}
+                          fixedDecimalScale
+                          allowNegative
+                          prefix="R$ "
+                          placeholder="R$ 0,00"
+                          customInput={FormFieldTooltip}
+                          onValueChange={(values) => {
+                            setFieldValue(
+                              `servicos.${index}.valorAjusteComercial`,
+                              values.floatValue
+                            );
+                            atualizarTotalLinha(index);
+                          }}
                         />
                       </Td>
                       <Td>
-                        <FormFieldTooltip
+                        <NumericFormat
                           name={`servicos.${index}.valorHospedagemAnuncio`}
-                          type="number"
-                          min={0}
-                          step="0.01"
-                          placeholder="0.00"
+                          thousandSeparator="."
+                          decimalSeparator=","
+                          decimalScale={2}
+                          fixedDecimalScale
+                          allowNegative
+                          prefix="R$ "
+                          placeholder="R$ 0,00"
+                          customInput={FormFieldTooltip}
+                          onValueChange={(values) => {
+                            setFieldValue(
+                              `servicos.${index}.valorHospedagemAnuncio`,
+                              values.floatValue
+                            );
+                            atualizarTotalLinha(index);
+                          }}
                         />
                       </Td>
                       <Td>
-                        <FormFieldTooltip
-                          name={`servicos.${index}.valorTotal`}
-                          type="number"
-                          min={0}
-                          step="0.01"
-                          placeholder="0.00"
-                          isDisabled={true} // Desabilita o campo "Valor Total"
+                        <NumericFormat
+                          value={form.values.servicos[index].valorTotal}
+                          displayType="text"
+                          thousandSeparator="."
+                          decimalSeparator=","
+                          prefix="R$ "
+                          decimalScale={2}
+                          fixedDecimalScale
+                          customInput={FormFieldTooltip}
+                          placeholder="R$ 0,00"
+                          isReadOnly={true} // Desabilita o campo "Valor Total"
                         />
                       </Td>
                       <Td>
@@ -176,7 +225,7 @@ const ServicoForm = () => {
                   valorBonus: "",
                   valorAjusteComercial: "",
                   valorHospedagemAnuncio: "",
-                  valorTotal: 0, // Define o valor como número
+                  valorTotal: 0,
                   correcao: false,
                   status: "ativo",
                 })
