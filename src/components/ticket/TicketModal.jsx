@@ -67,8 +67,6 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
     ticket?.servicos.length > 0 ? true : false
   );
 
-  console.log(ticket !== null);
-
   // Estados para controlar os diálogos de confirmação
   const [confirmacao, setConfirmacao] = useState({
     fecharModal: false,
@@ -77,22 +75,20 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
   });
   const [cnpjValido, setCnpjValido] = useState(null);
   const [cpfValido, setCpfValido] = useState(null);
+  const [formHasErrors, setFormHasErrors] = useState(false);
+  const [serviceFormIsEmpry, setServiceFormIsEmpry] = useState(true);
 
   // Referências para os AlertDialogs
   const cancelRefFechar = useRef();
   const cancelRefRemoverPrestador = useRef();
   const cancelRefRemoverServico = useRef();
 
-  // Esquema de validação combinado
-
   const combinedValidationSchema = useMemo(() => {
     let schema = ticketValidationSchema;
 
-    // Adiciona a validação do prestador, dependendo do estado "mostrarPrestador"
     if (mostrarPrestador) {
       schema = schema.shape({
         prestador: prestadorValidationSchema.shape({
-          // Validação do documento com base nos estados cnpjValido e cpfValido
           documento: Yup.string()
             .required("Documento é obrigatório")
             .test("documento-valido", "Documento inválido", function () {
@@ -108,8 +104,7 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
       });
     }
 
-    // Adiciona a validação dos serviços, dependendo do estado "mostrarServico"
-    if (mostrarServico) {
+    if (mostrarServico && !serviceFormIsEmpry) {
       schema = schema.shape({
         servicos: Yup.array()
           .of(servicoValidationSchema)
@@ -124,7 +119,6 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
     return schema;
   }, [mostrarPrestador, mostrarServico, cpfValido, cnpjValido]);
 
-  // Valores iniciais combinados
   const combinedInitValues = useMemo(() => {
     let initValues = {
       titulo: "",
@@ -137,20 +131,20 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
     if (ticket) {
       initValues = {
         ...initValues,
-        titulo: ticket.titulo,
-        arquivos: ticket.arquivos,
-        observacao: ticket.observacao,
+        titulo: ticket?.titulo,
+        arquivos: ticket?.arquivos,
+        observacao: ticket?.observacao,
         prestador: {
-          ...ticket.prestador,
+          ...ticket?.prestador,
           pessoaFisica: {
-            ...ticket.prestador.pessoaFisica,
+            ...ticket?.prestador?.pessoaFisica,
             dataNascimento: ticket?.prestador?.pessoaFisica?.dataNascimento
               ? ticket.prestador?.pessoaFisica?.dataNascimento?.slice(0, 10)
-              : "",
+              : '',
           },
         },
-        servicos: ticket.servicos
-          ? ticket.servicos.map((servico) => ({
+        servicos: ticket?.servicos
+          ? ticket?.servicos.map((servico) => ({
               ...servicoInitValues,
               ...servico,
             }))
@@ -162,8 +156,10 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
   }, [ticket]);
 
   // Handler de submissão
-  const handleSubmit = async (values, { setSubmitting }) => {
+  const handleSubmit = async (values, { setSubmitting, setErrors }) => {
     setSubmitting(true);
+    setFormHasErrors(false);
+
     try {
       let prestadorId = null;
       let servicosIds = [];
@@ -258,10 +254,12 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
       }
     } catch (error) {
       console.error("Erro ao salvar ticket:", error);
+      setErrors(error);
 
       toast({
         title: "Erro ao salvar ticket.",
-        description: error.response.data.detalhes || "Ocorreu um erro inesperado.",
+        description:
+          error.response.data.detalhes || "Ocorreu um erro inesperado.",
         status: "error",
         duration: 5000,
         isClosable: true,
@@ -328,7 +326,12 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
     pessoaFisicaAtual,
     pessoaFisicaInicial
   ) => {
-    if (!pessoaFisicaAtual || !pessoaFisicaInicial) return false;
+    if (
+      !pessoaFisicaAtual ||
+      !pessoaFisicaInicial ||
+      pessoaFisicaAtual.dataNascimento === ""
+    )
+      return false;
     return (
       pessoaFisicaAtual.rg.numero !== pessoaFisicaInicial.rg.numero ||
       pessoaFisicaAtual.rg.orgaoEmissor !==
@@ -365,7 +368,7 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
   };
 
   const verificarAlteracoesServicos = (servicosAtuais, servicosIniciais) => {
-    if (servicosAtuais.length !== servicosIniciais.length) return true;
+    if (servicosAtuais.length === servicosIniciais.length) return false;
 
     for (let i = 0; i < servicosAtuais.length; i++) {
       const servicoAtual = servicosAtuais[i];
@@ -380,7 +383,7 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
           servicoInicial.valorAjusteComercial ||
         servicoAtual.valorHospedagemAnuncio !==
           servicoInicial.valorHospedagemAnuncio ||
-        servicoAtual.valorTotal !== servicoInicial.valorTotal ||
+        servicoAtual.valorTotal == servicoInicial.valorTotal ||
         servicoAtual.status !== servicoInicial.status ||
         servicoAtual.correcao !== servicoInicial.correcao
       ) {
@@ -419,9 +422,19 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
     <Formik
       initialValues={combinedInitValues}
       validationSchema={combinedValidationSchema}
-      onSubmit={handleSubmit}
       enableReinitialize
       validateOnChange={false}
+      onSubmit={(values, actions) => {
+        actions.validateForm().then((errors) => {
+          console.log(Object.keys);
+          if (Object.keys(errors).length > 0) {
+            setFormHasErrors(true);
+          } else {
+            setFormHasErrors(false);
+            handleSubmit(values, actions);
+          }
+        });
+      }}
     >
       {(formik) => (
         <>
@@ -559,7 +572,9 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
                           >
                             {mostrarServico && (
                               <Box mt={4}>
-                                <ServicoForm />
+                                <ServicoForm
+                                  setServiceFormIsEmpry={setServiceFormIsEmpry}
+                                />
                               </Box>
                             )}
                           </AccordionPanel>
@@ -582,6 +597,7 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
                       <TicketActions
                         ticket={ticket}
                         isEditMode={isEditMode}
+                        formHasErrors={formHasErrors}
                         closeModal={abrirConfirmarFechar}
                         onCancel={abrirConfirmarFechar}
                         cancelar={closeModal}

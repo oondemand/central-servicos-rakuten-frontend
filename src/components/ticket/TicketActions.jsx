@@ -1,42 +1,56 @@
-// src/components/ticket/TicketActions.js
-import React, { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
-  ButtonGroup,
   Button,
+  ButtonGroup,
+  Flex,
+  Tooltip,
   AlertDialog,
   AlertDialogBody,
+  AlertDialogContent,
   AlertDialogFooter,
   AlertDialogHeader,
-  AlertDialogContent,
   AlertDialogOverlay,
   useDisclosure,
-  Flex,
+  useToast,
 } from "@chakra-ui/react";
-import { FaCheck, FaTimes, FaTrash } from "react-icons/fa";
+import { FaCheck, FaTimes } from "react-icons/fa";
 import { IoFileTrayStacked } from "react-icons/io5";
-import { useTicket } from "../../contexts/TicketContext";
 import { useFormikContext } from "formik";
 
-const TicketActions = ({
-  ticket,
-  isEditMode,
-  closeModal,
-  onCancel,
-  cancelar,
-}) => {
+const TicketActions = ({ ticket, isEditMode, closeModal, cancelar }) => {
   const formik = useFormikContext();
-  const { salvarTicket, aprovarTicket, reprovarTicket } = useTicket();
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const toast = useToast();
   const cancelRef = useRef();
-
   const [acao, setAcao] = useState(null);
+  const [formHasErrors, setFormHasErrors] = useState(false);
+  const [showTooltip, setShowTooltip] = useState(false);
+
+  // Atualiza `formHasErrors` sempre que `formik.errors` muda
+  useEffect(() => {
+    setFormHasErrors(Object.keys(formik.errors).length > 0);
+  }, [formik.errors]);
+
+  // Mostra tooltip temporariamente se o formulário tiver erros
+  const handleSaveClick = async () => {
+    const errors = await formik.validateForm();
+    const hasErrors = Object.keys(errors).length > 0;
+    setFormHasErrors(hasErrors);
+
+    if (hasErrors) {
+      setShowTooltip(true);
+      setTimeout(() => setShowTooltip(false), 3000); // Tooltip desaparece após 3 segundos
+    } else {
+      // Submete o formulário se não houver erros
+      formik.handleSubmit();
+    }
+  };
 
   const handleConfirmAction = async () => {
     if (!isEditMode || !acao) return;
 
     try {
       let sucesso = false;
-
       if (acao === "aprovar") {
         sucesso = await aprovarTicket(ticket._id);
       } else if (acao === "reprovar") {
@@ -73,7 +87,7 @@ const TicketActions = ({
               <Button
                 onClick={() => handleActionClick("aprovar")}
                 colorScheme="green"
-                _hover={{ bg: "green.400" }} 
+                _hover={{ bg: "green.400" }}
                 bg="green.success"
                 rightIcon={<FaCheck />}
               >
@@ -98,27 +112,38 @@ const TicketActions = ({
             </>
           )}
         </ButtonGroup>
+
         <ButtonGroup spacing={4}>
-          <Button 
-            bg="#89898B" 
-            color="white" 
+          <Button
+            bg="#89898B"
+            color="white"
             _hover={{ bg: "#808080" }}
             onClick={cancelar}
-            >
+          >
             Cancelar
           </Button>
-          <Button
-            type="submit"
-            colorScheme="brand"
-            bg="blue.500"
-            isLoading={formik.isSubmitting}
+          <Tooltip
+            label="Há erros no formulário. Por favor, corrija-os antes de salvar."
+            isOpen={showTooltip}
+            placement="top"
+            hasArrow
+            bg="yellow.400"
+            color="white"
+            textAlign="center"
           >
-            {isEditMode ? "Salvar" : "Salvar"}
-          </Button>
+            <Button
+              type="submit"
+              colorScheme="brand"
+              bg="blue.500"
+              isLoading={formik.isSubmitting}
+              onClick={handleSaveClick}
+            >
+              {isEditMode ? "Salvar" : "Salvar"}
+            </Button>
+          </Tooltip>
         </ButtonGroup>
       </Flex>
 
-      {/* AlertDialog para confirmação de ações */}
       <AlertDialog
         isOpen={isOpen}
         leastDestructiveRef={cancelRef}

@@ -30,8 +30,8 @@ const PrestadorForm = ({ onDocumentoValido }) => {
   const [sidValido, setSidValido] = useState(true);
   const [estados, setEstados] = useState([]);
   const [isAutoUpdating, setIsAutoUpdating] = useState(false);
-  const [displayNome, setDisplayNome] = useState(values.prestador.nome);
-  const [displaySid, setDisplaySid] = useState(values.prestador.sid);
+  const [displayNome, setDisplayNome] = useState(values?.prestador.nome);
+  const [displaySid, setDisplaySid] = useState(values?.prestador.sid);
   const [isTyping, setIsTyping] = useState(false);
   const [bancos, setBancos] = useState([]);
   const [loadingBanks, setLoadingBanks] = useState(true);
@@ -43,11 +43,11 @@ const PrestadorForm = ({ onDocumentoValido }) => {
 
   const verificarDocumento = (documentoValue) => {
     const isCPFValido =
-      values.prestador.tipo === "pf" &&
+      values?.prestador?.tipo === "pf" &&
       documentoValue.length === 11 &&
       isCPF(documentoValue);
     const isCNPJValido =
-      values.prestador.tipo === "pj" &&
+      values?.prestador?.tipo === "pj" &&
       documentoValue.length === 14 &&
       isCNPJ(documentoValue);
 
@@ -55,7 +55,7 @@ const PrestadorForm = ({ onDocumentoValido }) => {
 
     setCpfValido(isCPFValido);
     setCnpjValido(isCNPJValido);
-    onDocumentoValido(validationDocumentSchema, values.prestador.tipo);
+    onDocumentoValido(validationDocumentSchema, values?.prestador?.tipo);
 
     if (validationDocumentSchema) {
       setFieldError("prestador.documento", "");
@@ -137,20 +137,20 @@ const PrestadorForm = ({ onDocumentoValido }) => {
   };
 
   useEffect(() => {
-    const documentoNumerico = values.prestador.documento.replace(/\D/g, "");
+    const documentoNumerico = values?.prestador?.documento?.replace(/\D/g, "");
 
-    if (values.prestador.tipo === "pj" && documentoNumerico.length === 14) {
+    if (values?.prestador?.tipo === "pj" && documentoNumerico?.length === 14) {
       verificarCNPJ(documentoNumerico);
     } else if (
-      values.prestador.tipo === "pf" &&
+      values?.prestador?.tipo === "pf" &&
       documentoNumerico.length === 11
     ) {
       verificarCPF(documentoNumerico);
     }
-  }, [values.prestador.documento, values.prestador.tipo, setFieldValue]);
+  }, [values?.prestador.documento, values?.prestador.tipo, setFieldValue]);
 
   useEffect(() => {
-    const cepNumerico = values.prestador.endereco.cep.replace(/\D/g, "");
+    const cepNumerico = values?.prestador?.endereco?.cep?.replace(/\D/g, "");
 
     const buscarCep = async (cep) => {
       try {
@@ -173,10 +173,10 @@ const PrestadorForm = ({ onDocumentoValido }) => {
       }
     };
 
-    if (cepNumerico.length === 8) {
+    if (cepNumerico?.length === 8) {
       buscarCep(cepNumerico);
     }
-  }, [values.prestador.endereco.cep, setFieldValue]);
+  }, [values?.prestador?.endereco?.cep, setFieldValue]);
 
   useEffect(() => {
     // Função para buscar prestador pelo SID
@@ -194,21 +194,21 @@ const PrestadorForm = ({ onDocumentoValido }) => {
         }
       } catch (error) {
         console.error("Erro ao buscar prestador por SID:", error);
-        toast({
-          title: "Verifique o SID informado",
-          description:
-            "Houve um problema ao localizar os dados do prestador para o SID informado. Verifique e tente novamente.",
-          status: "warning",
-          duration: 5000,
-          isClosable: true,
-        });
+        // toast({
+        //   title: "Verifique o SID informado",
+        //   description:
+        //     "Houve um problema ao localizar os dados do prestador para o SID informado. Verifique e tente novamente.",
+        //   status: "warning",
+        //   duration: 5000,
+        //   isClosable: true,
+        // });
       }
     };
     // Executa a busca quando o SID for alterado e tiver um valor válido
-    if (/^\d{7}$/.test(values.prestador.sid)) {
-      buscarPrestador(values.prestador.sid);
+    if (/^\d{7}$/.test(values?.prestador?.sid)) {
+      buscarPrestador(values?.prestador.sid);
     }
-  }, [values.prestador.sid, setFieldValue, toast]);
+  }, [values?.prestador?.sid, setFieldValue, toast]);
 
   useEffect(() => {
     // estados da API BrasilAPI
@@ -234,13 +234,13 @@ const PrestadorForm = ({ onDocumentoValido }) => {
     setIsTyping(true);
 
     const handler = setTimeout(() => {
-      setDisplayNome(values.prestador.nome);
-      setDisplaySid(values.prestador.sid);
+      setDisplayNome(values?.prestador?.nome);
+      setDisplaySid(values?.prestador?.sid);
       setIsTyping(false);
     }, 1000);
 
     return () => clearTimeout(handler);
-  }, [values.prestador.nome, values.prestador.sid]);
+  }, [values?.prestador.nome, values?.prestador?.sid]);
 
   useEffect(() => {
     const fetchBancos = async () => {
@@ -263,19 +263,19 @@ const PrestadorForm = ({ onDocumentoValido }) => {
   }, []);
 
   useEffect(() => {
-    const pisNumerico = values.prestador.pessoaFisica?.pis?.replace(/\D/g, "");
+    const pisNumerico = values?.prestador?.pessoaFisica?.pis?.replace(/\D/g, "");
     if (pisNumerico && pisNumerico.length === 11) {
       verificarPIS(pisNumerico);
     }
-  }, [values.prestador.pessoaFisica?.pis]);
+  }, [values?.prestador?.pessoaFisica?.pis]);
 
   useEffect(() => {
     setCnpjValido(true);
     setCpfValido(true);
-  }, [values.prestador.tipo, setFieldValue]);
+  }, [values?.prestador?.tipo, setFieldValue]);
 
   // Determina se o prestador é Pessoa Física
-  const isPessoaFisica = values.prestador.tipo === "pf";
+  const isPessoaFisica = values?.prestador.tipo === "pf";
 
   return (
     <div>
@@ -341,19 +341,19 @@ const PrestadorForm = ({ onDocumentoValido }) => {
               type="text"
               onChange={handleDocumentoChange}
               mask={
-                values.prestador.tipo === "pf"
+                values?.prestador?.tipo === "pf"
                   ? "999.999.999-99"
                   : "99.999.999/9999-99"
               }
               style={{
                 borderColor:
-                  (values.prestador.tipo === "pj" && !cnpjValido) ||
-                  (values.prestador.tipo === "pf" && !cpfValido)
+                  (values?.prestador?.tipo === "pj" && !cnpjValido) ||
+                  (values?.prestador?.tipo === "pf" && !cpfValido)
                     ? "red"
                     : "#ccc",
                 color:
-                  (values.prestador.tipo === "pj" && !cnpjValido) ||
-                  (values.prestador.tipo === "pf" && !cpfValido)
+                  (values?.prestador?.tipo === "pj" && !cnpjValido) ||
+                  (values?.prestador?.tipo === "pf" && !cpfValido)
                     ? "red"
                     : "#8528CE",
               }}
@@ -448,7 +448,7 @@ const PrestadorForm = ({ onDocumentoValido }) => {
               <select
                 id="prestador.endereco.estado"
                 name="prestador.endereco.estado"
-                value={values.prestador.endereco.estado}
+                value={values?.prestador?.endereco?.estado}
                 onChange={(e) => {
                   if (!isAutoUpdating) {
                     setFieldValue("prestador.endereco.estado", e.target.value);
@@ -520,7 +520,7 @@ const PrestadorForm = ({ onDocumentoValido }) => {
                   value={
                     bancos.find(
                       (option) =>
-                        option.label === values.prestador?.dadosBancarios?.banco
+                        option.label === values?.prestador?.dadosBancarios?.banco
                     ) || null
                   }
                   onChange={handleChangeBanks}
