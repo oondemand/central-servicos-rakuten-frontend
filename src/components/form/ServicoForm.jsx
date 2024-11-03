@@ -21,7 +21,7 @@ import { FieldArray, useFormikContext } from "formik";
 import FormFieldTooltip from "../common/FormFildTooltip";
 import FormField from "../common/FormField";
 
-const ServicoForm = ({setServiceFormIsEmpry}) => {
+const ServicoForm = ({ setValeuArrayService }) => {
   const [showErrorTooltip, setShowErrorTooltip] = useState(false);
   const { values, setFieldValue } = useFormikContext();
 
@@ -54,10 +54,6 @@ const ServicoForm = ({setServiceFormIsEmpry}) => {
     values.servicos?.forEach((_, index) => {
       atualizarTotalLinha(index);
     });
-
-    if(values.servicos.length > 0) {
-      setServiceFormIsEmpry(false);
-    }
   }, [values.servicos, setFieldValue]);
 
   return (
@@ -294,7 +290,7 @@ const ServicoForm = ({setServiceFormIsEmpry}) => {
             </Table>
             <Button
               colorScheme="teal"
-              onClick={() =>
+              onClick={() => {
                 push({
                   mesCompetencia: "",
                   anoCompetencia: "",
@@ -305,8 +301,9 @@ const ServicoForm = ({setServiceFormIsEmpry}) => {
                   valorTotal: 0,
                   correcao: false,
                   status: "ativo",
-                })
-              }
+                }),
+                setValeuArrayService(true);
+              }}
             >
               Adicionar Serviço
             </Button>

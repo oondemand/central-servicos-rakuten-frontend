@@ -1,31 +1,43 @@
 // src/components/configuracoes/ConfigTabs.js
-import React from 'react';
+import React from "react";
 import {
   Tabs,
   TabList,
   TabPanels,
   Tab,
-  TabPanel
-} from '@chakra-ui/react';
-import CrudUsuarios from './CrudUsuarios';
-import CrudBaseOmies from './CrudBaseOmies';
+  TabPanel,
+  Box,
+  Heading,
+  Text,
+} from "@chakra-ui/react";
+import CrudUsuarios from "./CrudUsuarios";
+import CrudBaseOmies from "./CrudBaseOmies";
 
 const ConfigTabs = () => {
   return (
-    <Tabs variant="enclosed">
-      <TabList mb="1em">
-        <Tab>Usuários</Tab>
-        <Tab>Bases Omie</Tab>
-      </TabList>
-      <TabPanels>
-        <TabPanel>
-          <CrudUsuarios />
-        </TabPanel>
-        <TabPanel>
-          <CrudBaseOmies />
-        </TabPanel>
-      </TabPanels>
-    </Tabs>
+    <Box
+      bg="white"
+      boxShadow="md"
+      rounded="md"
+      p={4}
+    >
+      <Tabs variant="enclosed" colorScheme="purple">
+        <TabList>
+          <Tab>Usuários</Tab>
+        </TabList>
+
+        <TabPanels>
+          <TabPanel>
+            <Heading as="h3" fontSize="xl" mb={4}>
+              Configurações Gerais
+            </Heading>
+
+            <CrudUsuarios />
+
+          </TabPanel>
+        </TabPanels>
+      </Tabs>
+    </Box>
   );
 };
 

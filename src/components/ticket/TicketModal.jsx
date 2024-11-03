@@ -76,7 +76,7 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
   const [cnpjValido, setCnpjValido] = useState(null);
   const [cpfValido, setCpfValido] = useState(null);
   const [formHasErrors, setFormHasErrors] = useState(false);
-  const [serviceFormIsEmpry, setServiceFormIsEmpry] = useState(true);
+  const [valeuArrayService, setValeuArrayService] = useState(false);
 
   // Referências para os AlertDialogs
   const cancelRefFechar = useRef();
@@ -104,7 +104,7 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
       });
     }
 
-    if (mostrarServico && !serviceFormIsEmpry) {
+    if (mostrarServico && valeuArrayService) {
       schema = schema.shape({
         servicos: Yup.array()
           .of(servicoValidationSchema)
@@ -117,7 +117,13 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
     }
 
     return schema;
-  }, [mostrarPrestador, mostrarServico, cpfValido, cnpjValido]);
+  }, [
+    mostrarPrestador,
+    mostrarServico,
+    cpfValido,
+    cnpjValido,
+    valeuArrayService,
+  ]);
 
   const combinedInitValues = useMemo(() => {
     let initValues = {
@@ -140,7 +146,7 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
             ...ticket?.prestador?.pessoaFisica,
             dataNascimento: ticket?.prestador?.pessoaFisica?.dataNascimento
               ? ticket.prestador?.pessoaFisica?.dataNascimento?.slice(0, 10)
-              : '',
+              : "",
           },
         },
         servicos: ticket?.servicos
@@ -276,22 +282,24 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
 
   // Funções para abrir os diálogos de confirmação
   const abrirConfirmarFechar = (formik) => {
-    const formAlterado =
-      formik.values.titulo !== formik.initialValues.titulo ||
-      formik.values.observacao !== formik.initialValues.observacao ||
-      verificarAlteracoesPrestador(
-        formik.values.prestador,
-        formik.initialValues.prestador
-      ) ||
-      verificarAlteracoesServicos(
-        formik.values.servicos,
-        formik.initialValues.servicos
-      );
+    if (formik !== undefined) {
+      const formAlterado =
+        formik.values.titulo !== formik.initialValues.titulo ||
+        formik.values.observacao !== formik.initialValues.observacao ||
+        verificarAlteracoesPrestador(
+          formik.values.prestador,
+          formik.initialValues.prestador
+        ) ||
+        verificarAlteracoesServicos(
+          formik.values.servicos,
+          formik.initialValues.servicos
+        );
 
-    if (formAlterado) {
-      setConfirmacao((prev) => ({ ...prev, fecharModal: true }));
-    } else {
-      confirmarFechar();
+      if (formAlterado) {
+        setConfirmacao((prev) => ({ ...prev, fecharModal: true }));
+      } else {
+        confirmarFechar();
+      }
     }
   };
 
@@ -304,12 +312,10 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
       prestadorAtual.comentariosRevisao !==
         prestadorInicial.comentariosRevisao ||
       prestadorAtual.status !== prestadorInicial.status ||
-      //Aqui estou fazendo a Verificacao dos campos de pf
       verificarAlteracoesPessoaFisica(
         prestadorAtual.pessoaFisica,
         prestadorInicial.pessoaFisica
       ) ||
-      //Aqui estou fazendo Verificacao dos dados bancários
       verificarAlteracoesDadosBancarios(
         prestadorAtual.dadosBancarios,
         prestadorInicial.dadosBancarios
@@ -573,7 +579,7 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
                             {mostrarServico && (
                               <Box mt={4}>
                                 <ServicoForm
-                                  setServiceFormIsEmpry={setServiceFormIsEmpry}
+                                  setValeuArrayService={setValeuArrayService}
                                 />
                               </Box>
                             )}

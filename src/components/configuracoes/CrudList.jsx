@@ -8,6 +8,7 @@ import {
   Flex,
   Text,
   useDisclosure,
+  IconButton,
   AlertDialog,
   AlertDialogBody,
   AlertDialogFooter,
@@ -19,6 +20,7 @@ import CrudModal from "./CrudModal";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import FormField from "@/components/common/FormField";
+import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 
 const CrudList = ({
   title,
@@ -31,15 +33,38 @@ const CrudList = ({
   initialValues,
 }) => {
   const { isOpen, onOpen, onClose } = useDisclosure(); // Controle do Modal de criação/edição
-  const { isOpen: isAlertOpen, onOpen: onAlertOpen, onClose: onAlertClose } = useDisclosure(); // Controle do AlertDialog de exclusão
+  const {
+    isOpen: isAlertOpen,
+    onOpen: onAlertOpen,
+    onClose: onAlertClose,
+  } = useDisclosure(); // Controle do AlertDialog de exclusão
   const cancelRef = useRef(); // Referência para o botão de cancelar no AlertDialog
   const [itemToDelete, setItemToDelete] = useState(null); // Item selecionado para exclusão
   const [isEditMode, setIsEditMode] = useState(false); // Estado para determinar o modo do formulário
+  const [currentValues, setCurrentValues] = useState(initialValues);
+
+  const openCreateModal = () => {
+    setIsEditMode(false);
+    const newValues = { ...initialValues };
+    delete newValues._id;
+    setCurrentValues(newValues);
+    onOpen();
+  };
+
+  const openEditModal = (item) => {
+    setIsEditMode(true);
+    setCurrentValues({ ...item, senha: "" });
+    onOpen();
+  };
 
   const formik = useFormik({
     initialValues: initialValues,
     validationSchema: Yup.object(validationSchema),
+    validateOnMount: false, 
+    validateOnChange: true, 
+    validateOnBlur: true, 
     onSubmit: async (values, { resetForm }) => {
+      console.log(values);
       if (isEditMode) {
         await onEdit(values);
       } else {
@@ -52,6 +77,7 @@ const CrudList = ({
   });
 
   const handleEdit = (item) => {
+    console.log(item);
     formik.setValues(item);
     setIsEditMode(true);
     onOpen();
@@ -70,21 +96,22 @@ const CrudList = ({
     onAlertOpen();
   };
 
+  const handleSubmit = async (values, { resetForm }) => {
+    if (isEditMode) {
+      await onEdit(values);
+    } else {
+      await onAdd(values);
+    }
+    onClose();
+  };
+
   return (
     <Box p={6} rounded="md" shadow="md">
-      {/* Cabeçalho com título e botão de criação */}
       <Flex justify="space-between" align="center" mb={4}>
         <Text fontSize="2xl" fontWeight="bold">
           {title}
         </Text>
-        <Button
-          colorScheme="brand"
-          onClick={() => {
-            formik.resetForm();
-            setIsEditMode(false);
-            onOpen();
-          }}
-        >
+        <Button colorScheme="brand" onClick={openCreateModal}>
           Criar Novo
         </Button>
       </Flex>
@@ -95,17 +122,28 @@ const CrudList = ({
           <ListItem key={item._id} p={4} rounded="md" shadow="sm">
             <Flex justify="space-between" align="center">
               <Box>
-                {formFields.map(({ label, name }) => (
-                  <Text key={name}>
-                    <strong>{capitalizeFirstLetter(label)}:</strong> {getNestedValue(item, name)}
-                  </Text>
-                ))}
+                {formFields
+                  .filter(({ name }) => name !== "senha")
+                  .map(({ label, name }) => (
+                    <Text key={name}>
+                      <strong>{label}:</strong> {item[name]}
+                    </Text>
+                  ))}
               </Box>
               <Flex>
-                <Button size="sm" colorScheme="yellow" mr={2} onClick={() => handleEdit(item)}>
+                <Button
+                  size="sm"
+                  colorScheme="yellow"
+                  mr={2}
+                  onClick={() => openEditModal(item)}
+                >
                   Editar
                 </Button>
-                <Button size="sm" colorScheme="red" onClick={() => confirmDelete(item)}>
+                <Button
+                  size="sm"
+                  colorScheme="red"
+                  onClick={() => confirmDelete(item)}
+                >
                   Excluir
                 </Button>
               </Flex>
@@ -117,68 +155,17 @@ const CrudList = ({
       {/* Modal para criação/edição */}
       <CrudModal
         isOpen={isOpen}
-        onClose={() => {
-          formik.resetForm();
-          setIsEditMode(false);
-          onClose();
-        }}
-        title={isEditMode ? `Editar ${title.slice(0, -1)}` : `Criar ${title.slice(0, -1)}`}
-        onSubmit={formik.handleSubmit}
-      >
-        <Box>
-          {formFields.map(({ label, name, type, options }) => (
-            <FormField
-              key={name}
-              label={label}
-              name={name}
-              type={type}
-              options={options}
-              touched={formik.touched[name]} 
-              errors={formik.errors[name]}
-            />
-          ))}
-        </Box>
-      </CrudModal>
-
-      {/* AlertDialog para confirmação de exclusão */}
-      <AlertDialog
-        isOpen={isAlertOpen}
-        leastDestructiveRef={cancelRef}
-        onClose={() => {
-          onAlertClose();
-          setItemToDelete(null);
-        }}
-        isCentered
-      >
-        <AlertDialogOverlay>
-          <AlertDialogContent>
-            <AlertDialogHeader fontSize="lg" fontWeight="bold">
-              Confirmar Exclusão
-            </AlertDialogHeader>
-
-            <AlertDialogBody>
-              {`Tem certeza que deseja excluir "${
-                itemToDelete?.nome || "Este item"
-              }"? Essa ação não pode ser desfeita.`}
-            </AlertDialogBody>
-
-            <AlertDialogFooter>
-              <Button
-                ref={cancelRef}
-                onClick={() => {
-                  onAlertClose();
-                  setItemToDelete(null);
-                }}
-              >
-                Cancelar
-              </Button>
-              <Button colorScheme="red" onClick={handleDelete} ml={3}>
-                Excluir
-              </Button>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialogOverlay>
-      </AlertDialog>
+        onClose={onClose}
+        title={
+          isEditMode
+            ? `Editar ${title.slice(0, -1)}`
+            : `Criar ${title.slice(0, -1)}`
+        }
+        onSubmit={handleSubmit}
+        initialValues={currentValues}
+        validationSchema={validationSchema}
+        formFields={formFields}
+      />
     </Box>
   );
 };

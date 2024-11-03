@@ -6,7 +6,9 @@ const ConfigPage = () => {
   return (
     <>
       <main className="flex-grow p-4">
-        <h1 className="text-3xl font-bold mb-8">Configurações</h1>
+        <h1 style={{ fontSize: "1.8rem", fontWeight: "bold", marginBottom: '2rem' }}>
+          Configurações
+        </h1>
         <ConfigTabs />
       </main>
     </>

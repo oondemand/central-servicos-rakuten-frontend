@@ -1,5 +1,5 @@
 // src/components/configuracoes/CrudModal.js
-import React from 'react';
+import React from "react";
 import {
   Modal,
   ModalOverlay,
@@ -9,29 +9,45 @@ import {
   ModalBody,
   ModalCloseButton,
   Button,
-} from '@chakra-ui/react';
+} from "@chakra-ui/react";
+import { Formik, Form } from 'formik';
+import FormField from "../common/FormField";
+import * as Yup from 'yup';
 
-const CrudModal = ({ isOpen, onClose, title, children, onSubmit }) => {
+const CrudModal = ({ isOpen, onClose, title, onSubmit, initialValues, validationSchema, formFields }) => {
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="lg" isCentered>
+    <Modal isOpen={isOpen} onClose={onClose} isCentered>
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>{title}</ModalHeader>
-        <ModalCloseButton />
-        <form onSubmit={onSubmit}>
-          <ModalBody>
-            {children}
-          </ModalBody>
-
-          <ModalFooter>
-            <Button variant="ghost" mr={3} onClick={onClose}>
-              Cancelar
-            </Button>
-            <Button type="submit">
-              Salvar
-            </Button>
-          </ModalFooter>
-        </form>
+        <Formik
+          initialValues={initialValues}
+          validationSchema={Yup.object(validationSchema)}
+          onSubmit={onSubmit}
+          enableReinitialize
+        >
+          {({ handleSubmit }) => (
+            <Form onSubmit={handleSubmit}>
+              <ModalBody>
+                {formFields.map(({ label, name, type, options }) => (
+                  <FormField
+                    key={name}
+                    label={label}
+                    name={name}
+                    type={type}
+                    options={options}
+                  />
+                ))}
+              </ModalBody>
+              <ModalFooter>
+                <Button colorScheme="blue" mr={3} type="submit">
+                  Salvar
+                </Button>
+                <Button onClick={onClose}>Cancelar</Button>
+              </ModalFooter>
+            </Form>
+          )}
+        </Formik>
       </ModalContent>
     </Modal>
   );

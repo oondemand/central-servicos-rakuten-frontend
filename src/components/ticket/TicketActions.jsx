@@ -16,32 +16,35 @@ import {
 import { FaCheck, FaTimes } from "react-icons/fa";
 import { IoFileTrayStacked } from "react-icons/io5";
 import { useFormikContext } from "formik";
+import { useTicket } from "../../contexts/TicketContext";
 
-const TicketActions = ({ ticket, isEditMode, closeModal, cancelar }) => {
+const TicketActions = ({
+  ticket,
+  isEditMode,
+  closeModal,
+  onCancel,
+  cancelar,
+}) => {
   const formik = useFormikContext();
+
+  const { salvarTicket, aprovarTicket, reprovarTicket } = useTicket();
   const { isOpen, onOpen, onClose } = useDisclosure();
+
   const toast = useToast();
+
   const cancelRef = useRef();
+
   const [acao, setAcao] = useState(null);
-  const [formHasErrors, setFormHasErrors] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
 
-  // Atualiza `formHasErrors` sempre que `formik.errors` muda
-  useEffect(() => {
-    setFormHasErrors(Object.keys(formik.errors).length > 0);
-  }, [formik.errors]);
-
-  // Mostra tooltip temporariamente se o formulário tiver erros
   const handleSaveClick = async () => {
     const errors = await formik.validateForm();
     const hasErrors = Object.keys(errors).length > 0;
-    setFormHasErrors(hasErrors);
 
     if (hasErrors) {
       setShowTooltip(true);
-      setTimeout(() => setShowTooltip(false), 3000); // Tooltip desaparece após 3 segundos
+      setTimeout(() => setShowTooltip(false), 3000);
     } else {
-      // Submete o formulário se não houver erros
       formik.handleSubmit();
     }
   };
@@ -51,6 +54,7 @@ const TicketActions = ({ ticket, isEditMode, closeModal, cancelar }) => {
 
     try {
       let sucesso = false;
+
       if (acao === "aprovar") {
         sucesso = await aprovarTicket(ticket._id);
       } else if (acao === "reprovar") {
