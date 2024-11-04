@@ -143,7 +143,7 @@ const PrestadorForm = ({ onDocumentoValido }) => {
       verificarCNPJ(documentoNumerico);
     } else if (
       values?.prestador?.tipo === "pf" &&
-      documentoNumerico.length === 11
+      documentoNumerico?.length === 11
     ) {
       verificarCPF(documentoNumerico);
     }

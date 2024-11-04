@@ -32,15 +32,15 @@ const CrudList = ({
   validationSchema,
   initialValues,
 }) => {
-  const { isOpen, onOpen, onClose } = useDisclosure(); // Controle do Modal de criação/edição
+  const { isOpen, onOpen, onClose } = useDisclosure(); 
   const {
     isOpen: isAlertOpen,
     onOpen: onAlertOpen,
     onClose: onAlertClose,
-  } = useDisclosure(); // Controle do AlertDialog de exclusão
-  const cancelRef = useRef(); // Referência para o botão de cancelar no AlertDialog
-  const [itemToDelete, setItemToDelete] = useState(null); // Item selecionado para exclusão
-  const [isEditMode, setIsEditMode] = useState(false); // Estado para determinar o modo do formulário
+  } = useDisclosure();
+  const cancelRef = useRef(); 
+  const [itemToDelete, setItemToDelete] = useState(null);
+  const [isEditMode, setIsEditMode] = useState(false); 
   const [currentValues, setCurrentValues] = useState(initialValues);
 
   const openCreateModal = () => {
@@ -60,11 +60,10 @@ const CrudList = ({
   const formik = useFormik({
     initialValues: initialValues,
     validationSchema: Yup.object(validationSchema),
-    validateOnMount: false, 
-    validateOnChange: true, 
-    validateOnBlur: true, 
+    validateOnMount: false,
+    validateOnChange: true,
+    validateOnBlur: true,
     onSubmit: async (values, { resetForm }) => {
-      console.log(values);
       if (isEditMode) {
         await onEdit(values);
       } else {
@@ -76,18 +75,11 @@ const CrudList = ({
     },
   });
 
-  const handleEdit = (item) => {
-    console.log(item);
-    formik.setValues(item);
-    setIsEditMode(true);
-    onOpen();
-  };
-
   const handleDelete = async () => {
     if (itemToDelete) {
-      await onDelete(itemToDelete._id);
-      onAlertClose();
-      setItemToDelete(null);
+      await onDelete(itemToDelete._id); 
+      onAlertClose(); 
+      setItemToDelete(null); 
     }
   };
 
@@ -151,6 +143,34 @@ const CrudList = ({
           </ListItem>
         ))}
       </List>
+
+      <AlertDialog
+        isOpen={isAlertOpen}
+        leastDestructiveRef={cancelRef}
+        onClose={onAlertClose}
+        isCentered
+      >
+        <AlertDialogOverlay>
+          <AlertDialogContent>
+            <AlertDialogHeader fontSize="lg" fontWeight="bold">
+              Confirmar Exclusão
+            </AlertDialogHeader>
+            <AlertDialogBody>
+              {`Tem certeza que deseja excluir "${
+                itemToDelete?.nome || "Este item"
+              }"? Essa ação não pode ser desfeita.`}
+            </AlertDialogBody>
+            <AlertDialogFooter>
+              <Button ref={cancelRef} onClick={onAlertClose}>
+                Cancelar
+              </Button>
+              <Button colorScheme="red" onClick={handleDelete} ml={3}>
+                Excluir
+              </Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialogOverlay>
+      </AlertDialog>
 
       {/* Modal para criação/edição */}
       <CrudModal
