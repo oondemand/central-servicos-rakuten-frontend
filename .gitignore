@@ -25,3 +25,5 @@ yarn-error.log*
 **/.env
 **/.env.prod
 **/package-lock.json
+
+.vscode
