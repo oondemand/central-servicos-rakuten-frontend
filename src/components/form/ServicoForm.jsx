@@ -1,5 +1,5 @@
 // src/components/form/ServicoForm.jsx
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { NumericFormat } from "react-number-format";
 import {
   VStack,
@@ -21,7 +21,8 @@ import { FieldArray, useFormikContext } from "formik";
 import FormFieldTooltip from "../common/FormFildTooltip";
 import FormField from "../common/FormField";
 
-const ServicoForm = () => {
+const ServicoForm = ({ setValeuArrayService }) => {
+  const [showErrorTooltip, setShowErrorTooltip] = useState(false);
   const { values, setFieldValue } = useFormikContext();
 
   const atualizarTotalLinha = (index) => {
@@ -33,20 +34,20 @@ const ServicoForm = () => {
       valorHospedagemAnuncio,
     } = servico;
 
-    if (
-      valorPrincipal !== "" &&
-      valorBonus !== "" &&
-      valorAjusteComercial !== "" &&
-      valorHospedagemAnuncio !== ""
-    ) {
-      const total =
-        (Number(valorPrincipal) || 0) +
-        (Number(valorBonus) || 0) +
-        (Number(valorAjusteComercial) || 0) +
-        (Number(valorHospedagemAnuncio) || 0);
+    const total =
+      (parseFloat(valorPrincipal) || 0) +
+      (parseFloat(valorBonus) || 0) +
+      (parseFloat(valorAjusteComercial) || 0) +
+      (parseFloat(valorHospedagemAnuncio) || 0);
 
-      setFieldValue(`servicos.${index}.valorTotal`, Number(total.toFixed(2)));
-    }
+    setFieldValue(`servicos.${index}.valorTotal`, total.toFixed(2));
+  };
+
+  const calcularSomaTotal = () => {
+    return values.servicos.reduce(
+      (soma, servico) => soma + (parseFloat(servico.valorTotal) || 0),
+      0
+    );
   };
 
   useEffect(() => {
@@ -79,8 +80,8 @@ const ServicoForm = () => {
                 {form.values.servicos && form.values.servicos.length > 0 ? (
                   form.values.servicos.map((servico, index) => (
                     <Tr key={index}>
+                      {/* Competência Mês e Ano */}
                       <Td>
-                        {/* Competência: Mês e Ano */}
                         <HStack spacing={2}>
                           <Box width="60px">
                             <FormFieldTooltip
@@ -89,18 +90,31 @@ const ServicoForm = () => {
                               min={1}
                               max={12}
                               placeholder="Mês"
+                              setShowErrorTooltip={setShowErrorTooltip}
+                              showErrorTooltip={showErrorTooltip}
                             />
                           </Box>
                           <Box width="70px">
                             <FormFieldTooltip
                               name={`servicos.${index}.anoCompetencia`}
-                              type="number"
-                              min={2000}
+                              type="text"
+                              inputMode="numeric"
+                              maxLength={4}
                               placeholder="Ano"
+                              setShowErrorTooltip={setShowErrorTooltip}
+                              showErrorTooltip={showErrorTooltip}
+                              onChange={(e) => {
+                                const ano = e.target.value.replace(/\D/g, "");
+                                setFieldValue(
+                                  `servicos.${index}.anoCompetencia`,
+                                  ano.slice(0, 4)
+                                );
+                              }}
                             />
                           </Box>
                         </HStack>
                       </Td>
+                      {/* Campos de Valor com Cor Condicional */}
                       <Td>
                         <NumericFormat
                           name={`servicos.${index}.valorPrincipal`}
@@ -118,6 +132,12 @@ const ServicoForm = () => {
                               values.floatValue
                             );
                             atualizarTotalLinha(index);
+                          }}
+                          style={{
+                            color:
+                              form.values.servicos[index].valorPrincipal < 0
+                                ? "red"
+                                : "inherit",
                           }}
                         />
                       </Td>
@@ -139,6 +159,12 @@ const ServicoForm = () => {
                             );
                             atualizarTotalLinha(index);
                           }}
+                          style={{
+                            color:
+                              form.values.servicos[index].valorBonus < 0
+                                ? "red"
+                                : "inherit",
+                          }}
                         />
                       </Td>
                       <Td>
@@ -158,6 +184,13 @@ const ServicoForm = () => {
                               values.floatValue
                             );
                             atualizarTotalLinha(index);
+                          }}
+                          style={{
+                            color:
+                              form.values.servicos[index].valorAjusteComercial <
+                              0
+                                ? "red"
+                                : "inherit",
                           }}
                         />
                       </Td>
@@ -179,6 +212,13 @@ const ServicoForm = () => {
                             );
                             atualizarTotalLinha(index);
                           }}
+                          style={{
+                            color:
+                              form.values.servicos[index]
+                                .valorHospedagemAnuncio < 0
+                                ? "red"
+                                : "inherit",
+                          }}
                         />
                       </Td>
                       <Td>
@@ -192,7 +232,13 @@ const ServicoForm = () => {
                           fixedDecimalScale
                           customInput={FormFieldTooltip}
                           placeholder="R$ 0,00"
-                          isReadOnly={true} // Desabilita o campo "Valor Total"
+                          isReadOnly
+                          style={{
+                            color:
+                              form.values.servicos[index].valorTotal < 0
+                                ? "red"
+                                : "inherit",
+                          }}
                         />
                       </Td>
                       <Td>
@@ -213,11 +259,38 @@ const ServicoForm = () => {
                     </Td>
                   </Tr>
                 )}
+
+                {form.values.servicos.length > 0 && (
+                  <Tr>
+                    <Td colSpan={5} textAlign="right" fontWeight="bold">
+                      Soma Total:
+                    </Td>
+                    <Td fontWeight="bold">
+                      <Box whiteSpace="nowrap">
+                        <NumericFormat
+                          value={calcularSomaTotal()}
+                          displayType="text"
+                          thousandSeparator="."
+                          decimalSeparator=","
+                          prefix="R$ "
+                          decimalScale={2}
+                          fixedDecimalScale
+                          style={{
+                            fontWeight: "bold",
+                            fontSize: "1rem",
+                            color: calcularSomaTotal() < 0 ? "red" : "inherit",
+                          }}
+                        />
+                      </Box>
+                    </Td>
+                    <Td></Td>
+                  </Tr>
+                )}
               </Tbody>
             </Table>
             <Button
               colorScheme="teal"
-              onClick={() =>
+              onClick={() => {
                 push({
                   mesCompetencia: "",
                   anoCompetencia: "",
@@ -228,8 +301,9 @@ const ServicoForm = () => {
                   valorTotal: 0,
                   correcao: false,
                   status: "ativo",
-                })
-              }
+                }),
+                setValeuArrayService(true);
+              }}
             >
               Adicionar Serviço
             </Button>

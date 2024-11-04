@@ -1,5 +1,6 @@
 // src/components/form/PrestadorForm.js
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { debounce } from "lodash";
 import Select from "react-select";
 import { toast } from "react-toastify";
 import { isCPF, isCNPJ, isPIS } from "validation-br";
@@ -12,26 +13,44 @@ import {
   AccordionButton,
   AccordionIcon,
   AccordionPanel,
+  AlertDialog,
+  AlertDialogOverlay,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogBody,
+  AlertDialogFooter,
+  useDisclosure,
+  Button,
   Box,
   useToast,
   Text,
+  useFormControlStyles,
 } from "@chakra-ui/react";
 import { useFormikContext } from "formik";
 import FormField from "@/components/common/FormField";
 import CustomSelect from "../common/CustomSelect";
-import { carregarPrestadorPorSid } from "../../services/prestadorService";
+import {
+  carregarPrestadorPorSid,
+  obterPrestadorPorDocumento,
+  obterPrestadorPorEmail,
+  obterPrestadorPorPis,
+} from "../../services/prestadorService";
 
 const PrestadorForm = ({ onDocumentoValido }) => {
   const { setFieldValue, values, errors, dirty, isSubmitting, setFieldError } =
     useFormikContext();
 
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
   const toast = useToast();
+
+  const cancelRef = useRef();
 
   const [sidValido, setSidValido] = useState(true);
   const [estados, setEstados] = useState([]);
   const [isAutoUpdating, setIsAutoUpdating] = useState(false);
-  const [displayNome, setDisplayNome] = useState(values.prestador.nome);
-  const [displaySid, setDisplaySid] = useState(values.prestador.sid);
+  const [displayNome, setDisplayNome] = useState(values?.prestador.nome);
+  const [displaySid, setDisplaySid] = useState(values?.prestador.sid);
   const [isTyping, setIsTyping] = useState(false);
   const [bancos, setBancos] = useState([]);
   const [loadingBanks, setLoadingBanks] = useState(true);
@@ -40,25 +59,41 @@ const PrestadorForm = ({ onDocumentoValido }) => {
   const [pisValido, setPisValido] = useState(true);
   const [hasInteracted, setHasInteracted] = useState(false);
   const [hasInteractedCNPJ, setHasInteractedCNPJ] = useState(false);
+  const [documentoDuplicado, setDocumentoDuplicado] = useState(false);
+  const [prestadorExistente, setPrestadorExistente] = useState(null);
+  const [isEmailAlertOpen, setIsEmailAlertOpen] = useState(false);
+  const [emailAlertData, setEmailAlertData] = useState(null);
+  const [sidAlertData, setSidAlertData] = useState(null);
+  const [isSidAlertOpen, setIsSidAlertOpen] = useState(false);
+  const [isPisAlertOpen, setIsPisAlertOpen] = useState(false);
+  const [pisAlertData, setPisAlertData] = useState(null);
+  const [alertData, setAlertData] = useState(null);
 
-  const verificarDocumento = (documentoValue) => {
+  const verificarDocumento = async (documentoValue) => {
     const isCPFValido =
-      values.prestador.tipo === "pf" &&
-      documentoValue.length === 11 &&
-      isCPF(documentoValue);
+      values?.prestador?.tipo === "pf" && isCPF(documentoValue);
     const isCNPJValido =
-      values.prestador.tipo === "pj" &&
-      documentoValue.length === 14 &&
-      isCNPJ(documentoValue);
-
+      values?.prestador?.tipo === "pj" && isCNPJ(documentoValue);
     const validationDocumentSchema = isCPFValido || isCNPJValido;
 
     setCpfValido(isCPFValido);
     setCnpjValido(isCNPJValido);
-    onDocumentoValido(validationDocumentSchema, values.prestador.tipo);
+    setFieldError(
+      "prestador.documento",
+      validationDocumentSchema ? "" : "Documento inválido"
+    );
+    onDocumentoValido(validationDocumentSchema, values?.prestador?.tipo);
 
     if (validationDocumentSchema) {
-      setFieldError("prestador.documento", "");
+      try {
+        const prestador = await obterPrestadorPorDocumento(documentoValue);
+        if (prestador) {
+          setPrestadorExistente(prestador);
+          onOpen(); // Abre o AlertDialog
+        }
+      } catch (error) {
+        console.error("Erro ao verificar documento:", error);
+      }
     }
   };
 
@@ -120,37 +155,186 @@ const PrestadorForm = ({ onDocumentoValido }) => {
 
   const handleDocumentoChange = (e) => {
     const documentoValue = e.target.value.replace(/\D/g, "");
-    setFieldValue("prestador.documento", documentoValue);
-    if (documentoValue.length === 11 || documentoValue.length === 14) {
-      verificarDocumento(documentoValue);
-      setHasInteracted(true);
-      setHasInteractedCNPJ(true);
+    const currentDocument = values.prestador.documento || "";
+
+    if (documentoValue !== currentDocument) {
+      setFieldValue("prestador.documento", documentoValue);
+
+      if (
+        (values.prestador.tipo === "pf" && documentoValue.length === 11) ||
+        (values.prestador.tipo === "pj" && documentoValue.length === 14)
+      ) {
+        verificarDocumento(documentoValue);
+      }
     }
   };
 
-  const handlePISChange = (e) => {
-    const pisValue = e.target.value.replace(/\D/g, "");
-    if (pisValue.length === 11) {
-      verificarPIS(pisValue);
-      setHasInteracted(true);
+  const carregarDadosPrestador = () => {
+    if (prestadorExistente) {
+      setFieldValue("prestador", prestadorExistente);
     }
+    onClose();
+  };
+
+  const limparDocumento = () => {
+    setFieldValue("prestador.documento", "");
+    onClose();
+  };
+
+  const handlePisChange = async (e) => {
+    const pisValue = e.target.value.replace(/\D/g, "");
+    setFieldValue("prestador.pessoaFisica.pis", pisValue);
+
+    if (pisValue.length === 11) {
+      const prestador = await obterPrestadorPorPis(pisValue);
+      onDocumentoValido(true, prestador?.tipo);
+      if (prestador) {
+        setPisAlertData(prestador);
+        setIsPisAlertOpen(true);
+      }
+    }
+  };
+
+  const handlePisAlertClose = (clearPis = false) => {
+    setIsPisAlertOpen(false);
+    if (clearPis) {
+      setFieldValue("prestador.pessoaFisica.pis", "");
+    }
+  };
+
+  const verificarEmail = useCallback(
+    debounce(async (email) => {
+      if (email && /\S+@\S+\.\S+/.test(email)) {
+        try {
+          const emailPrestador = await obterPrestadorPorEmail(email);
+          console.log(emailPrestador);
+          if (emailPrestador) {
+            setEmailAlertData(emailPrestador);
+            setIsEmailAlertOpen(true);
+            onDocumentoValido(true, emailPrestador?.tipo);
+          }
+        } catch (error) {
+          console.error("Erro ao verificar e-mail:", error);
+          toast({
+            title: "Erro ao verificar e-mail.",
+            description: "Houve um problema ao verificar o e-mail.",
+            status: "error",
+            duration: 5000,
+            isClosable: true,
+          });
+        }
+      }
+    }, 500),
+    []
+  );
+
+  const handleEmailChange = (e) => {
+    const email = e.target.value;
+    setFieldValue("prestador.email", email);
+    verificarEmail(email);
+  };
+
+  const handleEmailAlertClose = (clearEmail = false) => {
+    setIsEmailAlertOpen(false);
+    if (clearEmail) {
+      setFieldValue("prestador.email", "");
+    }
+  };
+
+  const handleLoadData = (prestadorData) => {
+    if (prestadorData) {
+      setFieldValue("prestador._id", prestadorData._id);
+      setFieldValue("prestador.nome", prestadorData.nome);
+      setFieldValue("prestador.sid", prestadorData.sid);
+      setFieldValue("prestador.tipo", prestadorData.tipo);
+      setFieldValue("prestador.documento", prestadorData.documento);
+      setFieldValue("prestador.email", prestadorData.email);
+      setFieldValue(
+        "prestador.comentariosRevisao",
+        prestadorData.comentariosRevisao
+      );
+      setFieldValue("prestador.status", prestadorData.status);
+
+      setFieldValue(
+        "prestador.pessoaFisica.rg.numero",
+        prestadorData.pessoaFisica?.rg.numero
+      );
+      setFieldValue(
+        "prestador.pessoaFisica.rg.orgaoEmissor",
+        prestadorData.pessoaFisica?.rg.orgaoEmissor
+      );
+      setFieldValue(
+        "prestador.pessoaFisica.dataNascimento",
+        prestadorData.pessoaFisica?.dataNascimento
+      );
+      setFieldValue(
+        "prestador.pessoaFisica.nomeMae",
+        prestadorData.pessoaFisica?.nomeMae
+      );
+
+      setFieldValue("prestador.endereco.cep", prestadorData.endereco?.cep);
+      setFieldValue("prestador.endereco.rua", prestadorData.endereco?.rua);
+      setFieldValue(
+        "prestador.endereco.numero",
+        prestadorData.endereco?.numero
+      );
+      setFieldValue(
+        "prestador.endereco.complemento",
+        prestadorData.endereco?.complemento
+      );
+      setFieldValue(
+        "prestador.endereco.cidade",
+        prestadorData.endereco?.cidade
+      );
+      setFieldValue(
+        "prestador.endereco.estado",
+        prestadorData.endereco?.estado
+      );
+    }
+  };
+
+  const handleSIDChange = async (e) => {
+    const sidValue = e.target.value.replace(/\D/g, "");
+    setFieldValue("prestador.sid", sidValue);
+
+    if (/^\d{7}$/.test(sidValue)) {
+      try {
+        const prestador = await carregarPrestadorPorSid(sidValue);
+
+        console.log(prestador);
+
+        onDocumentoValido(true, prestador?.tipo);
+
+        if (prestador) {
+          setSidAlertData(prestador);
+          setIsSidAlertOpen(true);
+        }
+      } catch (error) {
+        console.error("Erro ao buscar prestador por SID:", error);
+      }
+    }
+  };
+
+  const handleCloseSidAlert = () => {
+    setIsSidAlertOpen(false);
+    setFieldValue("prestador.sid", "");
   };
 
   useEffect(() => {
-    const documentoNumerico = values.prestador.documento.replace(/\D/g, "");
+    const documentoNumerico = values?.prestador?.documento?.replace(/\D/g, "");
 
-    if (values.prestador.tipo === "pj" && documentoNumerico.length === 14) {
+    if (values?.prestador?.tipo === "pj" && documentoNumerico?.length === 14) {
       verificarCNPJ(documentoNumerico);
     } else if (
-      values.prestador.tipo === "pf" &&
-      documentoNumerico.length === 11
+      values?.prestador?.tipo === "pf" &&
+      documentoNumerico?.length === 11
     ) {
       verificarCPF(documentoNumerico);
     }
-  }, [values.prestador.documento, values.prestador.tipo, setFieldValue]);
+  }, [values?.prestador.documento, values?.prestador.tipo, setFieldValue]);
 
   useEffect(() => {
-    const cepNumerico = values.prestador.endereco.cep.replace(/\D/g, "");
+    const cepNumerico = values?.prestador?.endereco?.cep?.replace(/\D/g, "");
 
     const buscarCep = async (cep) => {
       try {
@@ -169,46 +353,46 @@ const PrestadorForm = ({ onDocumentoValido }) => {
       } catch (error) {
         console.error("Erro ao buscar CEP:", error);
       } finally {
-        setIsAutoUpdating(false); 
+        setIsAutoUpdating(false);
       }
     };
 
-    if (cepNumerico.length === 8) {
+    if (cepNumerico?.length === 8) {
       buscarCep(cepNumerico);
     }
-  }, [values.prestador.endereco.cep, setFieldValue]);
+  }, [values?.prestador?.endereco?.cep, setFieldValue]);
 
-  useEffect(() => {
-    // Função para buscar prestador pelo SID
-    const buscarPrestador = async (sid) => {
-      try {
-        const prestador = await carregarPrestadorPorSid(sid);
-        if (prestador) {
-          // Preenchendo os campos do formulário com os dados do prestador retornado
-          setFieldValue("prestador._id", prestador._id);
-          setFieldValue("prestador.nome", prestador.nome);
-          setFieldValue("prestador.tipo", prestador.tipo);
-          setFieldValue("prestador.documento", prestador.documento);
-          setFieldValue("prestador.email", prestador.email);
-          // Adicione aqui os outros campos que devem ser preenchidos automaticamente
-        }
-      } catch (error) {
-        console.error("Erro ao buscar prestador por SID:", error);
-        toast({
-          title: "Verifique o SID informado",
-          description:
-            "Houve um problema ao localizar os dados do prestador para o SID informado. Verifique e tente novamente.",
-          status: "warning",
-          duration: 5000,
-          isClosable: true,
-        });
-      }
-    };
-    // Executa a busca quando o SID for alterado e tiver um valor válido
-    if (/^\d{7}$/.test(values.prestador.sid)) {
-      buscarPrestador(values.prestador.sid);
-    }
-  }, [values.prestador.sid, setFieldValue, toast]);
+  // useEffect(() => {
+  //   // Função para buscar prestador pelo SID
+  //   const buscarPrestador = async (sid) => {
+  //     try {
+  //       const prestador = await carregarPrestadorPorSid(sid);
+  //       if (prestador) {
+  //         // Preenchendo os campos do formulário com os dados do prestador retornado
+  //         setFieldValue("prestador._id", prestador._id);
+  //         setFieldValue("prestador.nome", prestador.nome);
+  //         setFieldValue("prestador.tipo", prestador.tipo);
+  //         setFieldValue("prestador.documento", prestador.documento);
+  //         setFieldValue("prestador.email", prestador.email);
+  //         // Adicione aqui os outros campos que devem ser preenchidos automaticamente
+  //       }
+  //     } catch (error) {
+  //       console.error("Erro ao buscar prestador por SID:", error);
+  //       // toast({
+  //       //   title: "Verifique o SID informado",
+  //       //   description:
+  //       //     "Houve um problema ao localizar os dados do prestador para o SID informado. Verifique e tente novamente.",
+  //       //   status: "warning",
+  //       //   duration: 5000,
+  //       //   isClosable: true,
+  //       // });
+  //     }
+  //   };
+  //   // Executa a busca quando o SID for alterado e tiver um valor válido
+  //   if (/^\d{7}$/.test(values?.prestador?.sid)) {
+  //     buscarPrestador(values?.prestador.sid);
+  //   }
+  // }, [values?.prestador?.sid, setFieldValue, toast]);
 
   useEffect(() => {
     // estados da API BrasilAPI
@@ -234,13 +418,13 @@ const PrestadorForm = ({ onDocumentoValido }) => {
     setIsTyping(true);
 
     const handler = setTimeout(() => {
-      setDisplayNome(values.prestador.nome);
-      setDisplaySid(values.prestador.sid);
+      setDisplayNome(values?.prestador?.nome);
+      setDisplaySid(values?.prestador?.sid);
       setIsTyping(false);
     }, 1000);
 
     return () => clearTimeout(handler);
-  }, [values.prestador.nome, values.prestador.sid]);
+  }, [values?.prestador.nome, values?.prestador?.sid]);
 
   useEffect(() => {
     const fetchBancos = async () => {
@@ -263,19 +447,22 @@ const PrestadorForm = ({ onDocumentoValido }) => {
   }, []);
 
   useEffect(() => {
-    const pisNumerico = values.prestador.pessoaFisica?.pis?.replace(/\D/g, "");
+    const pisNumerico = values?.prestador?.pessoaFisica?.pis?.replace(
+      /\D/g,
+      ""
+    );
     if (pisNumerico && pisNumerico.length === 11) {
       verificarPIS(pisNumerico);
     }
-  }, [values.prestador.pessoaFisica?.pis]);
+  }, [values?.prestador?.pessoaFisica?.pis]);
 
   useEffect(() => {
     setCnpjValido(true);
     setCpfValido(true);
-  }, [values.prestador.tipo, setFieldValue]);
+  }, [values?.prestador?.tipo, setFieldValue]);
 
   // Determina se o prestador é Pessoa Física
-  const isPessoaFisica = values.prestador.tipo === "pf";
+  const isPessoaFisica = values?.prestador.tipo === "pf";
 
   return (
     <div>
@@ -305,6 +492,7 @@ const PrestadorForm = ({ onDocumentoValido }) => {
                 name="prestador.sid"
                 type="text"
                 mask="9999999"
+                onChange={handleSIDChange}
               />
             </div>
 
@@ -341,25 +529,26 @@ const PrestadorForm = ({ onDocumentoValido }) => {
               type="text"
               onChange={handleDocumentoChange}
               mask={
-                values.prestador.tipo === "pf"
+                values?.prestador?.tipo === "pf"
                   ? "999.999.999-99"
                   : "99.999.999/9999-99"
               }
               style={{
                 borderColor:
-                  (values.prestador.tipo === "pj" && !cnpjValido) ||
-                  (values.prestador.tipo === "pf" && !cpfValido)
+                  (!cpfValido && values?.prestador?.tipo === "pf") ||
+                  (!cnpjValido && values?.prestador?.tipo === "pj")
                     ? "red"
                     : "#ccc",
-                color:
-                  (values.prestador.tipo === "pj" && !cnpjValido) ||
-                  (values.prestador.tipo === "pf" && !cpfValido)
-                    ? "red"
-                    : "#8528CE",
               }}
             />
             <FormField label="Nome" name="prestador.nome" type="text" />
-            <FormField label="E-mail" name="prestador.email" type="email" />
+
+            <FormField
+              label="E-mail"
+              name="prestador.email"
+              type="email"
+              onChange={handleEmailChange}
+            />
           </HStack>
 
           {isPessoaFisica && (
@@ -385,7 +574,7 @@ const PrestadorForm = ({ onDocumentoValido }) => {
                 name="prestador.pessoaFisica.pis"
                 type="text"
                 mask="999.99999.99-9"
-                onChange={handlePISChange}
+                onChange={handlePisChange}
                 style={{
                   borderColor: !pisValido ? "red" : "#ccc",
                   color: !pisValido ? "red" : "#8528CE",
@@ -448,7 +637,7 @@ const PrestadorForm = ({ onDocumentoValido }) => {
               <select
                 id="prestador.endereco.estado"
                 name="prestador.endereco.estado"
-                value={values.prestador.endereco.estado}
+                value={values?.prestador?.endereco?.estado}
                 onChange={(e) => {
                   if (!isAutoUpdating) {
                     setFieldValue("prestador.endereco.estado", e.target.value);
@@ -520,7 +709,8 @@ const PrestadorForm = ({ onDocumentoValido }) => {
                   value={
                     bancos.find(
                       (option) =>
-                        option.label === values.prestador?.dadosBancarios?.banco
+                        option.label ===
+                        values?.prestador?.dadosBancarios?.banco
                     ) || null
                   }
                   onChange={handleChangeBanks}
@@ -567,6 +757,146 @@ const PrestadorForm = ({ onDocumentoValido }) => {
             />
           </HStack>
         </VStack>
+
+        <AlertDialog
+          isOpen={isOpen}
+          leastDestructiveRef={cancelRef}
+          onClose={onClose}
+        >
+          <AlertDialogOverlay>
+            <AlertDialogContent>
+              <AlertDialogHeader fontSize="lg" fontWeight="bold">
+                Prestador já cadastrado
+              </AlertDialogHeader>
+              <AlertDialogBody>
+                Este prestador já existe no sistema. Deseja carregar os dados
+                dele?
+              </AlertDialogBody>
+              <AlertDialogFooter>
+                <Button
+                  ref={cancelRef}
+                  onClick={limparDocumento}
+                  colorScheme="red"
+                >
+                  Não
+                </Button>
+                <Button
+                  colorScheme="blue"
+                  onClick={carregarDadosPrestador}
+                  ml={3}
+                >
+                  Sim
+                </Button>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialogOverlay>
+        </AlertDialog>
+
+        <AlertDialog
+          isOpen={isEmailAlertOpen}
+          onClose={() => handleEmailAlertClose()}
+        >
+          <AlertDialogOverlay>
+            <AlertDialogContent>
+              <AlertDialogHeader fontSize="lg" fontWeight="bold">
+                E-mail já cadastrado
+              </AlertDialogHeader>
+              <AlertDialogBody>
+                Este e-mail já está associado a um prestador. Deseja carregar as
+                informações dele?
+              </AlertDialogBody>
+              <AlertDialogFooter>
+                <Button
+                  onClick={() => handleEmailAlertClose(true)}
+                  colorScheme="red"
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  onClick={() => {
+                    handleLoadData(emailAlertData);
+                    handleEmailAlertClose();
+                  }}
+                  ml={3}
+                  colorScheme="blue"
+                >
+                  Carregar dados
+                </Button>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialogOverlay>
+        </AlertDialog>
+
+        <AlertDialog
+          isOpen={isSidAlertOpen}
+          leastDestructiveRef={cancelRef}
+          onClose={() => setIsSidAlertOpen(false)}
+        >
+          <AlertDialogOverlay>
+            <AlertDialogContent>
+              <AlertDialogHeader fontSize="lg" fontWeight="bold">
+                Prestador Encontrado
+              </AlertDialogHeader>
+              <AlertDialogBody>
+                Prestador já cadastrado. Deseja carregar os dados?
+              </AlertDialogBody>
+              <AlertDialogFooter>
+                <Button
+                  ref={cancelRef}
+                  onClick={() => setIsSidAlertOpen(false)}
+                  colorScheme="red"
+                >
+                  Não
+                </Button>
+                <Button
+                  colorScheme="blue"
+                  onClick={() => {
+                    handleLoadData(sidAlertData);
+                    setIsSidAlertOpen(false);
+                  }}
+                  ml={3}
+                >
+                  Sim
+                </Button>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialogOverlay>
+        </AlertDialog>
+
+        <AlertDialog
+          isOpen={isPisAlertOpen}
+          onClose={() => handlePisAlertClose()}
+        >
+          <AlertDialogOverlay>
+            <AlertDialogContent>
+              <AlertDialogHeader fontSize="lg" fontWeight="bold">
+                PIS já cadastrado
+              </AlertDialogHeader>
+              <AlertDialogBody>
+                Este PIS já está associado a um prestador. Deseja carregar as
+                informações dele?
+              </AlertDialogBody>
+              <AlertDialogFooter>
+                <Button
+                  onClick={() => handlePisAlertClose(true)}
+                  colorScheme="red"
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  onClick={() => {
+                    handleLoadPisData();
+                    handlePisAlertClose();
+                  }}
+                  colorScheme="blue"
+                  ml={3}
+                >
+                  Carregar dados
+                </Button>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialogOverlay>
+        </AlertDialog>
       </Box>
     </div>
   );

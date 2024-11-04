@@ -68,3 +68,39 @@ export const carregarPrestadorPorSid = async (sid) => {
     throw error; // Repassa o erro para que o chamador possa tratá-lo
   }
 };
+
+export const obterPrestadorPorDocumento = async (documento) => {
+  try {
+    const response = await api.get(`/prestadores/documento/${documento}`);
+    return response.data;
+  } catch (error) {
+    if (error.response && error.response.status === 404) {
+      return null;
+    }
+    throw new Error("Erro ao buscar prestador por documento.");
+  }
+};
+
+export const obterPrestadorPorEmail = async (email) => {
+  try {
+    const response = await api.get(`/prestadores/email/${email}`);
+    return response.data; 
+  } catch (error) {
+    if (error.response && error.response.status === 404) {
+      return null; 
+    }
+    throw error;
+  }
+};
+
+export const obterPrestadorPorPis = async (pis) => {
+  try {
+    const response = await api.get(`/prestadores/pis/${pis}`);
+    return response.data;
+  } catch (error) {
+    if (error.response && error.response.status === 404) {
+      return null;
+    }
+    throw error;
+  }
+};
