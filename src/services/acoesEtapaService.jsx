@@ -18,20 +18,26 @@ export const importarComissoes = async (file) => {
   }
 };
 
-export const exportarServicos = async (servicos) => {
+export const exportarServicos = async () => {
   try {
-    const response = await api.post("acoes-etapas/exportar-servicos", servicos);
-    return response.data; // Retorna os dados da resposta
+    const response = await api.get('acoes-etapas/exportar-servicos', {
+      responseType: 'blob' 
+  });
+
+  return response.data; 
   } catch (error) {
     console.error("Erro ao exportar serviços:", error);
     throw error; // Repassa o erro para que o chamador possa tratá-lo
   }
 };
 
-export const exportarPrestadores = async (prestadores) => {
+export const exportarPrestadores = async () => {
   try {
-    const response = await api.post("acoes-etapas/exportar-prestadores", prestadores);
-    return response.data; // Retorna os dados da resposta
+    const response = await api.get("acoes-etapas/exportar-prestadores", {
+      responseType: 'blob' 
+    });
+
+    return response.data; 
   } catch (error) {
     console.error("Erro ao exportar prestadores:", error);
     throw error; // Repassa o erro para que o chamador possa tratá-lo
@@ -48,10 +54,18 @@ export const importarPrestadores = async (prestadores) => {
   }
 };
 
-export const importarRPAs = async (rpas) => {
+export const importarRPAs = async (file) => {
   try {
-    const response = await api.post("acoes-etapas/importar-rpas", rpas);
-    return response.data; // Retorna os dados da resposta
+    const formData = new FormData();
+    formData.append("file", file);
+    
+
+    const response = await api.post("acoes-etapas/importar-rpas", formData, { headers: {
+      "Content-Type": "multipart/form-data",
+    }});
+
+
+    return response
   } catch (error) {
     console.error("Erro ao importar RPAs:", error);
     throw error; // Repassa o erro para que o chamador possa tratá-lo
