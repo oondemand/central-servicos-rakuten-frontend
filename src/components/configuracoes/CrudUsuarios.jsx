@@ -1,9 +1,14 @@
 // src/components/configuracoes/CrudUsuarios.js
-import React, { useEffect, useState } from 'react';
-import CrudList from './CrudList';
-import { listarUsuarios, adicionarUsuario, alterarUsuario, excluirUsuario } from '../../services/usuariosService';
-import { useToast } from '@chakra-ui/react';
-import * as Yup from 'yup';
+import React, { useEffect, useState } from "react";
+import CrudList from "./CrudList";
+import {
+  listarUsuarios,
+  adicionarUsuario,
+  alterarUsuario,
+  excluirUsuario,
+} from "../../services/usuariosService";
+import { useToast } from "@chakra-ui/react";
+import * as Yup from "yup";
 
 const CrudUsuarios = () => {
   const [usuarios, setUsuarios] = useState([]);
@@ -51,16 +56,18 @@ const CrudUsuarios = () => {
 
   const handleEdit = async (item) => {
     try {
-      // Supondo que `senha` não deve ser atualizada ao editar
       const { senha, ...rest } = item;
+
       await alterarUsuario(item._id, rest);
+
       toast({
         title: "Usuário atualizado com sucesso!",
         status: "success",
         duration: 5000,
         isClosable: true,
       });
-      fetchUsuarios();
+
+      fetchUsuarios(); 
     } catch (error) {
       toast({
         title: "Erro ao atualizar Usuário.",
@@ -96,30 +103,37 @@ const CrudUsuarios = () => {
   const formFields = [
     { label: "Nome", name: "nome", type: "text" },
     { label: "Email", name: "email", type: "email" },
-    { 
-      label: "Status", 
-      name: "status", 
+    {
+      label: "Status",
+      name: "status",
       type: "select",
       options: [
         { value: "ativo", label: "Ativo" },
         { value: "inativo", label: "Inativo" },
       ],
     },
+    { label: "Senha", name: "senha", type: "password" },
   ];
 
   const validationSchema = {
-    nome: Yup.string().required('Nome é obrigatório'),
-    email: Yup.string().email('E-mail inválido').required('E-mail é obrigatório'),
-    // Inclua validações condicionais para senha, se necessário
-    status: Yup.string().oneOf(['ativo', 'inativo'], 'Status inválido').required('Status é obrigatório'),
+    nome: Yup.string().required("Nome é obrigatório"),
+    email: Yup.string()
+      .email("E-mail inválido")
+      .required("E-mail é obrigatório"),
+    status: Yup.string()
+      .oneOf(["ativo", "inativo"], "Status inválido")
+      .required("Status é obrigatório"),
+    senha: Yup.string()
+      .min(6, "A senha deve ter pelo menos 6 caracteres")
+      .required("Senha é obrigatória ao criar um novo usuário"),
   };
 
   const initialValues = {
-    nome: '',
-    email: '',
-    senha: '', // Campo senha será opcional ao editar
-    status: 'ativo',
-    _id: '',
+    nome: "",
+    email: "",
+    senha: "", // Campo senha será opcional ao editar
+    status: "ativo",
+    _id: "",
   };
 
   return (
