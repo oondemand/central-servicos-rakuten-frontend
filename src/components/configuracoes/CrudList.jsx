@@ -1,5 +1,5 @@
 // src/components/configuracoes/CrudList.js
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useCallback } from "react";
 import {
   Box,
   Button,
@@ -32,15 +32,15 @@ const CrudList = ({
   validationSchema,
   initialValues,
 }) => {
-  const { isOpen, onOpen, onClose } = useDisclosure(); 
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const {
     isOpen: isAlertOpen,
     onOpen: onAlertOpen,
     onClose: onAlertClose,
   } = useDisclosure();
-  const cancelRef = useRef(); 
+  const cancelRef = useRef();
   const [itemToDelete, setItemToDelete] = useState(null);
-  const [isEditMode, setIsEditMode] = useState(false); 
+  const [isEditMode, setIsEditMode] = useState(false);
   const [currentValues, setCurrentValues] = useState(initialValues);
 
   const openCreateModal = () => {
@@ -77,9 +77,9 @@ const CrudList = ({
 
   const handleDelete = async () => {
     if (itemToDelete) {
-      await onDelete(itemToDelete._id); 
-      onAlertClose(); 
-      setItemToDelete(null); 
+      await onDelete(itemToDelete._id);
+      onAlertClose();
+      setItemToDelete(null);
     }
   };
 
@@ -96,6 +96,25 @@ const CrudList = ({
     }
     onClose();
   };
+
+  console.log(isEditMode);
+
+  const getValidationSchema = useCallback(() => {
+    return Yup.object({
+      nome: Yup.string().required("Nome é obrigatório"),
+      email: Yup.string()
+        .email("E-mail inválido")
+        .required("E-mail é obrigatório"),
+      status: Yup.string()
+        .oneOf(["ativo", "inativo"], "Status inválido")
+        .required("Status é obrigatório"),
+      senha: isEditMode
+        ? Yup.string() // Não é obrigatório no modo de edição
+        : Yup.string()
+            .min(6, "A senha deve ter pelo menos 6 caracteres")
+            .required("Senha é obrigatória ao criar um novo usuário"),
+    });
+  }, [isEditMode]);
 
   return (
     <Box p={6} rounded="md" shadow="md">
@@ -131,6 +150,16 @@ const CrudList = ({
                 >
                   Editar
                 </Button>
+
+                <Button
+                  size="sm"
+                  colorScheme="yellow"
+                  mr={2}
+                  isDisabled={true}
+                >
+                  Editar Senha
+                </Button>
+
                 <Button
                   size="sm"
                   colorScheme="red"
@@ -183,8 +212,9 @@ const CrudList = ({
         }
         onSubmit={handleSubmit}
         initialValues={currentValues}
-        validationSchema={validationSchema}
+        validationSchema={getValidationSchema()}
         formFields={formFields}
+        isEditMode={isEditMode}
       />
     </Box>
   );

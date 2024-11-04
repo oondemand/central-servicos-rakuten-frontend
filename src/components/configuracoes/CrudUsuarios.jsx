@@ -56,17 +56,18 @@ const CrudUsuarios = () => {
 
   const handleEdit = async (item) => {
     try {
-      const { _id, ...rest } = item;
-      const payload = item.senha ? { ...rest, senha: item.senha } : rest;
-      await alterarUsuario(_id, payload);
-      
+      const { senha, ...rest } = item;
+
+      await alterarUsuario(item._id, rest);
+
       toast({
         title: "Usuário atualizado com sucesso!",
         status: "success",
         duration: 5000,
         isClosable: true,
       });
-      fetchUsuarios();
+
+      fetchUsuarios(); 
     } catch (error) {
       toast({
         title: "Erro ao atualizar Usuário.",

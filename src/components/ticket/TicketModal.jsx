@@ -432,7 +432,6 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
       validateOnChange={false}
       onSubmit={(values, actions) => {
         actions.validateForm().then((errors) => {
-          console.log(Object.keys);
           if (Object.keys(errors).length > 0) {
             setFormHasErrors(true);
           } else {
