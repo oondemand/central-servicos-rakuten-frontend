@@ -36,7 +36,7 @@ import {
   obterPrestadorPorPis,
 } from "../../services/prestadorService";
 
-const PrestadorForm = ({ onDocumentoValido }) => {
+const PrestadorForm = ({ onUpdatePrestadorInfo, onDocumentoValido }) => {
   const { setFieldValue, values, errors, dirty, isSubmitting, setFieldError } =
     useFormikContext();
 
@@ -63,11 +63,10 @@ const PrestadorForm = ({ onDocumentoValido }) => {
   const [prestadorExistente, setPrestadorExistente] = useState(null);
   const [isEmailAlertOpen, setIsEmailAlertOpen] = useState(false);
   const [emailAlertData, setEmailAlertData] = useState(null);
-  const [sidAlertData, setSidAlertData] = useState(null);
-  const [isSidAlertOpen, setIsSidAlertOpen] = useState(false);
   const [isPisAlertOpen, setIsPisAlertOpen] = useState(false);
   const [pisAlertData, setPisAlertData] = useState(null);
   const [alertData, setAlertData] = useState(null);
+  const [documentoKey, setDocumentoKey] = useState(0);
 
   const verificarDocumento = async (documentoValue) => {
     const isCPFValido =
@@ -87,7 +86,6 @@ const PrestadorForm = ({ onDocumentoValido }) => {
     if (validationDocumentSchema) {
       try {
         const prestador = await obterPrestadorPorDocumento(documentoValue);
-        console.log(prestador);
         if (prestador) {
           setPrestadorExistente(prestador);
           onOpen();
@@ -154,31 +152,60 @@ const PrestadorForm = ({ onDocumentoValido }) => {
     );
   };
 
-  const handleDocumentoChange = (e) => {
-    const documentoValue = e.target.value.replace(/\D/g, "");
-    const currentDocument = values.prestador.documento || "";
-
-    if (documentoValue !== currentDocument) {
-      setFieldValue("prestador.documento", documentoValue);
-
-      if (
-        (values.prestador.tipo === "pf" && documentoValue.length === 11) ||
-        (values.prestador.tipo === "pj" && documentoValue.length === 14)
-      ) {
-        verificarDocumento(documentoValue);
-      }
+  const applyMask = (value, tipo) => {
+    if (tipo === "pf") {
+      return value
+        .replace(/\D/g, "")
+        .slice(0, 11)
+        .replace(/(\d{3})(\d)/, "$1.$2")
+        .replace(/(\d{3})(\d)/, "$1.$2")
+        .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+    } else if (tipo === "pj") {
+      return value
+        .replace(/\D/g, "")
+        .slice(0, 14)
+        .replace(/(\d{2})(\d)/, "$1.$2")
+        .replace(/(\d{3})(\d)/, "$1.$2")
+        .replace(/(\d{3})(\d{4})(\d)/, "$1/$2-$3");
     }
+    return value;
   };
 
-  const carregarDadosPrestador = () => {
-    if (prestadorExistente) {
-      setFieldValue("prestador", prestadorExistente);
+  const applyPisMask = (value) => {
+    return value
+      .replace(/\D/g, "")
+      .replace(/(\d{3})(\d{5})(\d{2})(\d{1})/, "$1.$2.$3-$4")
+      .slice(0, 14);
+  };
+
+  const handleDocumentoChange = (e) => {
+    const documentoValue = e.target.value;
+    const maskedValue = applyMask(documentoValue, values?.prestador?.tipo);
+
+    setFieldValue("prestador.documento", maskedValue);
+
+    if (
+      documentoValue.replace(/\D/g, "").length ===
+      (values?.prestador?.tipo === "pf" ? 11 : 14)
+    ) {
+      verificarDocumento(documentoValue.replace(/\D/g, ""));
     }
-    onClose();
   };
 
   const limparDocumento = () => {
-    // setFieldValue("prestador.documento", "");
+    setFieldValue("prestador.documento", "");
+
+    setFieldError("prestador.documento", "Documento inválido");
+
+    setTimeout(() => {
+      const hiddenButton = document.getElementById("hidden-focus-button");
+      if (hiddenButton) {
+        hiddenButton.focus();
+      } else {
+        document.activeElement.blur();
+      }
+    }, 0);
+
     onClose();
   };
 
@@ -314,32 +341,101 @@ const PrestadorForm = ({ onDocumentoValido }) => {
     }
   };
 
-  const handleSIDChange = async (e) => {
-    const sidValue = e.target.value.replace(/\D/g, "");
-    setFieldValue("prestador.sid", sidValue);
+  useEffect(() => {
+    onUpdatePrestadorInfo(displayNome, displaySid, isTyping);
+  }, [displayNome, displaySid, onUpdatePrestadorInfo]);
 
-    if (/^\d{7}$/.test(sidValue)) {
+  useEffect(() => {
+    // Função para buscar prestador pelo SID
+    const buscarPrestador = async (sid) => {
       try {
-        const prestador = await carregarPrestadorPorSid(sidValue);
-
-        console.log(prestador);
-
-        onDocumentoValido(true, prestador?.tipo);
-
+        const prestador = await carregarPrestadorPorSid(sid);
         if (prestador) {
-          setSidAlertData(prestador);
-          setIsSidAlertOpen(true);
+          setFieldValue("prestador._id", prestador._id);
+          setFieldValue("prestador.nome", prestador.nome);
+          setFieldValue("prestador.tipo", prestador.tipo);
+          setFieldValue("prestador.documento", prestador.documento);
+          setFieldValue("prestador.email", prestador.email);
+          setFieldValue("prestador.email", prestador.email);
+          setFieldValue(
+            "prestador.comentariosRevisao",
+            prestador.comentariosRevisao
+          );
+          setFieldValue("prestador.status", prestador.status);
+
+          const formattedDate = prestador.pessoaFisica?.dataNascimento
+            ? new Date(prestador.pessoaFisica.dataNascimento)
+                .toISOString()
+                .split("T")[0]
+            : "";
+
+          setFieldValue(
+            "prestador.pessoaFisica.rg.numero",
+            prestador.pessoaFisica?.rg.numero
+          );
+          setFieldValue(
+            "prestador.pessoaFisica.rg.orgaoEmissor",
+            prestador.pessoaFisica?.rg.orgaoEmissor
+          );
+          setFieldValue("prestador.pessoaFisica.dataNascimento", formattedDate);
+          setFieldValue(
+            "prestador.pessoaFisica.nomeMae",
+            prestador.pessoaFisica?.nomeMae
+          );
+
+          setFieldValue("prestador.endereco.cep", prestador.endereco?.cep);
+          setFieldValue("prestador.endereco.rua", prestador.endereco?.rua);
+          setFieldValue(
+            "prestador.endereco.numero",
+            prestador.endereco?.numero
+          );
+          setFieldValue(
+            "prestador.endereco.complemento",
+            prestador.endereco?.complemento
+          );
+          setFieldValue(
+            "prestador.endereco.cidade",
+            prestador.endereco?.cidade
+          );
+          setFieldValue(
+            "prestador.endereco.estado",
+            prestador.endereco?.estado
+          );
+
+          setFieldValue(
+            "prestador.dadosBancarios.banco",
+            prestador.dadosBancarios?.banco
+          );
+          setFieldValue(
+            "prestador.dadosBancarios.agencia",
+            prestador.dadosBancarios?.agencia
+          );
+          setFieldValue(
+            "prestador.dadosBancarios.conta",
+            prestador.dadosBancarios?.conta
+          );
+          setFieldValue(
+            "prestador.dadosBancarios.tipoConta",
+            prestador.dadosBancarios?.tipoConta
+          );
         }
       } catch (error) {
         console.error("Erro ao buscar prestador por SID:", error);
+        // toast({
+        //   title: "Verifique o SID informado",
+        //   description:
+        //     "Houve um problema ao localizar os dados do prestador para o SID informado. Verifique e tente novamente.",
+        //   status: "warning",
+        //   duration: 5000,
+        //   isClosable: true,
+        // });
       }
+    };
+    // Executa a busca quando o SID for alterado e tiver um valor válido
+    if (/^\d{7}$/.test(values?.prestador?.sid)) {
+      buscarPrestador(values?.prestador.sid);
     }
-  };
-
-  const handleCloseSidAlert = () => {
-    setIsSidAlertOpen(false);
-    setFieldValue("prestador.sid", "");
-  };
+  }, [values?.prestador?.sid, setFieldValue, toast]);
 
   useEffect(() => {
     const documentoNumerico = values?.prestador?.documento?.replace(/\D/g, "");
@@ -382,38 +478,6 @@ const PrestadorForm = ({ onDocumentoValido }) => {
       buscarCep(cepNumerico);
     }
   }, [values?.prestador?.endereco?.cep, setFieldValue]);
-
-  // useEffect(() => {
-  //   // Função para buscar prestador pelo SID
-  //   const buscarPrestador = async (sid) => {
-  //     try {
-  //       const prestador = await carregarPrestadorPorSid(sid);
-  //       if (prestador) {
-  //         // Preenchendo os campos do formulário com os dados do prestador retornado
-  //         setFieldValue("prestador._id", prestador._id);
-  //         setFieldValue("prestador.nome", prestador.nome);
-  //         setFieldValue("prestador.tipo", prestador.tipo);
-  //         setFieldValue("prestador.documento", prestador.documento);
-  //         setFieldValue("prestador.email", prestador.email);
-  //         // Adicione aqui os outros campos que devem ser preenchidos automaticamente
-  //       }
-  //     } catch (error) {
-  //       console.error("Erro ao buscar prestador por SID:", error);
-  //       // toast({
-  //       //   title: "Verifique o SID informado",
-  //       //   description:
-  //       //     "Houve um problema ao localizar os dados do prestador para o SID informado. Verifique e tente novamente.",
-  //       //   status: "warning",
-  //       //   duration: 5000,
-  //       //   isClosable: true,
-  //       // });
-  //     }
-  //   };
-  //   // Executa a busca quando o SID for alterado e tiver um valor válido
-  //   if (/^\d{7}$/.test(values?.prestador?.sid)) {
-  //     buscarPrestador(values?.prestador.sid);
-  //   }
-  // }, [values?.prestador?.sid, setFieldValue, toast]);
 
   useEffect(() => {
     // estados da API BrasilAPI
@@ -489,14 +553,14 @@ const PrestadorForm = ({ onDocumentoValido }) => {
     <div>
       <h2>
         <Box flex="1" textAlign="left" fontWeight="bold">
-          Informações do Prestador:{" "}
-          <label style={{ fontWeight: "normal", fontStyle: "italic" }}>
+          Informações
+          {/* <label style={{ fontWeight: "normal", fontStyle: "italic" }}>
             {isTyping
               ? "Carregando" + ".".repeat((Date.now() / 300) % 4)
               : `${displayNome} - SID ${
                   displaySid !== undefined ? displaySid : ""
                 }`}
-          </label>
+          </label> */}
         </Box>
       </h2>
 
@@ -513,7 +577,6 @@ const PrestadorForm = ({ onDocumentoValido }) => {
                 name="prestador.sid"
                 type="text"
                 mask="9999999"
-                onChange={handleSIDChange}
               />
             </div>
 
@@ -549,11 +612,11 @@ const PrestadorForm = ({ onDocumentoValido }) => {
               name="prestador.documento"
               type="text"
               onChange={handleDocumentoChange}
-              mask={
-                values?.prestador?.tipo === "pf"
-                  ? "999.999.999-99"
-                  : "99.999.999/9999-99"
-              }
+              // mask={
+              //   values?.prestador?.tipo === "pf"
+              //     ? "999.999.999-99"
+              //     : "99.999.999/9999-99"
+              // }
               style={{
                 borderColor:
                   (!cpfValido && values?.prestador?.tipo === "pf") ||
@@ -562,6 +625,9 @@ const PrestadorForm = ({ onDocumentoValido }) => {
                     : "#ccc",
               }}
             />
+
+            <button id="hidden-focus-button" style={{ display: "none" }} />
+
             <FormField label="Nome" name="prestador.nome" type="text" />
 
             <FormField
@@ -594,8 +660,11 @@ const PrestadorForm = ({ onDocumentoValido }) => {
                 label="PIS"
                 name="prestador.pessoaFisica.pis"
                 type="text"
-                mask="999.99999.99-9"
-                onChange={handlePisChange}
+                onChange={(e) => {
+                  const maskedValue = applyPisMask(e.target.value);
+                  setFieldValue("prestador.pessoaFisica.pis", maskedValue);
+                  handlePisChange(maskedValue);
+                }}
                 style={{
                   borderColor: !pisValido ? "red" : "#ccc",
                   color: !pisValido ? "red" : "#8528CE",
@@ -852,42 +921,6 @@ const PrestadorForm = ({ onDocumentoValido }) => {
         </AlertDialog>
 
         <AlertDialog
-          isOpen={isSidAlertOpen}
-          leastDestructiveRef={cancelRef}
-          onClose={() => setIsSidAlertOpen(false)}
-        >
-          <AlertDialogOverlay>
-            <AlertDialogContent>
-              <AlertDialogHeader fontSize="lg" fontWeight="bold">
-                Prestador Encontrado
-              </AlertDialogHeader>
-              <AlertDialogBody>
-                Prestador já cadastrado. Deseja carregar os dados?
-              </AlertDialogBody>
-              <AlertDialogFooter>
-                <Button
-                  ref={cancelRef}
-                  onClick={() => setIsSidAlertOpen(false)}
-                  colorScheme="red"
-                >
-                  Não
-                </Button>
-                <Button
-                  colorScheme="blue"
-                  onClick={() => {
-                    handleLoadData(sidAlertData);
-                    setIsSidAlertOpen(false);
-                  }}
-                  ml={3}
-                >
-                  Sim
-                </Button>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialogOverlay>
-        </AlertDialog>
-
-        <AlertDialog
           isOpen={isPisAlertOpen}
           onClose={() => handlePisAlertClose()}
         >
@@ -909,7 +942,7 @@ const PrestadorForm = ({ onDocumentoValido }) => {
                 </Button>
                 <Button
                   onClick={() => {
-                    handleLoadPisData();
+                    handleLoadData(pisAlertData);
                     handlePisAlertClose();
                   }}
                   colorScheme="blue"

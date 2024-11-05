@@ -26,6 +26,7 @@ import {
   AccordionButton,
   AccordionPanel,
   AccordionIcon,
+  Text,
 } from "@chakra-ui/react";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
@@ -77,6 +78,10 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
   const [cpfValido, setCpfValido] = useState(null);
   const [formHasErrors, setFormHasErrors] = useState(false);
   const [valeuArrayService, setValeuArrayService] = useState(false);
+  const [displayNome, setDisplayNome] = useState("");
+  const [displaySid, setDisplaySid] = useState("");
+  const [isTyping, setIsTyping] = useState(false);
+  const [somaTotalServicos, setSomaTotalServicos] = useState(0);
 
   // Referências para os AlertDialogs
   const cancelRefFechar = useRef();
@@ -160,6 +165,16 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
 
     return initValues;
   }, [ticket]);
+
+  const handleUpdatePrestadorInfo = (nome, sid, isTyping) => {
+    setDisplayNome(nome);
+    setDisplaySid(sid);
+    setIsTyping(isTyping);
+  };
+
+  const handleSomaTotalChange = (soma) => {
+    setSomaTotalServicos(soma); // Atualiza a soma total sempre que ServicoForm calcula um novo valor
+  };
 
   // Handler de submissão
   const handleSubmit = async (values, { setSubmitting, setErrors }) => {
@@ -282,7 +297,7 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
 
   // Funções para abrir os diálogos de confirmação
   const abrirConfirmarFechar = (formik) => {
-    console.log('entrou')
+    console.log("entrou");
     if (formik !== undefined) {
       const formAlterado =
         formik.values.titulo !== formik.initialValues.titulo ||
@@ -375,7 +390,11 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
   };
 
   const verificarAlteracoesServicos = (servicosAtuais, servicosIniciais) => {
-    if (servicosAtuais.length === servicosIniciais.length || servicosIniciais === undefined) return false;
+    if (
+      servicosAtuais.length === servicosIniciais.length ||
+      servicosIniciais === undefined
+    )
+      return false;
 
     for (let i = 0; i < servicosAtuais.length; i++) {
       const servicoAtual = servicosAtuais[i];
@@ -399,14 +418,6 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
     }
 
     return false;
-  };
-
-  const abrirConfirmarRemoverPrestador = (formik) => {
-    setConfirmacao((prev) => ({ ...prev, removerPrestador: true }));
-  };
-
-  const abrirConfirmarRemoverServico = (formik) => {
-    setConfirmacao((prev) => ({ ...prev, removerServico: true }));
   };
 
   // Funções para confirmar as ações
@@ -506,8 +517,8 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
                         allowMultiple
                         mt={4}
                         defaultIndex={[
-                          mostrarPrestador ? 0 : -1, // Abre o primeiro item se mostrarPrestador for true
-                          mostrarServico ? 1 : -1, // Abre o segundo item se mostrarServico for true
+                          mostrarPrestador ? 0 : -1,
+                          mostrarServico ? 1 : -1,
                         ]}
                       >
                         {/* Accordion para Prestador */}
@@ -527,10 +538,23 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
                                 flex="1"
                                 textAlign="left"
                                 color="#3D1C4F"
-                                fontWeight={500}
                                 fontSize="17px"
                               >
-                                Prestador
+                                <Text fontWeight="bold" fontSize="lg">
+                                  Prestador
+                                </Text>
+                                {(displayNome || displaySid) && (
+                                  <Text
+                                    fontWeight="semibold"
+                                    fontSize="md"
+                                    color="green.600"
+                                    mt={1}
+                                  >
+                                    {displayNome && `${displayNome}`}
+                                    {displayNome && displaySid && " | "}
+                                    {displaySid && `SID: ${displaySid}`}
+                                  </Text>
+                                )}
                               </Box>
                               <AccordionIcon />
                             </AccordionButton>
@@ -543,6 +567,9 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
                               <Box mt={4}>
                                 <PrestadorForm
                                   onDocumentoValido={handleDocumentoValido}
+                                  onUpdatePrestadorInfo={
+                                    handleUpdatePrestadorInfo
+                                  }
                                 />
                               </Box>
                             )}
@@ -564,10 +591,19 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
                                 flex="1"
                                 textAlign="left"
                                 color="#3D1C4F"
-                                fontWeight={500}
                                 fontSize="17px"
                               >
-                                Serviço
+                                <Text fontWeight="bold" fontSize="lg">
+                                  Serviço
+                                </Text>
+                                <Text
+                                  fontWeight="semibold"
+                                  fontSize="md"
+                                  color="green.600"
+                                  mt={1}
+                                >
+                                  Total: R$ {somaTotalServicos.toFixed(2)}
+                                </Text>
                               </Box>
                               <AccordionIcon />
                             </AccordionButton>
@@ -580,6 +616,7 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
                               <Box mt={4}>
                                 <ServicoForm
                                   setValeuArrayService={setValeuArrayService}
+                                  onSomaTotalChange={handleSomaTotalChange}
                                 />
                               </Box>
                             )}
