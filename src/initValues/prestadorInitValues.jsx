@@ -4,6 +4,7 @@ export const prestadorInitValues = {
   tipo: 'pf',
   documento: '',
   email: '',
+  sid: '',
   status: 'ativo',
   comentariosRevisao: '',
   endereco: { 

@@ -94,6 +94,7 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
     if (mostrarPrestador) {
       schema = schema.shape({
         prestador: prestadorValidationSchema.shape({
+          sid: Yup.string().required("SID é obrigatório"),
           documento: Yup.string()
             .required("Documento é obrigatório")
             .test("documento-valido", "Documento inválido", function () {
