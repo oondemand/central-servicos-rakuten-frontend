@@ -282,6 +282,7 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
 
   // Funções para abrir os diálogos de confirmação
   const abrirConfirmarFechar = (formik) => {
+    console.log('entrou')
     if (formik !== undefined) {
       const formAlterado =
         formik.values.titulo !== formik.initialValues.titulo ||
@@ -374,24 +375,24 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
   };
 
   const verificarAlteracoesServicos = (servicosAtuais, servicosIniciais) => {
-    if (servicosAtuais.length === servicosIniciais.length) return false;
+    if (servicosAtuais.length === servicosIniciais.length || servicosIniciais === undefined) return false;
 
     for (let i = 0; i < servicosAtuais.length; i++) {
       const servicoAtual = servicosAtuais[i];
       const servicoInicial = servicosIniciais[i];
 
       if (
-        servicoAtual.mesCompetencia !== servicoInicial.mesCompetencia ||
-        servicoAtual.anoCompetencia !== servicoInicial.anoCompetencia ||
-        servicoAtual.valorPrincipal !== servicoInicial.valorPrincipal ||
-        servicoAtual.valorBonus !== servicoInicial.valorBonus ||
-        servicoAtual.valorAjusteComercial !==
-          servicoInicial.valorAjusteComercial ||
+        servicoAtual?.mesCompetencia !== servicoInicial?.mesCompetencia ||
+        servicoAtual?.anoCompetencia !== servicoInicial?.anoCompetencia ||
+        servicoAtual?.valorPrincipal !== servicoInicial?.valorPrincipal ||
+        servicoAtual?.valorBonus !== servicoInicial?.valorBonus ||
+        servicoAtual?.valorAjusteComercial !==
+          servicoInicial?.valorAjusteComercial ||
         servicoAtual.valorHospedagemAnuncio !==
-          servicoInicial.valorHospedagemAnuncio ||
-        servicoAtual.valorTotal == servicoInicial.valorTotal ||
-        servicoAtual.status !== servicoInicial.status ||
-        servicoAtual.correcao !== servicoInicial.correcao
+          servicoInicial?.valorHospedagemAnuncio ||
+        servicoAtual?.valorTotal == servicoInicial?.valorTotal ||
+        servicoAtual?.status !== servicoInicial?.status ||
+        servicoAtual?.correcao !== servicoInicial?.correcao
       ) {
         return true;
       }

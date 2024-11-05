@@ -87,9 +87,10 @@ const PrestadorForm = ({ onDocumentoValido }) => {
     if (validationDocumentSchema) {
       try {
         const prestador = await obterPrestadorPorDocumento(documentoValue);
+        console.log(prestador);
         if (prestador) {
           setPrestadorExistente(prestador);
-          onOpen(); // Abre o AlertDialog
+          onOpen();
         }
       } catch (error) {
         console.error("Erro ao verificar documento:", error);
@@ -177,7 +178,7 @@ const PrestadorForm = ({ onDocumentoValido }) => {
   };
 
   const limparDocumento = () => {
-    setFieldValue("prestador.documento", "");
+    // setFieldValue("prestador.documento", "");
     onClose();
   };
 
@@ -255,6 +256,12 @@ const PrestadorForm = ({ onDocumentoValido }) => {
       );
       setFieldValue("prestador.status", prestadorData.status);
 
+      const formattedDate = prestadorData.pessoaFisica?.dataNascimento
+        ? new Date(prestadorData.pessoaFisica.dataNascimento)
+            .toISOString()
+            .split("T")[0]
+        : "";
+
       setFieldValue(
         "prestador.pessoaFisica.rg.numero",
         prestadorData.pessoaFisica?.rg.numero
@@ -263,10 +270,7 @@ const PrestadorForm = ({ onDocumentoValido }) => {
         "prestador.pessoaFisica.rg.orgaoEmissor",
         prestadorData.pessoaFisica?.rg.orgaoEmissor
       );
-      setFieldValue(
-        "prestador.pessoaFisica.dataNascimento",
-        prestadorData.pessoaFisica?.dataNascimento
-      );
+      setFieldValue("prestador.pessoaFisica.dataNascimento", formattedDate);
       setFieldValue(
         "prestador.pessoaFisica.nomeMae",
         prestadorData.pessoaFisica?.nomeMae
@@ -289,6 +293,23 @@ const PrestadorForm = ({ onDocumentoValido }) => {
       setFieldValue(
         "prestador.endereco.estado",
         prestadorData.endereco?.estado
+      );
+
+      setFieldValue(
+        "prestador.dadosBancarios.banco",
+        prestadorData.dadosBancarios?.banco
+      );
+      setFieldValue(
+        "prestador.dadosBancarios.agencia",
+        prestadorData.dadosBancarios?.agencia
+      );
+      setFieldValue(
+        "prestador.dadosBancarios.conta",
+        prestadorData.dadosBancarios?.conta
+      );
+      setFieldValue(
+        "prestador.dadosBancarios.tipoConta",
+        prestadorData.dadosBancarios?.tipoConta
       );
     }
   };
@@ -782,7 +803,10 @@ const PrestadorForm = ({ onDocumentoValido }) => {
                 </Button>
                 <Button
                   colorScheme="blue"
-                  onClick={carregarDadosPrestador}
+                  onClick={() => {
+                    handleLoadData(prestadorExistente);
+                    onClose();
+                  }}
                   ml={3}
                 >
                   Sim
