@@ -186,7 +186,7 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
       let prestadorId = null;
       let servicosIds = [];
 
-      if (mostrarPrestador && values.prestador) {
+      if (mostrarPrestador || values.prestador) {
         const documentoLimpo = values.prestador.documento
           ? values.prestador.documento.replace(/[^\d]/g, "")
           : "";
@@ -221,7 +221,7 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
         }
       }
 
-      if (mostrarServico && values.servicos.length > 0) {
+      if (mostrarServico || values.servicos.length > 0) {
         for (let i = 0; i < values.servicos.length; i++) {
           const servico = values.servicos[i];
           if (servico) {
