@@ -298,7 +298,6 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
 
   // Funções para abrir os diálogos de confirmação
   const abrirConfirmarFechar = (formik) => {
-    console.log("entrou");
     if (formik !== undefined) {
       const formAlterado =
         formik.values.titulo !== formik.initialValues.titulo ||

@@ -86,6 +86,7 @@ const PrestadorForm = ({ onUpdatePrestadorInfo, onDocumentoValido }) => {
     if (validationDocumentSchema) {
       try {
         const prestador = await obterPrestadorPorDocumento(documentoValue);
+        console.log(prestador)
         if (prestador) {
           setPrestadorExistente(prestador);
           onOpen();
@@ -284,18 +285,18 @@ const PrestadorForm = ({ onUpdatePrestadorInfo, onDocumentoValido }) => {
       setFieldValue("prestador.status", prestadorData.status);
 
       const formattedDate = prestadorData.pessoaFisica?.dataNascimento
-        ? new Date(prestadorData.pessoaFisica.dataNascimento)
+        ? new Date(prestadorData.pessoaFisica?.dataNascimento)
             .toISOString()
             .split("T")[0]
         : "";
 
       setFieldValue(
         "prestador.pessoaFisica.rg.numero",
-        prestadorData.pessoaFisica?.rg.numero
+        prestadorData.pessoaFisica?.rg?.numero
       );
       setFieldValue(
         "prestador.pessoaFisica.rg.orgaoEmissor",
-        prestadorData.pessoaFisica?.rg.orgaoEmissor
+        prestadorData.pessoaFisica?.rg?.orgaoEmissor
       );
       setFieldValue("prestador.pessoaFisica.dataNascimento", formattedDate);
       setFieldValue(
@@ -850,7 +851,6 @@ const PrestadorForm = ({ onUpdatePrestadorInfo, onDocumentoValido }) => {
 
         <AlertDialog
           isOpen={isOpen}
-          leastDestructiveRef={cancelRef}
           onClose={onClose}
         >
           <AlertDialogOverlay>
@@ -864,7 +864,6 @@ const PrestadorForm = ({ onUpdatePrestadorInfo, onDocumentoValido }) => {
               </AlertDialogBody>
               <AlertDialogFooter>
                 <Button
-                  ref={cancelRef}
                   onClick={limparDocumento}
                   colorScheme="red"
                 >
