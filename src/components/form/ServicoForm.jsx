@@ -21,7 +21,7 @@ import { FieldArray, useFormikContext } from "formik";
 import FormFieldTooltip from "../common/FormFildTooltip";
 import FormField from "../common/FormField";
 
-const ServicoForm = ({ setValeuArrayService }) => {
+const ServicoForm = ({ setValeuArrayService, onSomaTotalChange }) => {
   const [showErrorTooltip, setShowErrorTooltip] = useState(false);
   const { values, setFieldValue } = useFormikContext();
 
@@ -44,10 +44,12 @@ const ServicoForm = ({ setValeuArrayService }) => {
   };
 
   const calcularSomaTotal = () => {
-    return values.servicos.reduce(
+    const somaTotal = values.servicos.reduce(
       (soma, servico) => soma + (parseFloat(servico.valorTotal) || 0),
       0
     );
+    onSomaTotalChange(somaTotal); 
+    return somaTotal;
   };
 
   useEffect(() => {
@@ -302,7 +304,7 @@ const ServicoForm = ({ setValeuArrayService }) => {
                   correcao: false,
                   status: "ativo",
                 }),
-                setValeuArrayService(true);
+                  setValeuArrayService(true);
               }}
             >
               Adicionar Serviço

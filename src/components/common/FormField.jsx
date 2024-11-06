@@ -14,7 +14,6 @@ import CustomSelect from "./CustomSelect";
 const FormField = ({ label, name, type = "text", options = [], mask, ...props }) => {
   const { touched, errors } = useFormikContext();
 
-  // Desestrutura maxLength para removê-lo quando uma máscara estiver presente
   const { maxLength, ...restProps } = props;
 
   const isInvalid = getIn(touched, name) && getIn(errors, name);
