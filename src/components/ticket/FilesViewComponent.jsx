@@ -18,6 +18,7 @@ import React, { useState } from "react";
 
 import { DeleteIcon, DownloadIcon } from "@chakra-ui/icons";
 import { useTicket } from "../../contexts/TicketContext";
+import {downloadFileFromTicket} from "../../services/ticketService"
 
 export const FilesViewComponent = () => {
   const { removerArquivoDoTicket } = useTicket();
@@ -42,6 +43,12 @@ export const FilesViewComponent = () => {
     }
   };
 
+  const handleDownloadFileFromTicket = async (e) =>{
+    const file = await downloadFileFromTicket(e.path)
+    const blob = new Blob([file], { type: e.mimetype });
+    saveAs(blob, e.nomeOriginal);
+  }
+
   if (values.length === 0) return;
 
   return (
@@ -54,18 +61,12 @@ export const FilesViewComponent = () => {
 
       {values.arquivos.map((e, i) => {
         return (
-          <Flex key={e._id} justify="space-between" align="center">
+          <Flex key={e._id} mb={2} justify="space-between" align="center">
             <Text>{e.nomeOriginal}</Text>
             <Flex gap={2} align="center">
-              <a
-                href={`${import.meta.env.VITE_API_URL}/${e.path}`}
-                download={e.nomeOriginal}
-              >
-                <IconButton size="xs" colorScheme="green">
-                  <DownloadIcon />
-                </IconButton>
-              </a>
-
+              <IconButton  onClick={() => {handleDownloadFileFromTicket(e)}} size="xs" colorScheme="green">
+                <DownloadIcon />
+              </IconButton>
               <IconButton
                 size="xs"
                 colorScheme="red"
