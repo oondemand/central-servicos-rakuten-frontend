@@ -3,7 +3,7 @@ import React, { Suspense, lazy } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { Spinner } from "@chakra-ui/react";
 import ErrorBoundary from "./components/common/ErrorBoundary";
-import Layout from "./components/layout/Layout";
+import Layout from "./components/Layout/Layout";
 import PrivateRoute from "./components/PrivateRoute";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ToastContainer } from "react-toastify";
