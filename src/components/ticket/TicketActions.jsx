@@ -43,7 +43,6 @@ const TicketActions = ({
     const hasErrors = Object.keys(errors).length > 0;
 
     if (hasErrors) {
-      console.log(errors.prestador)
       if (errors.prestador) {
         abrirPainelPrestador(); 
       }

@@ -21,7 +21,11 @@ import { FieldArray, useFormikContext } from "formik";
 import FormFieldTooltip from "../common/FormFildTooltip";
 import FormField from "../common/FormField";
 
-const ServicoForm = ({ setValeuArrayService, onSomaTotalChange }) => {
+const ServicoForm = ({
+  setValeuArrayService,
+  onSomaTotalChange,
+  mostrarServico,
+}) => {
   const [showErrorTooltip, setShowErrorTooltip] = useState(false);
   const { values, setFieldValue } = useFormikContext();
 
@@ -48,7 +52,7 @@ const ServicoForm = ({ setValeuArrayService, onSomaTotalChange }) => {
       (soma, servico) => soma + (parseFloat(servico.valorTotal) || 0),
       0
     );
-    onSomaTotalChange(somaTotal); 
+    onSomaTotalChange(somaTotal);
     return somaTotal;
   };
 

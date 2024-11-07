@@ -67,6 +67,7 @@ const PrestadorForm = ({ onUpdatePrestadorInfo, onDocumentoValido }) => {
   const [pisAlertData, setPisAlertData] = useState(null);
   const [alertData, setAlertData] = useState(null);
   const [documentoKey, setDocumentoKey] = useState(0);
+  const [sidJaBuscado, setSidJaBuscado] = useState(false);
 
   const verificarDocumento = async (documentoValue) => {
     const isCPFValido =
@@ -86,7 +87,6 @@ const PrestadorForm = ({ onUpdatePrestadorInfo, onDocumentoValido }) => {
     if (validationDocumentSchema) {
       try {
         const prestador = await obterPrestadorPorDocumento(documentoValue);
-        console.log(prestador);
         if (prestador) {
           setPrestadorExistente(prestador);
           onOpen();
@@ -236,7 +236,6 @@ const PrestadorForm = ({ onUpdatePrestadorInfo, onDocumentoValido }) => {
       if (email && /\S+@\S+\.\S+/.test(email)) {
         try {
           const emailPrestador = await obterPrestadorPorEmail(email);
-          console.log(emailPrestador);
           if (emailPrestador) {
             setEmailAlertData(emailPrestador);
             setIsEmailAlertOpen(true);
@@ -347,7 +346,7 @@ const PrestadorForm = ({ onUpdatePrestadorInfo, onDocumentoValido }) => {
   }, [displayNome, displaySid, onUpdatePrestadorInfo]);
 
   useEffect(() => {
-    // Função para buscar prestador pelo SID
+    // Funcao para buscar prestador pelo SID
     const buscarPrestador = async (sid) => {
       try {
         const prestador = await carregarPrestadorPorSid(sid);
@@ -425,16 +424,34 @@ const PrestadorForm = ({ onUpdatePrestadorInfo, onDocumentoValido }) => {
               ? isCPF(prestador.documento)
               : isCNPJ(prestador.documento);
           onDocumentoValido(isDocumentoValido, prestador.tipo);
+
+          toast({
+            title: "Prestador Carregado",
+            description: `Prestador ${prestador.nome}, com SID ${prestador.sid}.`,
+            status: "success",
+            duration: 5000,
+            isClosable: true,
+          });
         }
       } catch (error) {
-        console.error("Erro ao buscar prestador por SID:", error);
       }
     };
- 
-    if (/^\d{7}$/.test(values?.prestador?.sid)) {
+
+    if (/^\d{7}$/.test(values?.prestador?.sid) && !sidJaBuscado) {
       buscarPrestador(values?.prestador.sid);
+      setSidJaBuscado(true);
     }
-  }, [values?.prestador?.sid, setFieldValue, toast]);
+
+    if (!/^\d{7}$/.test(values?.prestador?.sid)) {
+      setSidJaBuscado(false);
+    }
+  }, [
+    values?.prestador?.sid,
+    setFieldValue,
+    onDocumentoValido,
+    toast,
+    sidJaBuscado,
+  ]);
 
   useEffect(() => {
     const documentoNumerico = values?.prestador?.documento?.replace(/\D/g, "");

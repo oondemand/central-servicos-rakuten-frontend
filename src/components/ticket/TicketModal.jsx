@@ -1,5 +1,5 @@
 // src/components/ticket/TicketModal.js
-import React, { useMemo, useState, useRef } from "react";
+import React, { useMemo, useState, useRef, useEffect } from "react";
 import _ from "lodash";
 import { motion } from "framer-motion";
 import {
@@ -28,7 +28,7 @@ import {
   AccordionIcon,
   Text,
 } from "@chakra-ui/react";
-import { Formik, Form } from "formik";
+import { Formik, Form, useFormikContext } from "formik";
 import * as Yup from "yup";
 
 import { useBaseOmie } from "../../contexts/BaseOmieContext";
@@ -168,7 +168,7 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
   }, [ticket]);
 
   const abrirPainelPrestador = () => {
-    if(!mostrarPrestador) {
+    if (!mostrarPrestador) {
       setMostrarPrestador(true);
     }
   };
@@ -180,7 +180,7 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
   };
 
   const handleSomaTotalChange = (soma) => {
-    setSomaTotalServicos(soma); 
+    setSomaTotalServicos(soma);
   };
 
   // Handler de submissão
@@ -621,6 +621,7 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
                             {mostrarServico && (
                               <Box mt={4}>
                                 <ServicoForm
+                                  mostrarServico={mostrarServico}
                                   setValeuArrayService={setValeuArrayService}
                                   onSomaTotalChange={handleSomaTotalChange}
                                 />
