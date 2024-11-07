@@ -86,7 +86,7 @@ const PrestadorForm = ({ onUpdatePrestadorInfo, onDocumentoValido }) => {
     if (validationDocumentSchema) {
       try {
         const prestador = await obterPrestadorPorDocumento(documentoValue);
-        console.log(prestador)
+        console.log(prestador);
         if (prestador) {
           setPrestadorExistente(prestador);
           onOpen();
@@ -354,9 +354,9 @@ const PrestadorForm = ({ onUpdatePrestadorInfo, onDocumentoValido }) => {
         if (prestador) {
           setFieldValue("prestador._id", prestador._id);
           setFieldValue("prestador.nome", prestador.nome);
+          setFieldValue("prestador.sid", prestador.sid);
           setFieldValue("prestador.tipo", prestador.tipo);
           setFieldValue("prestador.documento", prestador.documento);
-          setFieldValue("prestador.email", prestador.email);
           setFieldValue("prestador.email", prestador.email);
           setFieldValue(
             "prestador.comentariosRevisao",
@@ -372,11 +372,11 @@ const PrestadorForm = ({ onUpdatePrestadorInfo, onDocumentoValido }) => {
 
           setFieldValue(
             "prestador.pessoaFisica.rg.numero",
-            prestador.pessoaFisica?.rg.numero
+            prestador.pessoaFisica?.rg?.numero
           );
           setFieldValue(
             "prestador.pessoaFisica.rg.orgaoEmissor",
-            prestador.pessoaFisica?.rg.orgaoEmissor
+            prestador.pessoaFisica?.rg?.orgaoEmissor
           );
           setFieldValue("prestador.pessoaFisica.dataNascimento", formattedDate);
           setFieldValue(
@@ -419,20 +419,18 @@ const PrestadorForm = ({ onUpdatePrestadorInfo, onDocumentoValido }) => {
             "prestador.dadosBancarios.tipoConta",
             prestador.dadosBancarios?.tipoConta
           );
+
+          const isDocumentoValido =
+            prestador.tipo === "pf"
+              ? isCPF(prestador.documento)
+              : isCNPJ(prestador.documento);
+          onDocumentoValido(isDocumentoValido, prestador.tipo);
         }
       } catch (error) {
         console.error("Erro ao buscar prestador por SID:", error);
-        // toast({
-        //   title: "Verifique o SID informado",
-        //   description:
-        //     "Houve um problema ao localizar os dados do prestador para o SID informado. Verifique e tente novamente.",
-        //   status: "warning",
-        //   duration: 5000,
-        //   isClosable: true,
-        // });
       }
     };
-    // Executa a busca quando o SID for alterado e tiver um valor válido
+ 
     if (/^\d{7}$/.test(values?.prestador?.sid)) {
       buscarPrestador(values?.prestador.sid);
     }
@@ -849,10 +847,7 @@ const PrestadorForm = ({ onUpdatePrestadorInfo, onDocumentoValido }) => {
           </HStack>
         </VStack>
 
-        <AlertDialog
-          isOpen={isOpen}
-          onClose={onClose}
-        >
+        <AlertDialog isOpen={isOpen} onClose={onClose}>
           <AlertDialogOverlay>
             <AlertDialogContent>
               <AlertDialogHeader fontSize="lg" fontWeight="bold">
@@ -863,10 +858,7 @@ const PrestadorForm = ({ onUpdatePrestadorInfo, onDocumentoValido }) => {
                 dele?
               </AlertDialogBody>
               <AlertDialogFooter>
-                <Button
-                  onClick={limparDocumento}
-                  colorScheme="red"
-                >
+                <Button onClick={limparDocumento} colorScheme="red">
                   Não
                 </Button>
                 <Button

@@ -19,6 +19,7 @@ import { useFormikContext } from "formik";
 import { useTicket } from "../../contexts/TicketContext";
 
 const TicketActions = ({
+  abrirPainelPrestador,
   ticket,
   isEditMode,
   closeModal,
@@ -42,6 +43,10 @@ const TicketActions = ({
     const hasErrors = Object.keys(errors).length > 0;
 
     if (hasErrors) {
+      console.log(errors.prestador)
+      if (errors.prestador) {
+        abrirPainelPrestador(); 
+      }
       setShowTooltip(true);
       setTimeout(() => setShowTooltip(false), 3000);
     } else {
