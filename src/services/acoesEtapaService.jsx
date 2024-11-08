@@ -1,13 +1,12 @@
 // src/services/PrestadorService.js
 import api from "./api";
 
-export const importarComissoes = async ({file,competencia}) => {
-  // formato da competencia MMyyyy ex: 122022 referente: dia/12/2022
+export const importarComissoes = async ({file,mes, ano}) => {
   try {
     const formData = new FormData();
     formData.append("file", file, file.name);
 
-    api.post(`acoes-etapas/importar-comissoes?competencia=${competencia}`, formData, {
+    api.post(`acoes-etapas/importar-comissoes?mes=${mes}&ano=${ano}`, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },

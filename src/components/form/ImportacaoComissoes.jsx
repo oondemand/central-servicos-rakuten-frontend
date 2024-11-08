@@ -43,7 +43,8 @@ const ImportacaoComissoes = () => {
 
     await importarComissoes({
       file: inputFileRef.current.files[0],
-      competencia: `${values.mes}${values.ano}`,
+      mes: values.mes,
+      ano: values.ano
     });
 
     toast({
