@@ -36,7 +36,11 @@ import {
   obterPrestadorPorPis,
 } from "../../services/prestadorService";
 
-const PrestadorForm = ({ onUpdatePrestadorInfo, onDocumentoValido }) => {
+const PrestadorForm = ({
+  onUpdatePrestadorInfo,
+  onDocumentoValido,
+  ticket,
+}) => {
   const { setFieldValue, values, errors, dirty, isSubmitting, setFieldError } =
     useFormikContext();
 
@@ -345,113 +349,113 @@ const PrestadorForm = ({ onUpdatePrestadorInfo, onDocumentoValido }) => {
     onUpdatePrestadorInfo(displayNome, displaySid, isTyping);
   }, [displayNome, displaySid, onUpdatePrestadorInfo]);
 
-  useEffect(() => {
-    // Funcao para buscar prestador pelo SID
-    const buscarPrestador = async (sid) => {
-      try {
-        const prestador = await carregarPrestadorPorSid(sid);
-        if (prestador) {
-          setFieldValue("prestador._id", prestador._id);
-          setFieldValue("prestador.nome", prestador.nome);
-          setFieldValue("prestador.sid", prestador.sid);
-          setFieldValue("prestador.tipo", prestador.tipo);
-          setFieldValue("prestador.documento", prestador.documento);
-          setFieldValue("prestador.email", prestador.email);
-          setFieldValue(
-            "prestador.comentariosRevisao",
-            prestador.comentariosRevisao
-          );
-          setFieldValue("prestador.status", prestador.status);
+  useEffect(
+    () => {
+      // Funcao para buscar prestador pelo SID
+      const buscarPrestador = async (sid) => {
+        try {
+          const prestador = await carregarPrestadorPorSid(sid);
+          if (prestador) {
+            setFieldValue("prestador._id", prestador._id);
+            setFieldValue("prestador.nome", prestador.nome);
+            setFieldValue("prestador.sid", prestador.sid);
+            setFieldValue("prestador.tipo", prestador.tipo);
+            setFieldValue("prestador.documento", prestador.documento);
+            setFieldValue("prestador.email", prestador.email);
+            setFieldValue(
+              "prestador.comentariosRevisao",
+              prestador.comentariosRevisao
+            );
+            setFieldValue("prestador.status", prestador.status);
 
-          const formattedDate = prestador.pessoaFisica?.dataNascimento
-            ? new Date(prestador.pessoaFisica.dataNascimento)
-                .toISOString()
-                .split("T")[0]
-            : "";
+            const formattedDate = prestador.pessoaFisica?.dataNascimento
+              ? new Date(prestador.pessoaFisica.dataNascimento)
+                  .toISOString()
+                  .split("T")[0]
+              : "";
 
-          setFieldValue(
-            "prestador.pessoaFisica.rg.numero",
-            prestador.pessoaFisica?.rg?.numero
-          );
-          setFieldValue(
-            "prestador.pessoaFisica.rg.orgaoEmissor",
-            prestador.pessoaFisica?.rg?.orgaoEmissor
-          );
-          setFieldValue("prestador.pessoaFisica.dataNascimento", formattedDate);
-          setFieldValue(
-            "prestador.pessoaFisica.nomeMae",
-            prestador.pessoaFisica?.nomeMae
-          );
+            setFieldValue(
+              "prestador.pessoaFisica.rg.numero",
+              prestador.pessoaFisica?.rg?.numero
+            );
+            setFieldValue(
+              "prestador.pessoaFisica.rg.orgaoEmissor",
+              prestador.pessoaFisica?.rg?.orgaoEmissor
+            );
+            setFieldValue(
+              "prestador.pessoaFisica.dataNascimento",
+              formattedDate
+            );
+            setFieldValue(
+              "prestador.pessoaFisica.nomeMae",
+              prestador.pessoaFisica?.nomeMae
+            );
 
-          setFieldValue("prestador.endereco.cep", prestador.endereco?.cep);
-          setFieldValue("prestador.endereco.rua", prestador.endereco?.rua);
-          setFieldValue(
-            "prestador.endereco.numero",
-            prestador.endereco?.numero
-          );
-          setFieldValue(
-            "prestador.endereco.complemento",
-            prestador.endereco?.complemento
-          );
-          setFieldValue(
-            "prestador.endereco.cidade",
-            prestador.endereco?.cidade
-          );
-          setFieldValue(
-            "prestador.endereco.estado",
-            prestador.endereco?.estado
-          );
+            setFieldValue("prestador.endereco.cep", prestador.endereco?.cep);
+            setFieldValue("prestador.endereco.rua", prestador.endereco?.rua);
+            setFieldValue(
+              "prestador.endereco.numero",
+              prestador.endereco?.numero
+            );
+            setFieldValue(
+              "prestador.endereco.complemento",
+              prestador.endereco?.complemento
+            );
+            setFieldValue(
+              "prestador.endereco.cidade",
+              prestador.endereco?.cidade
+            );
+            setFieldValue(
+              "prestador.endereco.estado",
+              prestador.endereco?.estado
+            );
 
-          setFieldValue(
-            "prestador.dadosBancarios.banco",
-            prestador.dadosBancarios?.banco
-          );
-          setFieldValue(
-            "prestador.dadosBancarios.agencia",
-            prestador.dadosBancarios?.agencia
-          );
-          setFieldValue(
-            "prestador.dadosBancarios.conta",
-            prestador.dadosBancarios?.conta
-          );
-          setFieldValue(
-            "prestador.dadosBancarios.tipoConta",
-            prestador.dadosBancarios?.tipoConta
-          );
+            setFieldValue(
+              "prestador.dadosBancarios.banco",
+              prestador.dadosBancarios?.banco
+            );
+            setFieldValue(
+              "prestador.dadosBancarios.agencia",
+              prestador.dadosBancarios?.agencia
+            );
+            setFieldValue(
+              "prestador.dadosBancarios.conta",
+              prestador.dadosBancarios?.conta
+            );
+            setFieldValue(
+              "prestador.dadosBancarios.tipoConta",
+              prestador.dadosBancarios?.tipoConta
+            );
 
-          const isDocumentoValido =
-            prestador.tipo === "pf"
-              ? isCPF(prestador.documento)
-              : isCNPJ(prestador.documento);
-          onDocumentoValido(isDocumentoValido, prestador.tipo);
+            const isDocumentoValido =
+              prestador.tipo === "pf"
+                ? isCPF(prestador.documento)
+                : isCNPJ(prestador.documento);
+            onDocumentoValido(isDocumentoValido, prestador.tipo);
 
-          toast({
-            title: "Prestador Carregado",
-            description: `Prestador ${prestador.nome}, com SID ${prestador.sid}.`,
-            status: "success",
-            duration: 5000,
-            isClosable: true,
-          });
-        }
-      } catch (error) {
+            toast({
+              title: "Prestador Carregado",
+              description: `Prestador ${prestador.nome}, com SID ${prestador.sid}.`,
+              status: "success",
+              duration: 5000,
+              isClosable: true,
+            });
+          }
+        } catch (error) {}
+      };
+
+      if (/^\d{7}$/.test(values?.prestador?.sid) && !sidJaBuscado && !ticket) {
+        buscarPrestador(values?.prestador.sid);
+        setSidJaBuscado(true);
       }
-    };
 
-    if (/^\d{7}$/.test(values?.prestador?.sid) && !sidJaBuscado) {
-      buscarPrestador(values?.prestador.sid);
-      setSidJaBuscado(true);
-    }
-
-    if (!/^\d{7}$/.test(values?.prestador?.sid)) {
-      setSidJaBuscado(false);
-    }
-  }, [
-    values?.prestador?.sid,
-    setFieldValue,
-    onDocumentoValido,
-    toast,
-    sidJaBuscado,
-  ]);
+      if (!/^\d{7}$/.test(values?.prestador?.sid)) {
+        setSidJaBuscado(false);
+      }
+    },
+    [values?.prestador?.sid, sidJaBuscado],
+    []
+  );
 
   useEffect(() => {
     const documentoNumerico = values?.prestador?.documento?.replace(/\D/g, "");

@@ -576,6 +576,7 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
                                   onUpdatePrestadorInfo={
                                     handleUpdatePrestadorInfo
                                   }
+                                  ticket={ticket}
                                 />
                               </Box>
                             )}
