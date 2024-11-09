@@ -20,11 +20,9 @@ export const importarComissoes = async ({file,mes, ano}) => {
 
 export const exportarServicos = async () => {
   try {
-    const response = await api.get('acoes-etapas/exportar-servicos', {
-      responseType: 'blob' 
-  });
+    const response = await api.post('acoes-etapas/exportar-servicos')
 
-  return response.data; 
+    return response; 
   } catch (error) {
     console.error("Erro ao exportar serviços:", error);
     throw error; // Repassa o erro para que o chamador possa tratá-lo
@@ -33,11 +31,9 @@ export const exportarServicos = async () => {
 
 export const exportarPrestadores = async () => {
   try {
-    const response = await api.get("acoes-etapas/exportar-prestadores", {
-      responseType: 'blob' 
-    });
+    const response = await api.post("acoes-etapas/exportar-prestadores")
 
-    return response.data; 
+    return response; 
   } catch (error) {
     console.error("Erro ao exportar prestadores:", error);
     throw error; // Repassa o erro para que o chamador possa tratá-lo
@@ -54,10 +50,12 @@ export const importarPrestadores = async (prestadores) => {
   }
 };
 
-export const importarRPAs = async (file) => {
+export const importarRPAs = async (files) => {
   try {
     const formData = new FormData();
-    formData.append("file", file);
+    for (const file of files) {
+      formData.append("file", file);
+    }
     
 
     const response = await api.post("acoes-etapas/importar-rpas", formData, { headers: {
