@@ -214,16 +214,20 @@ const PrestadorForm = ({
     onClose();
   };
 
-  const handlePisChange = async (e) => {
-    const pisValue = e.target.value.replace(/\D/g, "");
-    setFieldValue("prestador.pessoaFisica.pis", pisValue);
+  const handlePisChange = async (pisValue) => {
+    // const pisSemMascara = pisValue.replace(/\D/g, ""); 
 
-    if (pisValue.length === 11) {
-      const prestador = await obterPrestadorPorPis(pisValue);
-      onDocumentoValido(true, prestador?.tipo);
-      if (prestador) {
-        setPisAlertData(prestador);
-        setIsPisAlertOpen(true);
+    if (pisValue.length === 14) {
+      try {
+        const prestador = await obterPrestadorPorPis(pisValue); 
+        if (prestador) {
+          setPisAlertData(prestador);
+          setIsPisAlertOpen(true);
+        } else {
+          console.log("Prestador não encontrado.");
+        }
+      } catch (error) {
+        console.error("Erro ao obter prestador por PIS:", error);
       }
     }
   };
