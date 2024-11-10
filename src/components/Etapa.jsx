@@ -12,7 +12,6 @@ import {
   Spinner,
   Text,
 } from "@chakra-ui/react";
-import { FaPlus } from "react-icons/fa";
 import AcoesEtapa from "./AcoesEtapa";
 
 const Etapa = ({ index, etapa }) => {

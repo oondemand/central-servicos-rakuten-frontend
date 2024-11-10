@@ -8,7 +8,6 @@ import {
   Flex,
   Text,
   useDisclosure,
-  IconButton,
   AlertDialog,
   AlertDialogBody,
   AlertDialogFooter,
@@ -17,10 +16,7 @@ import {
   AlertDialogOverlay,
 } from "@chakra-ui/react";
 import CrudModal from "./CrudModal";
-import { useFormik } from "formik";
 import * as Yup from "yup";
-import FormField from "@/components/common/FormField";
-import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 
 const CrudList = ({
   title,
@@ -29,7 +25,6 @@ const CrudList = ({
   onEdit,
   onDelete,
   formFields,
-  validationSchema,
   initialValues,
 }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -56,24 +51,6 @@ const CrudList = ({
     setCurrentValues({ ...item, senha: "" });
     onOpen();
   };
-
-  const formik = useFormik({
-    initialValues: initialValues,
-    validationSchema: Yup.object(validationSchema),
-    validateOnMount: false,
-    validateOnChange: true,
-    validateOnBlur: true,
-    onSubmit: async (values, { resetForm }) => {
-      if (isEditMode) {
-        await onEdit(values);
-      } else {
-        await onAdd(values);
-      }
-      resetForm();
-      setIsEditMode(false);
-      onClose();
-    },
-  });
 
   const handleDelete = async () => {
     if (itemToDelete) {
