@@ -1,18 +1,11 @@
-// src/components/form/PrestadorForm.js
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { debounce } from "lodash";
 import Select from "react-select";
-import { toast } from "react-toastify";
 import { isCPF, isCNPJ, isPIS } from "validation-br";
 import axios from "axios";
 import {
   VStack,
   HStack,
-  Accordion,
-  AccordionItem,
-  AccordionButton,
-  AccordionIcon,
-  AccordionPanel,
   AlertDialog,
   AlertDialogOverlay,
   AlertDialogContent,
@@ -48,8 +41,6 @@ const PrestadorForm = ({
 
   const toast = useToast();
 
-  const cancelRef = useRef();
-
   const [sidValido, setSidValido] = useState(true);
   const [estados, setEstados] = useState([]);
   const [isAutoUpdating, setIsAutoUpdating] = useState(false);
@@ -63,14 +54,11 @@ const PrestadorForm = ({
   const [pisValido, setPisValido] = useState(true);
   const [hasInteracted, setHasInteracted] = useState(false);
   const [hasInteractedCNPJ, setHasInteractedCNPJ] = useState(false);
-  const [documentoDuplicado, setDocumentoDuplicado] = useState(false);
   const [prestadorExistente, setPrestadorExistente] = useState(null);
   const [isEmailAlertOpen, setIsEmailAlertOpen] = useState(false);
   const [emailAlertData, setEmailAlertData] = useState(null);
   const [isPisAlertOpen, setIsPisAlertOpen] = useState(false);
   const [pisAlertData, setPisAlertData] = useState(null);
-  const [alertData, setAlertData] = useState(null);
-  const [documentoKey, setDocumentoKey] = useState(0);
   const [sidJaBuscado, setSidJaBuscado] = useState(false);
 
   const verificarDocumento = async (documentoValue) => {
@@ -215,11 +203,9 @@ const PrestadorForm = ({
   };
 
   const handlePisChange = async (pisValue) => {
-    // const pisSemMascara = pisValue.replace(/\D/g, ""); 
-
     if (pisValue.length === 14) {
       try {
-        const prestador = await obterPrestadorPorPis(pisValue); 
+        const prestador = await obterPrestadorPorPis(pisValue);
         if (prestador) {
           setPisAlertData(prestador);
           setIsPisAlertOpen(true);
@@ -479,7 +465,7 @@ const PrestadorForm = ({
 
     const buscarCep = async (cep) => {
       try {
-        setIsAutoUpdating(true); // Ativa o modo de atualização automática
+        setIsAutoUpdating(true); 
         const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
         const data = await response.json();
 
@@ -504,7 +490,7 @@ const PrestadorForm = ({
   }, [values?.prestador?.endereco?.cep, setFieldValue]);
 
   useEffect(() => {
-    // estados da API BrasilAPI
+    // API BrasilAPI
     const fetchEstados = async () => {
       try {
         const response = await axios.get(

@@ -97,8 +97,6 @@ const CrudList = ({
     onClose();
   };
 
-  console.log(isEditMode);
-
   const getValidationSchema = useCallback(() => {
     return Yup.object({
       nome: Yup.string().required("Nome é obrigatório"),
@@ -109,7 +107,7 @@ const CrudList = ({
         .oneOf(["ativo", "inativo"], "Status inválido")
         .required("Status é obrigatório"),
       senha: isEditMode
-        ? Yup.string() // Não é obrigatório no modo de edição
+        ? Yup.string() // naao é obrigatório no modo de edição!!!
         : Yup.string()
             .min(6, "A senha deve ter pelo menos 6 caracteres")
             .required("Senha é obrigatória ao criar um novo usuário"),
@@ -141,6 +139,7 @@ const CrudList = ({
                     </Text>
                   ))}
               </Box>
+
               <Flex>
                 <Button
                   size="sm"
@@ -218,16 +217,6 @@ const CrudList = ({
       />
     </Box>
   );
-};
-
-// Função auxiliar para capitalizar a primeira letra
-const capitalizeFirstLetter = (string) => {
-  return string.charAt(0).toUpperCase() + string.slice(1);
-};
-
-// Função auxiliar para acessar valores aninhados usando notação de ponto (ex: "prestador.nome")
-const getNestedValue = (obj, path) => {
-  return path.split(".").reduce((acc, part) => acc && acc[part], obj);
 };
 
 export default CrudList;

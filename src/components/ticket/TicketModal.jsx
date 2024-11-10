@@ -1,5 +1,5 @@
 // src/components/ticket/TicketModal.js
-import React, { useMemo, useState, useRef, useEffect } from "react";
+import React, { useMemo, useState, useRef } from "react";
 import _ from "lodash";
 import { motion } from "framer-motion";
 import {
@@ -28,7 +28,7 @@ import {
   AccordionIcon,
   Text,
 } from "@chakra-ui/react";
-import { Formik, Form, useFormikContext } from "formik";
+import { Formik, Form } from "formik";
 import * as Yup from "yup";
 
 import { useBaseOmie } from "../../contexts/BaseOmieContext";
@@ -461,7 +461,6 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
     >
       {(formik) => (
         <>
-          {/* Modal Principal */}
           <Modal
             isOpen={isOpen}
             onClose={() => abrirConfirmarFechar(formik)}

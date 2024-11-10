@@ -8,10 +8,8 @@ import {
   TabPanel,
   Box,
   Heading,
-  Text,
 } from "@chakra-ui/react";
 import CrudUsuarios from "./CrudUsuarios";
-import CrudBaseOmies from "./CrudBaseOmies";
 
 const ConfigTabs = () => {
   return (
