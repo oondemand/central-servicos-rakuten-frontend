@@ -62,7 +62,7 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
 
   // Estados para controlar a exibição dos formulários
   const [mostrarPrestador, setMostrarPrestador] = useState(
-    ticket?.prestador ? true : false
+    ticket?.prestador ? true : true
   );
   const [mostrarServico, setMostrarServico] = useState(
     ticket?.servicos.length > 0 ? true : false
@@ -91,7 +91,7 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
   const combinedValidationSchema = useMemo(() => {
     let schema = ticketValidationSchema;
 
-    if (mostrarPrestador) {
+    if (mostrarPrestador || !mostrarPrestador) {
       schema = schema.shape({
         prestador: prestadorValidationSchema.shape({
           sid: Yup.string().required("SID é obrigatório"),
@@ -167,6 +167,12 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
     return initValues;
   }, [ticket]);
 
+  const abrirPainelPrestador = () => {
+    if (!mostrarPrestador) {
+      setMostrarPrestador(true);
+    }
+  };
+
   const handleUpdatePrestadorInfo = (nome, sid, isTyping) => {
     setDisplayNome(nome);
     setDisplaySid(sid);
@@ -174,7 +180,7 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
   };
 
   const handleSomaTotalChange = (soma) => {
-    setSomaTotalServicos(soma); // Atualiza a soma total sempre que ServicoForm calcula um novo valor
+    setSomaTotalServicos(soma);
   };
 
   // Handler de submissão
@@ -455,7 +461,6 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
     >
       {(formik) => (
         <>
-          {/* Modal Principal */}
           <Modal
             isOpen={isOpen}
             onClose={() => abrirConfirmarFechar(formik)}
@@ -516,9 +521,9 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
                       <Accordion
                         allowMultiple
                         mt={4}
-                        defaultIndex={[
-                          mostrarPrestador ? 0 : -1,
-                          mostrarServico ? 1 : -1,
+                        index={[
+                          mostrarPrestador ? 0 : -1, // index 0 é o Accordion "Prestador"
+                          mostrarServico ? 1 : -1, // index 1 é o Accordion "Serviço"
                         ]}
                       >
                         {/* Accordion para Prestador */}
@@ -570,6 +575,7 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
                                   onUpdatePrestadorInfo={
                                     handleUpdatePrestadorInfo
                                   }
+                                  ticket={ticket}
                                 />
                               </Box>
                             )}
@@ -615,6 +621,7 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
                             {mostrarServico && (
                               <Box mt={4}>
                                 <ServicoForm
+                                  mostrarServico={mostrarServico}
                                   setValeuArrayService={setValeuArrayService}
                                   onSomaTotalChange={handleSomaTotalChange}
                                 />
@@ -644,6 +651,7 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
                         closeModal={abrirConfirmarFechar}
                         onCancel={abrirConfirmarFechar}
                         cancelar={closeModal}
+                        abrirPainelPrestador={abrirPainelPrestador}
                       />
                     </Flex>
                   </ModalFooter>

@@ -21,7 +21,10 @@ import { FieldArray, useFormikContext } from "formik";
 import FormFieldTooltip from "../common/FormFildTooltip";
 import FormField from "../common/FormField";
 
-const ServicoForm = ({ setValeuArrayService, onSomaTotalChange }) => {
+const ServicoForm = ({
+  setValeuArrayService,
+  onSomaTotalChange,
+}) => {
   const [showErrorTooltip, setShowErrorTooltip] = useState(false);
   const { values, setFieldValue } = useFormikContext();
 
@@ -48,7 +51,7 @@ const ServicoForm = ({ setValeuArrayService, onSomaTotalChange }) => {
       (soma, servico) => soma + (parseFloat(servico.valorTotal) || 0),
       0
     );
-    onSomaTotalChange(somaTotal); 
+    onSomaTotalChange(somaTotal);
     return somaTotal;
   };
 
@@ -82,7 +85,6 @@ const ServicoForm = ({ setValeuArrayService, onSomaTotalChange }) => {
                 {form.values.servicos && form.values.servicos.length > 0 ? (
                   form.values.servicos.map((servico, index) => (
                     <Tr key={index}>
-                      {/* Competência Mês e Ano */}
                       <Td>
                         <HStack spacing={2}>
                           <Box width="60px">
@@ -96,6 +98,7 @@ const ServicoForm = ({ setValeuArrayService, onSomaTotalChange }) => {
                               showErrorTooltip={showErrorTooltip}
                             />
                           </Box>
+
                           <Box width="70px">
                             <FormFieldTooltip
                               name={`servicos.${index}.anoCompetencia`}
@@ -143,6 +146,7 @@ const ServicoForm = ({ setValeuArrayService, onSomaTotalChange }) => {
                           }}
                         />
                       </Td>
+
                       <Td>
                         <NumericFormat
                           name={`servicos.${index}.valorBonus`}
@@ -169,6 +173,7 @@ const ServicoForm = ({ setValeuArrayService, onSomaTotalChange }) => {
                           }}
                         />
                       </Td>
+
                       <Td>
                         <NumericFormat
                           name={`servicos.${index}.valorAjusteComercial`}
@@ -196,6 +201,7 @@ const ServicoForm = ({ setValeuArrayService, onSomaTotalChange }) => {
                           }}
                         />
                       </Td>
+
                       <Td>
                         <NumericFormat
                           name={`servicos.${index}.valorHospedagemAnuncio`}
@@ -223,6 +229,7 @@ const ServicoForm = ({ setValeuArrayService, onSomaTotalChange }) => {
                           }}
                         />
                       </Td>
+
                       <Td>
                         <NumericFormat
                           value={form.values.servicos[index].valorTotal}
@@ -243,6 +250,7 @@ const ServicoForm = ({ setValeuArrayService, onSomaTotalChange }) => {
                           }}
                         />
                       </Td>
+
                       <Td>
                         <IconButton
                           aria-label="Remover Serviço"
@@ -267,6 +275,7 @@ const ServicoForm = ({ setValeuArrayService, onSomaTotalChange }) => {
                     <Td colSpan={5} textAlign="right" fontWeight="bold">
                       Soma Total:
                     </Td>
+
                     <Td fontWeight="bold">
                       <Box whiteSpace="nowrap">
                         <NumericFormat
@@ -284,6 +293,7 @@ const ServicoForm = ({ setValeuArrayService, onSomaTotalChange }) => {
                           }}
                         />
                       </Box>
+                      
                     </Td>
                     <Td></Td>
                   </Tr>

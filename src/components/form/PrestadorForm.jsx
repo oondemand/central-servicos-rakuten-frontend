@@ -1,18 +1,11 @@
-// src/components/form/PrestadorForm.js
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { debounce } from "lodash";
 import Select from "react-select";
-import { toast } from "react-toastify";
 import { isCPF, isCNPJ, isPIS } from "validation-br";
 import axios from "axios";
 import {
   VStack,
   HStack,
-  Accordion,
-  AccordionItem,
-  AccordionButton,
-  AccordionIcon,
-  AccordionPanel,
   AlertDialog,
   AlertDialogOverlay,
   AlertDialogContent,
@@ -36,15 +29,17 @@ import {
   obterPrestadorPorPis,
 } from "../../services/prestadorService";
 
-const PrestadorForm = ({ onUpdatePrestadorInfo, onDocumentoValido }) => {
+const PrestadorForm = ({
+  onUpdatePrestadorInfo,
+  onDocumentoValido,
+  ticket,
+}) => {
   const { setFieldValue, values, errors, dirty, isSubmitting, setFieldError } =
     useFormikContext();
 
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const toast = useToast();
-
-  const cancelRef = useRef();
 
   const [sidValido, setSidValido] = useState(true);
   const [estados, setEstados] = useState([]);
@@ -59,14 +54,12 @@ const PrestadorForm = ({ onUpdatePrestadorInfo, onDocumentoValido }) => {
   const [pisValido, setPisValido] = useState(true);
   const [hasInteracted, setHasInteracted] = useState(false);
   const [hasInteractedCNPJ, setHasInteractedCNPJ] = useState(false);
-  const [documentoDuplicado, setDocumentoDuplicado] = useState(false);
   const [prestadorExistente, setPrestadorExistente] = useState(null);
   const [isEmailAlertOpen, setIsEmailAlertOpen] = useState(false);
   const [emailAlertData, setEmailAlertData] = useState(null);
   const [isPisAlertOpen, setIsPisAlertOpen] = useState(false);
   const [pisAlertData, setPisAlertData] = useState(null);
-  const [alertData, setAlertData] = useState(null);
-  const [documentoKey, setDocumentoKey] = useState(0);
+  const [sidJaBuscado, setSidJaBuscado] = useState(false);
 
   const verificarDocumento = async (documentoValue) => {
     const isCPFValido =
@@ -86,7 +79,6 @@ const PrestadorForm = ({ onUpdatePrestadorInfo, onDocumentoValido }) => {
     if (validationDocumentSchema) {
       try {
         const prestador = await obterPrestadorPorDocumento(documentoValue);
-        console.log(prestador)
         if (prestador) {
           setPrestadorExistente(prestador);
           onOpen();
@@ -210,16 +202,18 @@ const PrestadorForm = ({ onUpdatePrestadorInfo, onDocumentoValido }) => {
     onClose();
   };
 
-  const handlePisChange = async (e) => {
-    const pisValue = e.target.value.replace(/\D/g, "");
-    setFieldValue("prestador.pessoaFisica.pis", pisValue);
-
-    if (pisValue.length === 11) {
-      const prestador = await obterPrestadorPorPis(pisValue);
-      onDocumentoValido(true, prestador?.tipo);
-      if (prestador) {
-        setPisAlertData(prestador);
-        setIsPisAlertOpen(true);
+  const handlePisChange = async (pisValue) => {
+    if (pisValue.length === 14) {
+      try {
+        const prestador = await obterPrestadorPorPis(pisValue);
+        if (prestador) {
+          setPisAlertData(prestador);
+          setIsPisAlertOpen(true);
+        } else {
+          console.log("Prestador não encontrado.");
+        }
+      } catch (error) {
+        console.error("Erro ao obter prestador por PIS:", error);
       }
     }
   };
@@ -236,7 +230,6 @@ const PrestadorForm = ({ onUpdatePrestadorInfo, onDocumentoValido }) => {
       if (email && /\S+@\S+\.\S+/.test(email)) {
         try {
           const emailPrestador = await obterPrestadorPorEmail(email);
-          console.log(emailPrestador);
           if (emailPrestador) {
             setEmailAlertData(emailPrestador);
             setIsEmailAlertOpen(true);
@@ -346,97 +339,113 @@ const PrestadorForm = ({ onUpdatePrestadorInfo, onDocumentoValido }) => {
     onUpdatePrestadorInfo(displayNome, displaySid, isTyping);
   }, [displayNome, displaySid, onUpdatePrestadorInfo]);
 
-  useEffect(() => {
-    // Função para buscar prestador pelo SID
-    const buscarPrestador = async (sid) => {
-      try {
-        const prestador = await carregarPrestadorPorSid(sid);
-        if (prestador) {
-          setFieldValue("prestador._id", prestador._id);
-          setFieldValue("prestador.nome", prestador.nome);
-          setFieldValue("prestador.tipo", prestador.tipo);
-          setFieldValue("prestador.documento", prestador.documento);
-          setFieldValue("prestador.email", prestador.email);
-          setFieldValue("prestador.email", prestador.email);
-          setFieldValue(
-            "prestador.comentariosRevisao",
-            prestador.comentariosRevisao
-          );
-          setFieldValue("prestador.status", prestador.status);
+  useEffect(
+    () => {
+      // Funcao para buscar prestador pelo SID
+      const buscarPrestador = async (sid) => {
+        try {
+          const prestador = await carregarPrestadorPorSid(sid);
+          if (prestador) {
+            setFieldValue("prestador._id", prestador._id);
+            setFieldValue("prestador.nome", prestador.nome);
+            setFieldValue("prestador.sid", prestador.sid);
+            setFieldValue("prestador.tipo", prestador.tipo);
+            setFieldValue("prestador.documento", prestador.documento);
+            setFieldValue("prestador.email", prestador.email);
+            setFieldValue(
+              "prestador.comentariosRevisao",
+              prestador.comentariosRevisao
+            );
+            setFieldValue("prestador.status", prestador.status);
 
-          const formattedDate = prestador.pessoaFisica?.dataNascimento
-            ? new Date(prestador.pessoaFisica.dataNascimento)
-                .toISOString()
-                .split("T")[0]
-            : "";
+            const formattedDate = prestador.pessoaFisica?.dataNascimento
+              ? new Date(prestador.pessoaFisica.dataNascimento)
+                  .toISOString()
+                  .split("T")[0]
+              : "";
 
-          setFieldValue(
-            "prestador.pessoaFisica.rg.numero",
-            prestador.pessoaFisica?.rg.numero
-          );
-          setFieldValue(
-            "prestador.pessoaFisica.rg.orgaoEmissor",
-            prestador.pessoaFisica?.rg.orgaoEmissor
-          );
-          setFieldValue("prestador.pessoaFisica.dataNascimento", formattedDate);
-          setFieldValue(
-            "prestador.pessoaFisica.nomeMae",
-            prestador.pessoaFisica?.nomeMae
-          );
+            setFieldValue(
+              "prestador.pessoaFisica.rg.numero",
+              prestador.pessoaFisica?.rg?.numero
+            );
+            setFieldValue(
+              "prestador.pessoaFisica.rg.orgaoEmissor",
+              prestador.pessoaFisica?.rg?.orgaoEmissor
+            );
+            setFieldValue(
+              "prestador.pessoaFisica.dataNascimento",
+              formattedDate
+            );
+            setFieldValue(
+              "prestador.pessoaFisica.nomeMae",
+              prestador.pessoaFisica?.nomeMae
+            );
 
-          setFieldValue("prestador.endereco.cep", prestador.endereco?.cep);
-          setFieldValue("prestador.endereco.rua", prestador.endereco?.rua);
-          setFieldValue(
-            "prestador.endereco.numero",
-            prestador.endereco?.numero
-          );
-          setFieldValue(
-            "prestador.endereco.complemento",
-            prestador.endereco?.complemento
-          );
-          setFieldValue(
-            "prestador.endereco.cidade",
-            prestador.endereco?.cidade
-          );
-          setFieldValue(
-            "prestador.endereco.estado",
-            prestador.endereco?.estado
-          );
+            setFieldValue("prestador.endereco.cep", prestador.endereco?.cep);
+            setFieldValue("prestador.endereco.rua", prestador.endereco?.rua);
+            setFieldValue(
+              "prestador.endereco.numero",
+              prestador.endereco?.numero
+            );
+            setFieldValue(
+              "prestador.endereco.complemento",
+              prestador.endereco?.complemento
+            );
+            setFieldValue(
+              "prestador.endereco.cidade",
+              prestador.endereco?.cidade
+            );
+            setFieldValue(
+              "prestador.endereco.estado",
+              prestador.endereco?.estado
+            );
 
-          setFieldValue(
-            "prestador.dadosBancarios.banco",
-            prestador.dadosBancarios?.banco
-          );
-          setFieldValue(
-            "prestador.dadosBancarios.agencia",
-            prestador.dadosBancarios?.agencia
-          );
-          setFieldValue(
-            "prestador.dadosBancarios.conta",
-            prestador.dadosBancarios?.conta
-          );
-          setFieldValue(
-            "prestador.dadosBancarios.tipoConta",
-            prestador.dadosBancarios?.tipoConta
-          );
-        }
-      } catch (error) {
-        console.error("Erro ao buscar prestador por SID:", error);
-        // toast({
-        //   title: "Verifique o SID informado",
-        //   description:
-        //     "Houve um problema ao localizar os dados do prestador para o SID informado. Verifique e tente novamente.",
-        //   status: "warning",
-        //   duration: 5000,
-        //   isClosable: true,
-        // });
+            setFieldValue(
+              "prestador.dadosBancarios.banco",
+              prestador.dadosBancarios?.banco
+            );
+            setFieldValue(
+              "prestador.dadosBancarios.agencia",
+              prestador.dadosBancarios?.agencia
+            );
+            setFieldValue(
+              "prestador.dadosBancarios.conta",
+              prestador.dadosBancarios?.conta
+            );
+            setFieldValue(
+              "prestador.dadosBancarios.tipoConta",
+              prestador.dadosBancarios?.tipoConta
+            );
+
+            const isDocumentoValido =
+              prestador.tipo === "pf"
+                ? isCPF(prestador.documento)
+                : isCNPJ(prestador.documento);
+            onDocumentoValido(isDocumentoValido, prestador.tipo);
+
+            toast({
+              title: "Prestador Carregado",
+              description: `Prestador ${prestador.nome}, com SID ${prestador.sid}.`,
+              status: "success",
+              duration: 5000,
+              isClosable: true,
+            });
+          }
+        } catch (error) {}
+      };
+
+      if (/^\d{7}$/.test(values?.prestador?.sid) && !sidJaBuscado && !ticket) {
+        buscarPrestador(values?.prestador.sid);
+        setSidJaBuscado(true);
       }
-    };
-    // Executa a busca quando o SID for alterado e tiver um valor válido
-    if (/^\d{7}$/.test(values?.prestador?.sid)) {
-      buscarPrestador(values?.prestador.sid);
-    }
-  }, [values?.prestador?.sid, setFieldValue, toast]);
+
+      if (!/^\d{7}$/.test(values?.prestador?.sid)) {
+        setSidJaBuscado(false);
+      }
+    },
+    [values?.prestador?.sid, sidJaBuscado],
+    []
+  );
 
   useEffect(() => {
     const documentoNumerico = values?.prestador?.documento?.replace(/\D/g, "");
@@ -456,7 +465,7 @@ const PrestadorForm = ({ onUpdatePrestadorInfo, onDocumentoValido }) => {
 
     const buscarCep = async (cep) => {
       try {
-        setIsAutoUpdating(true); // Ativa o modo de atualização automática
+        setIsAutoUpdating(true); 
         const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
         const data = await response.json();
 
@@ -481,7 +490,7 @@ const PrestadorForm = ({ onUpdatePrestadorInfo, onDocumentoValido }) => {
   }, [values?.prestador?.endereco?.cep, setFieldValue]);
 
   useEffect(() => {
-    // estados da API BrasilAPI
+    // API BrasilAPI
     const fetchEstados = async () => {
       try {
         const response = await axios.get(
@@ -849,10 +858,7 @@ const PrestadorForm = ({ onUpdatePrestadorInfo, onDocumentoValido }) => {
           </HStack>
         </VStack>
 
-        <AlertDialog
-          isOpen={isOpen}
-          onClose={onClose}
-        >
+        <AlertDialog isOpen={isOpen} onClose={onClose}>
           <AlertDialogOverlay>
             <AlertDialogContent>
               <AlertDialogHeader fontSize="lg" fontWeight="bold">
@@ -863,10 +869,7 @@ const PrestadorForm = ({ onUpdatePrestadorInfo, onDocumentoValido }) => {
                 dele?
               </AlertDialogBody>
               <AlertDialogFooter>
-                <Button
-                  onClick={limparDocumento}
-                  colorScheme="red"
-                >
+                <Button onClick={limparDocumento} colorScheme="red">
                   Não
                 </Button>
                 <Button

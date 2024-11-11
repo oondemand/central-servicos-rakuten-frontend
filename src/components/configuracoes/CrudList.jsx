@@ -8,7 +8,6 @@ import {
   Flex,
   Text,
   useDisclosure,
-  IconButton,
   AlertDialog,
   AlertDialogBody,
   AlertDialogFooter,
@@ -17,10 +16,7 @@ import {
   AlertDialogOverlay,
 } from "@chakra-ui/react";
 import CrudModal from "./CrudModal";
-import { useFormik } from "formik";
 import * as Yup from "yup";
-import FormField from "@/components/common/FormField";
-import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 
 const CrudList = ({
   title,
@@ -29,7 +25,6 @@ const CrudList = ({
   onEdit,
   onDelete,
   formFields,
-  validationSchema,
   initialValues,
 }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -57,24 +52,6 @@ const CrudList = ({
     onOpen();
   };
 
-  const formik = useFormik({
-    initialValues: initialValues,
-    validationSchema: Yup.object(validationSchema),
-    validateOnMount: false,
-    validateOnChange: true,
-    validateOnBlur: true,
-    onSubmit: async (values, { resetForm }) => {
-      if (isEditMode) {
-        await onEdit(values);
-      } else {
-        await onAdd(values);
-      }
-      resetForm();
-      setIsEditMode(false);
-      onClose();
-    },
-  });
-
   const handleDelete = async () => {
     if (itemToDelete) {
       await onDelete(itemToDelete._id);
@@ -97,8 +74,6 @@ const CrudList = ({
     onClose();
   };
 
-  console.log(isEditMode);
-
   const getValidationSchema = useCallback(() => {
     return Yup.object({
       nome: Yup.string().required("Nome é obrigatório"),
@@ -109,7 +84,7 @@ const CrudList = ({
         .oneOf(["ativo", "inativo"], "Status inválido")
         .required("Status é obrigatório"),
       senha: isEditMode
-        ? Yup.string() // Não é obrigatório no modo de edição
+        ? Yup.string() // naao é obrigatório no modo de edição!!!
         : Yup.string()
             .min(6, "A senha deve ter pelo menos 6 caracteres")
             .required("Senha é obrigatória ao criar um novo usuário"),
@@ -141,6 +116,7 @@ const CrudList = ({
                     </Text>
                   ))}
               </Box>
+
               <Flex>
                 <Button
                   size="sm"
@@ -218,16 +194,6 @@ const CrudList = ({
       />
     </Box>
   );
-};
-
-// Função auxiliar para capitalizar a primeira letra
-const capitalizeFirstLetter = (string) => {
-  return string.charAt(0).toUpperCase() + string.slice(1);
-};
-
-// Função auxiliar para acessar valores aninhados usando notação de ponto (ex: "prestador.nome")
-const getNestedValue = (obj, path) => {
-  return path.split(".").reduce((acc, part) => acc && acc[part], obj);
 };
 
 export default CrudList;
