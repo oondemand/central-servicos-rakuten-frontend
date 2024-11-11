@@ -588,6 +588,16 @@ const PrestadorForm = ({
                 type="text"
                 mask="9999999"
               />
+               
+            </div>
+
+            <div>
+            <FormField
+                label="Sci Unico"
+                name="prestador.sciUnico"
+                type="text"
+                mask="99999"
+              />
             </div>
 
             <FormField
@@ -603,6 +613,7 @@ const PrestadorForm = ({
                 },
                 { value: "inativo", label: "Inativo" },
                 { value: "arquivado", label: "Arquivado" },
+                { value: "aguardando-codigo-sci", label: "Aguardando código sci" },
               ]}
             />
           </HStack>

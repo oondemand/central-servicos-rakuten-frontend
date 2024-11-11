@@ -138,6 +138,7 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
       prestador: prestadorInitValues,
       servicos: [],
       arquivos: [],
+      sciUnico: ""
     };
 
     if (ticket) {

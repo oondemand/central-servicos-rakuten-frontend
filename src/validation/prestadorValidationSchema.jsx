@@ -10,7 +10,7 @@ export const prestadorValidationSchema = Yup.object({
   email: Yup.string().email("E-mail inválido").required("E-mail é obrigatório"),
   status: Yup.string()
     .oneOf(
-      ["ativo", "em-analise", "pendente-de-revisao", "inativo", "arquivado"],
+      ["ativo", "em-analise", "pendente-de-revisao", "inativo", "arquivado", "aguardando-codigo-sci"],
       "Status inválido"
     )
     .required("Status é obrigatório"),
