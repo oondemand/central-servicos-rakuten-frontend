@@ -1,3 +1,3 @@
-docker build -f ../docker/Dockerfile.prod -t central-servicos-frontend:latest ../..
+docker build -f ../docker/Dockerfile.prod -t cst-rakuten-frontend:latest ../..
 
 Write-Host "Build completo!"
