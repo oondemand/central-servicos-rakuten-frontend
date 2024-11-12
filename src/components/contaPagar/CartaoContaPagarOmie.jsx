@@ -77,7 +77,7 @@ const CartaoContaPagarOmie = ({ ticket }) => {
       <Text fontWeight="bold">{ticket.titulo}</Text>
       <Text>Documento: {contaPagar?.numero_documento}</Text>
       <Text>Valor: R$ {contaPagar?.valor_documento?.toFixed(2)}</Text>
-      <Text>Vencimento: {formatDate(contaPagar?.data_vencimento)}</Text>
+      <Text>Vencimento: {contaPagar?.data_vencimento}</Text>
       <Text>{contaPagar?.status_titulo}</Text>
     </Box>
   );
