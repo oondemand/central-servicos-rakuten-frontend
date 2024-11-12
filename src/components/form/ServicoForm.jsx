@@ -67,7 +67,7 @@ const ServicoForm = ({
         Serviços
       </Text>
       <FieldArray name="servicos">
-        {({ push, remove, form }) => (
+        {({ push, remove, form  }) => (
           <VStack align="stretch">
             <Table variant="simple" size="sm">
               <Thead>
@@ -130,6 +130,7 @@ const ServicoForm = ({
                           allowNegative
                           prefix="R$ "
                           placeholder="R$ 0,00"
+                          value={servico.valorPrincipal}
                           customInput={FormFieldTooltip}
                           onValueChange={(values) => {
                             setFieldValue(
@@ -157,6 +158,7 @@ const ServicoForm = ({
                           allowNegative
                           prefix="R$ "
                           placeholder="R$ 0,00"
+                          value={servico.valorBonus}
                           customInput={FormFieldTooltip}
                           onValueChange={(values) => {
                             setFieldValue(
@@ -184,6 +186,7 @@ const ServicoForm = ({
                           allowNegative
                           prefix="R$ "
                           placeholder="R$ 0,00"
+                          value={servico.valorAjusteComercial}
                           customInput={FormFieldTooltip}
                           onValueChange={(values) => {
                             setFieldValue(
@@ -212,6 +215,7 @@ const ServicoForm = ({
                           allowNegative
                           prefix="R$ "
                           placeholder="R$ 0,00"
+                          value={servico.valorHospedagemAnuncio}
                           customInput={FormFieldTooltip}
                           onValueChange={(values) => {
                             setFieldValue(
