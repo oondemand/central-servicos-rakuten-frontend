@@ -619,7 +619,7 @@ const PrestadorForm = ({
 
           <HStack align="stretch">
             <FormField
-              label="Tipo"
+              label="Tipo *"
               name="prestador.tipo"
               type="select"
               options={[
@@ -651,7 +651,7 @@ const PrestadorForm = ({
             <FormField label="Nome *" name="prestador.nome" type="text" />
 
             <FormField
-              label="E-mail *"
+              label="E-mail"
               name="prestador.email"
               type="email"
               onChange={handleEmailChange}
