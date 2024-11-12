@@ -369,6 +369,10 @@ const PrestadorForm = ({
               prestador.pessoaFisica?.rg?.numero
             );
             setFieldValue(
+              "prestador.pessoaFisica.pis",
+              prestador.pessoaFisica?.pis
+            );
+            setFieldValue(
               "prestador.pessoaFisica.rg.orgaoEmissor",
               prestador.pessoaFisica?.rg?.orgaoEmissor
             );

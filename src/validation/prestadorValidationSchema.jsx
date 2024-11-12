@@ -7,7 +7,7 @@ export const prestadorValidationSchema = Yup.object({
     .oneOf(["pf", "pj"], "Tipo inválido")
     .required("Tipo é obrigatório"),
   documento: Yup.string().required("Documento é obrigatório"),
-  email: Yup.string().email("E-mail inválido"),
+  email: Yup.string().email("E-mail inválido").optional(),
   status: Yup.string()
     .oneOf(
       ["ativo", "em-analise", "pendente-de-revisao", "inativo", "arquivado", "aguardando-codigo-sci"],

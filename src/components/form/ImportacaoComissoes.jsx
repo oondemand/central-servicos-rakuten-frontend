@@ -124,7 +124,7 @@ const ImportacaoComissoes = () => {
               onClick={() => inputFileRef.current.click()}
               colorScheme="brand"
             >
-              Importar comissões
+             Selecionar arquivo
             </Button>
 
             <Button type="submit">Enviar</Button>

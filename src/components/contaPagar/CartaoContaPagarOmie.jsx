@@ -57,7 +57,7 @@ const CartaoContaPagarOmie = ({ ticket }) => {
   if (!contaPagar) {
     return (
       <Box p={4} bg={warningBg} rounded="md" shadow="sm">
-        <Text>Conta a pagar não encontrada.</Text>
+        <Text>Carregando conta a pagar...</Text>
       </Box>
     );
   }
