@@ -583,12 +583,11 @@ const PrestadorForm = ({
           <HStack align="stretch">
             <div>
               <FormField
-                label="SID"
+                label="SID *"
                 name="prestador.sid"
                 type="text"
                 mask="9999999"
               />
-               
             </div>
 
             <div>
@@ -629,7 +628,7 @@ const PrestadorForm = ({
               ]}
             />
             <FormField
-              label="Documento (CPF/CNPJ)"
+              label="Documento (CPF/CNPJ) *"
               name="prestador.documento"
               type="text"
               onChange={handleDocumentoChange}
@@ -649,10 +648,10 @@ const PrestadorForm = ({
 
             <button id="hidden-focus-button" style={{ display: "none" }} />
 
-            <FormField label="Nome" name="prestador.nome" type="text" />
+            <FormField label="Nome *" name="prestador.nome" type="text" />
 
             <FormField
-              label="E-mail"
+              label="E-mail *"
               name="prestador.email"
               type="email"
               onChange={handleEmailChange}
