@@ -198,7 +198,8 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
           ? values.prestador.documento.replace(/[^\d]/g, "")
           : "";
 
-        const cepLimpo = values.prestador.endereco.cep
+
+        const cepLimpo = values.prestador.endereco?.cep
           ? values.prestador.endereco.cep.replace(/[^\d]/g, "")
           : "";
 
