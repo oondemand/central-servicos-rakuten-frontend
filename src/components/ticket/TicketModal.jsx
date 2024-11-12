@@ -289,7 +289,7 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
       toast({
         title: "Erro ao salvar ticket.",
         description:
-          error.response.data.detalhes || "Ocorreu um erro inesperado.",
+          error.response.data.detalhes || error.response.data.message || "Ocorreu um erro inesperado.",
         status: "error",
         duration: 5000,
         isClosable: true,
