@@ -144,6 +144,7 @@ const handleRemoveFile = (arquivo) => {
               onChange={handleArquivoChange}
               style={{ display: "none" }}
               accept=".pdf"
+              multiple
             />
           <Button onClick={handleImportRpas}>Enviar</Button>
           </Flex>

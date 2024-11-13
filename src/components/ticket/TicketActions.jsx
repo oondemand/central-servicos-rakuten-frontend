@@ -71,6 +71,7 @@ const TicketActions = ({
       if (sucesso) {
         closeModal();
         toast.success(`Ticket ${acao}do com sucesso!`);
+        cancelar();
       }
     } catch (error) {
       console.error(`Erro ao ${acao} ticket:`, error);
