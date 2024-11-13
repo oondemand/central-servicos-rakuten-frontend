@@ -16,8 +16,9 @@ const CartaoContaPagarOmie = ({ ticket }) => {
         const response = await api.get(`/contas-pagar/${ticket.contaPagarOmie}`);
         setContaPagar(response.data);
       } catch (err) {
-        console.error("Erro ao buscar conta a pagar:", err);
-        setError("Erro ao buscar conta a pagar. Tentando novamente em 30 segundos...");
+        console.log("Erro ao buscar conta a pagar:", err);
+        // console.error("Erro ao buscar conta a pagar:", err);
+        // setError("Erro ao buscar conta a pagar. Tentando novamente em 30 segundos...");
         setTimeout(() => {
           setRetry((prevRetry) => prevRetry + 1);
         }, 30000);
