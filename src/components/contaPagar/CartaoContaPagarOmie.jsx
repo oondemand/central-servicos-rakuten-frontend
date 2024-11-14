@@ -37,7 +37,7 @@ const CartaoContaPagarOmie = ({ ticket }) => {
   const bg = useColorModeValue("gray.200", "gray.600");
   const errorBg = useColorModeValue("red.100", "red.600");
   const warningBg = useColorModeValue("yellow.100", "yellow.600");
-  const successBg = useColorModeValue("green.100", "green.600");
+  const successBg = useColorModeValue("green.100", "green.600");  
 
   if (loading) {
     return (
@@ -55,6 +55,29 @@ const CartaoContaPagarOmie = ({ ticket }) => {
     );
   }
 
+
+  // tickets sem serviço não geram conta a pagar (isso evita um bug)
+  if(ticket.servicos.length === 0){
+    // return (
+    //   <Box
+    //   rounded="lg"
+    //   shadow="md"
+    //   cursor="pointer"
+    //   bg={bg}
+    //   p={2}
+    //   my={2}
+    //   borderWidth="1px"
+    //   borderColor="brand.200"
+    //   color="brand.900"
+    // >
+    //   <Text fontWeight="bold">{ticket.titulo}</Text>
+    //   <Text>Status: <b>{ticket.status}</b></Text>
+    // </Box>
+    // );
+
+    return;
+  }
+
   if (!contaPagar) {
     return (
       <Box p={4} bg={warningBg} rounded="md" shadow="sm">
@@ -62,6 +85,7 @@ const CartaoContaPagarOmie = ({ ticket }) => {
       </Box>
     );
   }
+
 
   return (
     <Box
