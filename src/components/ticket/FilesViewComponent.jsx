@@ -18,7 +18,7 @@ import React, { useState } from "react";
 
 import { DeleteIcon, DownloadIcon } from "@chakra-ui/icons";
 import { useTicket } from "../../contexts/TicketContext";
-import {downloadFileFromTicket} from "../../services/ticketService"
+
 
 export const FilesViewComponent = () => {
   const { removerArquivoDoTicket } = useTicket();
@@ -44,8 +44,8 @@ export const FilesViewComponent = () => {
   };
 
   const handleDownloadFileFromTicket = async (e) =>{
-    const file = await downloadFileFromTicket(e.path)
-    const blob = new Blob([file], { type: e.mimetype });
+    const byteArray = new Uint8Array(e.buffer.data);
+    const blob = new Blob([byteArray], { type: e.mimetype });
     saveAs(blob, e.nomeOriginal);
   }
 

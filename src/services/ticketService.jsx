@@ -118,16 +118,16 @@ export const listarArquivosDoTicket = async (filtro) => {
   }
 };
 
+// 
+// export const downloadFileFromTicket = async (path) => {
+//   try {
+//     const response = await api.get(path, {
+//       responseType: 'blob' 
+//     });
 
-export const downloadFileFromTicket = async (path) => {
-  try {
-    const response = await api.get(path, {
-      responseType: 'blob' 
-    });
-
-    return response.data; 
-  } catch (error) {
-    console.error("Erro ao baixar imagem", error);
-    throw error; // Repassa o erro para que o chamador possa tratá-lo
-  }
-};
+//     return response.data; 
+//   } catch (error) {
+//     console.error("Erro ao baixar imagem", error);
+//     throw error; // Repassa o erro para que o chamador possa tratá-lo
+//   }
+// };
