@@ -1,6 +1,8 @@
 # Define the source directory
 $sourceDir = "../.."
-$srcDir = "../../src"
+$srcDir = "../.."
+# $srcDir = "../../src"
+# $srcDir = "../../infra"
 
 # Get all files in the root directory, excluding package-lock.json
 $rootFilesToWrite = Get-ChildItem -Path $sourceDir -File | Where-Object { $_.Name -ne "package-lock.json" }
