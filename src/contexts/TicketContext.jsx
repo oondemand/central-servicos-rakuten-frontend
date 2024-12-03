@@ -30,29 +30,44 @@ export const TicketProvider = ({ children }) => {
   const toast = useToast();
 
   const normalizarTexto = (texto) => {
-    return texto.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+    if (typeof texto !== 'string') {
+      return '';
+    }
+    return texto.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  };
+
+  const normalizarValor = (valor) => {
+    return new Intl.NumberFormat('pt-BR', { style: 'decimal', minimumFractionDigits: 2 }).format(valor);
   };
 
   const filtrarTickets = (termo) => {
-    if (!termo) {
+    if (typeof termo !== 'string' || termo.length <= 2) {
       setListaTickets(listaTodosTickets);
-    } else {
-      const termoNormalizado = normalizarTexto(termo);
-
-      const ticketsFiltrados = listaTodosTickets.filter((ticket) => {
-        // const base = baseOmie ? baseOmie : {};
-        // const { nome, documento } = base;
-
-        return (
-          normalizarTexto(ticket.titulo).includes(termoNormalizado) ||
-          normalizarTexto(ticket.observacao).includes(termoNormalizado)
-          // normalizarTexto(nome).includes(termoNormalizado) ||
-          // normalizarTexto(documento).includes(termoNormalizado)
-        );
-      });
-
-      setListaTickets(ticketsFiltrados);
+      return;
     }
+
+    const termos = termo.split(';').map(t => t.trim().toLowerCase());
+
+    const ticketsFiltrados = listaTodosTickets.filter((ticket) => {
+      return termos.every((termo) => {
+        const titulo = normalizarTexto(ticket.titulo).includes(termo);
+        const observacao = normalizarTexto(ticket.observacao).includes(termo);
+        const nomePrestador = ticket.prestador && normalizarTexto(ticket.prestador.nome).includes(termo);
+        const documentoPrestador = ticket.prestador && normalizarTexto(ticket.prestador.documento).includes(termo);
+        const sciUnicoPrestador = ticket.prestador?.sciUnico && normalizarTexto(ticket.prestador.sciUnico.toString()).includes(termo);
+        const sidPrestador = ticket.prestador?.sid && normalizarTexto(ticket.prestador.sid.toString()).includes(termo);
+        const competenciaServico = ticket.servicos && ticket.servicos.some(servico => 
+          normalizarTexto(servico.competencia).includes(termo)
+        );
+        const valorTotalServico = ticket.servicos && ticket.servicos.some(servico =>
+          normalizarValor(servico.valorTotal).includes(termo)
+        );
+
+        return titulo || observacao || nomePrestador || documentoPrestador || sciUnicoPrestador || sidPrestador || competenciaServico || valorTotalServico;
+      });
+    });
+
+    setListaTickets(ticketsFiltrados);
   };
 
   const salvarTicket = useCallback(

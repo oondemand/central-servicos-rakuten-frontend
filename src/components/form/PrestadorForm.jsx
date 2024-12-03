@@ -599,7 +599,7 @@ const PrestadorForm = ({
                 label="Sci Unico"
                 name="prestador.sciUnico"
                 type="text"
-                mask="99999"
+                mask="999999"
               />
             </div>
 

@@ -1,5 +1,5 @@
 # Definir a versão da imagem, nome da imagem e o URL do registro de container
-$VERSION = "1.0.6"
+$VERSION = "1.0.7"
 $IMAGE_NAME = "cst-rakuten-frontend"
 $REGISTRY_URL = "registry.digitalocean.com/oondemand"
 
