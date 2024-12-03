@@ -21,6 +21,10 @@ import { deleteFile, uploadFiles } from "../services/ticketService";
 
 const TicketContext = createContext();
 
+const normalizarTexto = (texto) => {
+  return texto.toString().toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+};
+
 export const TicketProvider = ({ children }) => {
   const [listaTodosTickets, setListaTodosTickets] = useState([]);
   const [listaTickets, setListaTickets] = useState([]);
@@ -28,32 +32,6 @@ export const TicketProvider = ({ children }) => {
   const [error, setError] = useState(null);
   const { baseOmie } = useBaseOmie();
   const toast = useToast();
-
-  const normalizarTexto = (texto) => {
-    return texto.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
-  };
-
-  const filtrarTickets = (termo) => {
-    if (!termo) {
-      setListaTickets(listaTodosTickets);
-    } else {
-      const termoNormalizado = normalizarTexto(termo);
-
-      const ticketsFiltrados = listaTodosTickets.filter((ticket) => {
-        // const base = baseOmie ? baseOmie : {};
-        // const { nome, documento } = base;
-
-        return (
-          normalizarTexto(ticket.titulo).includes(termoNormalizado) ||
-          normalizarTexto(ticket.observacao).includes(termoNormalizado)
-          // normalizarTexto(nome).includes(termoNormalizado) ||
-          // normalizarTexto(documento).includes(termoNormalizado)
-        );
-      });
-
-      setListaTickets(ticketsFiltrados);
-    }
-  };
 
   const salvarTicket = useCallback(
     async (ticket) => {
@@ -203,8 +181,11 @@ export const TicketProvider = ({ children }) => {
   const carregarTickets = useCallback(async () => {
     setLoading(true);
     try {
+      console.log("carregarTickets");
       const filtro = baseOmie ? { baseOmieId: baseOmie._id } : {};
+      console.log("Carregando tickets com filtro:", filtro);
       const response = await listarTickets(filtro);
+      console.log("Tickets carregados:", response);
 
       setListaTodosTickets(response);
       setListaTickets(response);
@@ -386,7 +367,92 @@ export const TicketProvider = ({ children }) => {
     [toast]
   );
 
+  const buscarTickets = ({ arrayDeBusca }) => {
+    console.log("Iniciando busca com:", arrayDeBusca);
+    console.log("Lista de todos os tickets antes da busca:", listaTodosTickets);
+
+    // console.log("LOG MAIS IMPORTANTE ->", arrayDeBusca, listaTodosTickets);
+
+    const todosTicktsEncontrados2 = [];
+    const ticketsJaAdicionados2 = new Set();
+
+    for (const termoDeBusca of arrayDeBusca) {
+      if (termoDeBusca.length === 0) continue;
+      for (const ticket of listaTodosTickets) {
+        varificarTicketExistente(normalizarTexto(termoDeBusca), ticket);
+      }
+    }
+
+    function varificarTicketExistente(termoDeBuscaNormalizado, ticket) {
+      if (ticketsJaAdicionados2.has(ticket._id)) return;
+
+      const camposDeBusca = [
+        ticket.titulo,
+        ticket.observacao,
+        ticket.prestador.nome,
+        ticket.prestador.documento,
+        ticket.prestador.sid,
+        ticket.prestador.sciUnico,
+      ];
+
+      const camposDeBuscaTicket = camposDeBusca.some(
+        (campo) =>
+          campo && normalizarTexto(campo).includes(termoDeBuscaNormalizado)
+      );
+
+      if (camposDeBuscaTicket) {
+        todosTicktsEncontrados2.push(ticket);
+        ticketsJaAdicionados2.add(ticket._id);
+        return;
+      }
+
+      for (const servico of ticket.servicos) {
+        const camposDeBusca = [
+          servico.mesCompetencia,
+          servico.anoCompetencia,
+          servico.valorTotal,
+        ];
+
+        const servicoDoTicket = camposDeBusca.some(
+          (campo) =>
+            campo && normalizarTexto(campo).includes(termoDeBuscaNormalizado)
+        );
+
+        if (servicoDoTicket) {
+          todosTicktsEncontrados2.push(ticket);
+          ticketsJaAdicionados2.add(ticket._id);
+          return;
+        }
+      }
+    }
+
+    return todosTicktsEncontrados2;
+  };
+
+  const filtrarTickets = useCallback(
+    ({ stringDeBusca }) => {
+      if (loading) {
+        console.log("Tickets ainda estão sendo carregados.");
+        return;
+      }
+
+      if (!stringDeBusca || stringDeBusca.length <= 1) {
+        setListaTickets(listaTodosTickets);
+      } else {
+        stringDeBusca = stringDeBusca.trimEnd().trimStart();
+        const arrayDeBusca = stringDeBusca.split(";");
+
+        console.log("listaTodosTickets", listaTodosTickets);
+        const ticketsFiltrados = buscarTickets({ arrayDeBusca });
+
+        setListaTickets(ticketsFiltrados);
+      }
+    },
+    [listaTodosTickets, loading]
+  );
+
   useEffect(() => {
+    console.log("Log");
     carregarTickets();
   }, [carregarTickets]);
 

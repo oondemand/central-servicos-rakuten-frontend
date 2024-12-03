@@ -23,6 +23,7 @@ import {
 import { useTicket } from "../../contexts/TicketContext";
 import { useBaseOmie } from "../../contexts/BaseOmieContext";
 import { useAuth } from "../../contexts/AuthContext"; // Importar o contexto de autenticação
+import { useDebounce } from "../../hooks/useDebounce";
 
 const Header = () => {
   const [baseOmieSelecionado, setBaseOmieSelecionado] = useState(null);
@@ -32,6 +33,10 @@ const Header = () => {
   const navigate = useNavigate();
 
   const [termoPesquisa, setTermoPesquisa] = useState("");
+  const debouncedFunction = useDebounce((value) => {
+    filtrarTickets({ stringDeBusca: value });
+  }, 800);
+
   // const [baseOmieDropdown, setBaseOmieSelecionadaDropdown] = useState("");
 
   // const handleBaseOmieChange = (e) => {
@@ -39,9 +44,8 @@ const Header = () => {
   // };
 
   const handlePesquisaChange = (e) => {
-    const termo = e.target.value;
-    setTermoPesquisa(termo);
-    filtrarTickets(termo);
+    setTermoPesquisa(e.target.value);
+    debouncedFunction(e.target.value);
   };
 
   const handleConfigClick = () => {
@@ -53,9 +57,9 @@ const Header = () => {
     navigate("/login");
   };
 
-  const handleBaseOmie = (selectedOption) => {
-    setBaseOmieSelecionado(selectedOption); // Atualiza o estado com a opção selecionada
-  };
+  // const handleBaseOmie = (selectedOption) => {
+  //   setBaseOmieSelecionado(selectedOption); // Atualiza o estado com a opção selecionada
+  // };
 
   // useEffect(() => {
   //   if (listaBases.length > 0) {
@@ -73,7 +77,9 @@ const Header = () => {
       justify="space-between"
       bg="white"
       color="white"
-      boxShadow={"0px 20px 25px -5px rgba(0, 0, 0, 0.10), 0px 10px 10px -5px rgba(0, 0, 0, 0.04)"}
+      boxShadow={
+        "0px 20px 25px -5px rgba(0, 0, 0, 0.10), 0px 10px 10px -5px rgba(0, 0, 0, 0.04)"
+      }
     >
       <Flex align="center" gap={14}>
         <Link to="/auth/home">
@@ -87,7 +93,7 @@ const Header = () => {
         <InputGroup display={{ base: "none", md: "flex" }}>
           <Input
             type="text"
-            placeholder="Busque por CNPJ..."
+            placeholder="Pesquisar ticket..."
             value={termoPesquisa}
             onChange={handlePesquisaChange}
             size="sm"
