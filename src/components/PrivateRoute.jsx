@@ -17,8 +17,12 @@ const PrivateRoute = () => {
       </Center>
     );
   }
+  
+  if(usuario && (usuario.tipo === "central" || usuario.tipo === "admin")){
+    return <Outlet/>
+  }
 
-  return usuario ? <Outlet /> : <Navigate to="/login" replace />;
+  return <Navigate to="/login" replace />;
 };
 
 export default PrivateRoute;
