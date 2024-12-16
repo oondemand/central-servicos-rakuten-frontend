@@ -705,7 +705,7 @@ const PrestadorForm = ({
                 label="RG"
                 name="prestador.pessoaFisica.rg.numero"
                 type="text"
-                mask="9999999999999999"
+                mask="****************"
               />
               <FormField
                 label="Órgão Emissor do RG"
