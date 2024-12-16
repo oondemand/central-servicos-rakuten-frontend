@@ -205,14 +205,14 @@ const Login = () => {
                       Login
                     </Button>
 
-                    <Flex justifyContent="space-between" w="full">
+                    {/* <Flex justifyContent="space-between" w="full">
                       <Link color="brand.500" href="#" textDecoration="underline">
                         Esqueci minha senha
                       </Link>
                       <Link color="brand.500" href="#"  textDecoration="underline">
                         Cadastrar
                       </Link>
-                    </Flex>
+                    </Flex> */}
                   </VStack>
                 </Form>
               );
