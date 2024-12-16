@@ -5,9 +5,9 @@ FROM node:18-alpine AS build
 WORKDIR /app
 
 # Copia os arquivos package.json e package-lock.json para o diretório de trabalho
-COPY package.json package-lock.json ./
+# COPY package.json package-lock.json ./
 
-# Copia o arquivo .env.prod para o diretório de trabalho e renomeia para .env
+# Copia o arquivo .env.dev para o diretório de trabalho e renomeia para .env
 COPY .env.dev .env
 
 # Instala as dependências
