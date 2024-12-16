@@ -4,11 +4,8 @@ FROM node:18-alpine AS build
 # Define o diretório de trabalho dentro do container
 WORKDIR /app
 
-# Copia os arquivos package.json e package-lock.json para o diretório de trabalho
+# Copia os arquivos package.json para o diretório de trabalho
 COPY package.json ./
-
-# Copia o arquivo .env.dev para o diretório de trabalho e renomeia para .env
-COPY .env.dev .env
 
 # Instala as dependências
 RUN npm install
