@@ -4,16 +4,16 @@ export const UsuarioCard = ({ usuario, onEdit, onDelete, onInvite }) => {
   return (
     <Flex mt="6" shadow="sm" p="4" justifyContent="space-between" align="end">
       <Box>
-        <Text>
+        <Text color="gray.950">
           <strong>Nome:</strong> {usuario.nome}
         </Text>
-        <Text>
+        <Text color="gray.950">
           <strong>Email:</strong> {usuario.email}
         </Text>
-        <Text>
+        <Text color="gray.950">
           <strong>Status:</strong> {usuario.status}
         </Text>
-        <Text>
+        <Text color="gray.950">
           <strong>Tipo:</strong> {usuario.tipo}
         </Text>
       </Box>

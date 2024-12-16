@@ -9,7 +9,6 @@ import {
   Box,
   Heading,
 } from "@chakra-ui/react";
-import CrudUsuarios from "./CrudUsuarios";
 
 import { UsuariosList } from "../usuariosList/index";
 
@@ -24,11 +23,6 @@ const ConfigTabs = () => {
         <TabPanels>
           <TabPanel>
             <UsuariosList />
-
-            {/* <Heading as="h3" fontSize="xl" mb={4}>
-              Configurações Gerais
-            </Heading>
-            <CrudUsuarios /> */}
           </TabPanel>
         </TabPanels>
       </Tabs>

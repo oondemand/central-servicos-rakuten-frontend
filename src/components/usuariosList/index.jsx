@@ -179,7 +179,7 @@ export const UsuariosList = () => {
   return (
     <>
       <Flex justifyContent="space-between">
-        <Heading as="h3" fontSize="xl" mb={4}>
+        <Heading as="h3" color="gray.950" fontSize="xl" mb={4}>
           Configurações Gerais
         </Heading>
         <Button
@@ -195,7 +195,7 @@ export const UsuariosList = () => {
       </Flex>
 
       <Box p="6" shadow="sm">
-        <Text fontSize="2xl" fontWeight="bold">
+        <Text fontSize="2xl" color="gray.950" fontWeight="bold">
           Usuários
         </Text>
         {usuarios &&
