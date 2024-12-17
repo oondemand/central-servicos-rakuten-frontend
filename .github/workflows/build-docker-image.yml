@@ -3,7 +3,7 @@ name: Build and create cst-rakuten-frontend package
 on:
   push:
     branches:
-      - humolog
+      - homolog
       - main
 jobs:
   build_and_publish:
@@ -12,8 +12,8 @@ jobs:
       - uses: actions/checkout@v3
       - name: Set environment variables based on branch
         run: |
-          if [[ "${GITHUB_REF##*/}" == "humolog" ]]; then
-            echo "IMAGE_NAME=cst-rakuten-frontend-humolog" >> $GITHUB_ENV
+          if [[ "${GITHUB_REF##*/}" == "homolog" ]]; then
+            echo "IMAGE_NAME=cst-rakuten-frontend-homolog" >> $GITHUB_ENV
           elif [[ "${GITHUB_REF##*/}" == "main" ]]; then
             echo "IMAGE_NAME=cst-rakuten-frontend" >> $GITHUB_ENV
           fi
