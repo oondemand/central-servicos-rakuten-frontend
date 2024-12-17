@@ -9,16 +9,12 @@ import {
   Box,
   Heading,
 } from "@chakra-ui/react";
-import CrudUsuarios from "./CrudUsuarios";
+
+import { UsuariosList } from "../usuariosList/index";
 
 const ConfigTabs = () => {
   return (
-    <Box
-      bg="white"
-      boxShadow="md"
-      rounded="md"
-      p={4}
-    >
+    <Box bg="white" boxShadow="md" rounded="md" p={4}>
       <Tabs variant="enclosed" colorScheme="purple">
         <TabList>
           <Tab>Usuários</Tab>
@@ -26,12 +22,7 @@ const ConfigTabs = () => {
 
         <TabPanels>
           <TabPanel>
-            <Heading as="h3" fontSize="xl" mb={4}>
-              Configurações Gerais
-            </Heading>
-
-            <CrudUsuarios />
-
+            <UsuariosList />
           </TabPanel>
         </TabPanels>
       </Tabs>

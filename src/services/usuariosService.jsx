@@ -40,3 +40,13 @@ export const listarUsuarios = async () => {
     throw error;
   }
 };
+
+export const enviarConvite = async (userId) => {
+  try {
+    const response = await api.post("/usuarios/enviar-convite", { userId });
+    return response.data;
+  } catch (error) {
+    console.error("Erro ao adicionar Usuário:", error);
+    throw error;
+  }
+};

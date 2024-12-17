@@ -34,8 +34,15 @@ const PrestadorForm = ({
   onDocumentoValido,
   ticket,
 }) => {
-  const { setFieldValue, values, errors, dirty, isSubmitting, setFieldError } =
-    useFormikContext();
+  const {
+    setFieldValue,
+    values,
+    errors,
+    dirty,
+    isSubmitting,
+    setFieldError,
+    handleChange,
+  } = useFormikContext();
 
   const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -464,12 +471,13 @@ const PrestadorForm = ({
     }
   }, [values?.prestador.documento, values?.prestador.tipo, setFieldValue]);
 
-  useEffect(() => {
-    const cepNumerico = values?.prestador?.endereco?.cep?.replace(/\D/g, "");
+  const handleCepChange = async (e) => {
+    handleChange(e);
+    const cep = e.target.value;
 
-    const buscarCep = async (cep) => {
+    if (cep.length >= 9) {
       try {
-        setIsAutoUpdating(true); 
+        setIsAutoUpdating(true);
         const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
         const data = await response.json();
 
@@ -483,15 +491,11 @@ const PrestadorForm = ({
         setFieldValue("prestador.endereco.estado", data.uf);
       } catch (error) {
         console.error("Erro ao buscar CEP:", error);
-      } finally {
-        setIsAutoUpdating(false);
       }
-    };
 
-    if (cepNumerico?.length === 8) {
-      buscarCep(cepNumerico);
+      setIsAutoUpdating(false);
     }
-  }, [values?.prestador?.endereco?.cep, setFieldValue]);
+  };
 
   useEffect(() => {
     // API BrasilAPI
@@ -595,7 +599,7 @@ const PrestadorForm = ({
             </div>
 
             <div>
-            <FormField
+              <FormField
                 label="Sci Unico"
                 name="prestador.sciUnico"
                 type="text"
@@ -616,7 +620,10 @@ const PrestadorForm = ({
                 },
                 { value: "inativo", label: "Inativo" },
                 { value: "arquivado", label: "Arquivado" },
-                { value: "aguardando-codigo-sci", label: "Aguardando código sci" },
+                {
+                  value: "aguardando-codigo-sci",
+                  label: "Aguardando código sci",
+                },
               ]}
             />
           </HStack>
@@ -698,7 +705,7 @@ const PrestadorForm = ({
                 label="RG"
                 name="prestador.pessoaFisica.rg.numero"
                 type="text"
-                mask="999999999"
+                mask="****************"
               />
               <FormField
                 label="Órgão Emissor do RG"
@@ -714,6 +721,7 @@ const PrestadorForm = ({
 
           <HStack align="stretch">
             <FormField
+              onChange={handleCepChange}
               label="CEP"
               name="prestador.endereco.cep"
               type="text"

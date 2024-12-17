@@ -30,6 +30,41 @@ const Login = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
 
+  const onSubmit = async(values) => {
+      try {
+        const response = await loginService(values);
+        const { token, usuario } = response.data;
+
+        console.log(usuario);
+
+        if(usuario.tipo === "central" || usuario.tipo === "admin"){
+          login(token, usuario);
+          return navigate("/auth/home");
+        }
+
+        toast.error("Usuário não tem permissões para acessar a CST!", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+      } catch (error) {
+        const errorMessage = getErrorMessage(error) || "Erro ao fazer login";
+        toast.error(errorMessage, {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+      }
+  }
+
   return (
     <Flex
       height="100vh"
@@ -94,36 +129,9 @@ const Login = () => {
             validationSchema={LoginSchema}
             validateOnBlur={false}
             validateOnChange={false}
-            onSubmit={async (values, actions) => {
-              try {
-                const response = await loginService(values);
-                const { token, usuario } = response.data;
-
-                login(token, usuario);
-                navigate("/auth/home");
-              } catch (error) {
-                const errorMessage =
-                  getErrorMessage(error) || "Erro ao fazer login";
-                actions.setFieldError("general", errorMessage);
-              }
-              actions.setSubmitting(false);
-            }}
+            onSubmit={onSubmit}
           >
             {({ errors, touched, isSubmitting }) => {
-              useEffect(() => {
-                if (errors.general) {
-                  toast.error(errors.general, {
-                    position: "top-right",
-                    autoClose: 5000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                  });
-                }
-              }, [errors.general]);
-
               return (
                 <Form>
                   <VStack spacing={5} align="flex-start">
