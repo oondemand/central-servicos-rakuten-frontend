@@ -100,14 +100,14 @@ const TicketActions = ({
                 bg="green.success"
                 rightIcon={<FaCheck />}
               >
-                Aprovar NFSe
+                Aprovar 
               </Button>
               <Button
                 onClick={() => handleActionClick("reprovar")}
                 colorScheme="red"
                 rightIcon={<FaTimes />}
               >
-                Recusar NFSe
+                Recusar 
               </Button>
               <Button
                 onClick={() => handleActionClick("arquivar")}
