@@ -35,6 +35,8 @@ import {
   alterarUsuario,
 } from "../../services/usuariosService";
 
+import { useAuth } from "../../contexts/AuthContext";
+
 export const UsuariosList = () => {
   const defaultValues = {
     tipo: "central",
@@ -51,6 +53,7 @@ export const UsuariosList = () => {
     onOpen: onAlertOpen,
     onClose: onAlertClose,
   } = useDisclosure();
+  const { usuario, loading } = useAuth();
   const [usuarios, setUsuarios] = useState([]);
   const [isEditMode, setIsEditMode] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
@@ -150,8 +153,6 @@ export const UsuariosList = () => {
   };
 
   const handleInvite = async (usuario) => {
-    console.log(usuario._id);
-
     try {
       await enviarConvite(usuario._id);
 
@@ -182,23 +183,39 @@ export const UsuariosList = () => {
         <Heading as="h3" color="gray.950" fontSize="xl" mb={4}>
           Configurações Gerais
         </Heading>
-        <Button
-          colorScheme="brand"
-          onClick={() => {
-            setValoreIniciais(defaultValues);
-            setIsEditMode(false);
-            onOpen();
-          }}
-        >
-          Criar usuário
-        </Button>
+        {usuario.tipo === "admin" && (
+          <Button
+            colorScheme="brand"
+            onClick={() => {
+              setValoreIniciais(defaultValues);
+              setIsEditMode(false);
+              onOpen();
+            }}
+          >
+            Criar usuário
+          </Button>
+        )}
       </Flex>
 
       <Box p="6" shadow="sm">
         <Text fontSize="2xl" color="gray.950" fontWeight="bold">
           Usuários
         </Text>
-        {usuarios &&
+        {usuario.tipo !== "admin" && usuarios.length > 0 && (
+          <UsuarioCard
+            key={usuario._id}
+            usuario={usuarios?.find((user) => user._id === usuario._id)}
+            onEdit={handleEdit}
+            onDelete={(id) => {
+              onAlertOpen();
+              setItemToDelete(id);
+            }}
+            onInvite={handleInvite}
+          />
+        )}
+
+        {usuario.tipo === "admin" &&
+          usuarios &&
           usuarios.map((usuario) => (
             <UsuarioCard
               key={usuario._id}
