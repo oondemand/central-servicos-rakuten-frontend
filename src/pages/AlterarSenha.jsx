@@ -16,27 +16,42 @@ import {
   Flex,
 } from "@chakra-ui/react";
 import * as Yup from "yup";
-import { login as loginService } from "../services/authService";
-import { useNavigate } from "react-router-dom";
+import { login as loginService, criarNovaSenha } from "../services/authService";
+import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { getErrorMessage } from "../utils/errorUtils";
 
 const LoginSchema = Yup.object().shape({
-  email: Yup.string().email("E-mail inválido").required("E-mail é obrigatório"),
-  senha: Yup.string().required("Senha é obrigatória"),
+  novaSenha: Yup.string()
+    .min(6, "A senha precisa ter no mínimo 6 caracteres")
+    .required("Nova senha é obrigatório"),
+  confirmacao: Yup.string()
+    .oneOf([Yup.ref("novaSenha")], "As senhas precisam ser iguais")
+    .required("Confirmação é obrigatória"),
 });
 
-const Login = () => {
-  const navigate = useNavigate();
+const AlterarSenha = () => {
   const { login } = useAuth();
+
+  const [searchParams] = useSearchParams();
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = searchParams.get("code");
+    if (token) {
+      localStorage.setItem("code", token);
+      navigate(location.pathname, { replace: true });
+    }
+  }, [searchParams, navigate]);
 
   const onSubmit = async (values) => {
     try {
-      const response = await loginService(values);
-      const { token, usuario } = response.data;
+      const { token, usuario } = await criarNovaSenha(values);
 
       if (usuario.tipo === "central" || usuario.tipo === "admin") {
         login(token, usuario);
+        localStorage.removeItem("code");
         return navigate("/auth/home");
       }
 
@@ -110,42 +125,43 @@ const Login = () => {
             justifyContent="center"
           >
             <Heading mb={2} color="brand.500" size="md" textAlign="center">
-              Que bom ter você por aqui! :)
+              Bem vindo(a) :)
             </Heading>
             <Text mb={4} color="brand.500" textAlign="center">
-              Vamos juntos transformar sua <br />
-              rotina com tecnologia.
+              Crie sua nova senha para acessar a Central de Serviços Rakuten.
             </Text>
           </Box>
 
           <Formik
             initialValues={{
-              email: "",
-              senha: "",
-              general: "",
+              novaSenha: "",
+              confirmacao: "",
             }}
             validationSchema={LoginSchema}
-            validateOnBlur={false}
-            validateOnChange={false}
             onSubmit={onSubmit}
           >
             {({ errors, touched, isSubmitting }) => {
               return (
                 <Form>
-                  <VStack spacing={5} align="flex-start">
+                  <VStack spacing={8} align="flex-start">
                     <FormControl
-                      isInvalid={errors.email && touched.email}
+                      isInvalid={errors.novaSenha && touched.novaSenha}
                       position="relative"
                     >
                       <FormLabel
-                        htmlFor="email"
+                        htmlFor="novaSenha"
                         color="brand.500"
                         fontWeight={400}
                       >
-                        Seu E-mail
+                        Nova senha
                       </FormLabel>
 
-                      <Field as={Input} id="email" name="email" type="email" />
+                      <Field
+                        as={Input}
+                        id="novaSenha"
+                        name="novaSenha"
+                        type="novaSenha"
+                      />
 
                       <FormErrorMessage
                         position="absolute"
@@ -155,25 +171,25 @@ const Login = () => {
                         color="red.500"
                         fontSize="xs"
                       >
-                        {errors.email}
+                        {errors.novaSenha}
                       </FormErrorMessage>
                     </FormControl>
 
                     <FormControl
-                      isInvalid={errors.senha && touched.senha}
+                      isInvalid={errors.confirmacao && touched.confirmacao}
                       position="relative"
                     >
                       <FormLabel
-                        htmlFor="senha"
+                        htmlFor="confirmacao"
                         color="brand.500"
                         fontWeight={400}
                       >
-                        Sua Senha
+                        Confirme sua nova senha
                       </FormLabel>
                       <Field
                         as={Input}
-                        id="senha"
-                        name="senha"
+                        id="confirmacao"
+                        name="confirmacao"
                         type="password"
                       />
                       <FormErrorMessage
@@ -184,7 +200,7 @@ const Login = () => {
                         color="red.500"
                         fontSize="xs"
                       >
-                        {errors.senha}
+                        {errors.confirmacao}
                       </FormErrorMessage>
                     </FormControl>
 
@@ -195,24 +211,14 @@ const Login = () => {
                       color={"white"}
                       background={"#0BC5EA"}
                     >
-                      Login
+                      Confirmar
                     </Button>
-
-                    {/* <Flex justifyContent="space-between" w="full">
-                      <Link color="brand.500" href="#" textDecoration="underline">
-                        Esqueci minha senha
-                      </Link>
-                      <Link color="brand.500" href="#"  textDecoration="underline">
-                        Cadastrar
-                      </Link>
-                    </Flex> */}
                   </VStack>
                 </Form>
               );
             }}
           </Formik>
 
-          {/* O ToastContainer deve estar aqui, fora do Form */}
           <ToastContainer />
         </Flex>
       </Box>
@@ -220,4 +226,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default AlterarSenha;

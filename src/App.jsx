@@ -13,6 +13,7 @@ const LoginPage = lazy(() => import("./pages/LoginPage"));
 const HomePage = lazy(() => import("./pages/HomePage"));
 const ConfigPage = lazy(() => import("./pages/ConfigPage"));
 const NotFoundPage = lazy(() => import("./pages/NotFoundPage"));
+const AlterarSenha = lazy(() => import("./pages/AlterarSenha"));
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
         <Suspense fallback={<Spinner size="xl" />}>
           <Routes>
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/alterar-senha" element={<AlterarSenha />} />
             <Route path="/auth" element={<PrivateRoute />}>
               <Route element={<Layout />}>
                 <Route path="home" element={<HomePage />} />

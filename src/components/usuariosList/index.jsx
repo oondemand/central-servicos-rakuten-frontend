@@ -26,14 +26,13 @@ import {
   listarUsuarios,
   excluirUsuario,
   enviarConvite,
+  adicionarUsuario,
+  alterarUsuario,
 } from "../../services/usuariosService";
 import { UsuarioForm } from "./form";
 import { UsuarioCard } from "./usuarioCard";
 
-import {
-  adicionarUsuario,
-  alterarUsuario,
-} from "../../services/usuariosService";
+import { esqueciMinhaSenha } from "../../services/authService";
 
 import { useAuth } from "../../contexts/AuthContext";
 
@@ -173,6 +172,29 @@ export const UsuariosList = () => {
     }
   };
 
+  const handleEditPassword = async (email) => {
+    try {
+      await esqueciMinhaSenha(email);
+
+      toast({
+        title: "Verifique o seu email!",
+        description:
+          "Um link de alteração foi mandado para o email do usuário.",
+        status: "info",
+        duration: 5000,
+        isClosable: true,
+      });
+    } catch (error) {
+      toast({
+        title: "Um erro aconteceu durante o processo.",
+        description: error.message,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+  };
+
   useEffect(() => {
     fetchUsuarios();
   }, []);
@@ -211,6 +233,7 @@ export const UsuariosList = () => {
               setItemToDelete(id);
             }}
             onInvite={handleInvite}
+            onEditPassword={handleEditPassword}
           />
         )}
 
@@ -226,6 +249,7 @@ export const UsuariosList = () => {
                 setItemToDelete(id);
               }}
               onInvite={handleInvite}
+              onEditPassword={handleEditPassword}
             />
           ))}
       </Box>
