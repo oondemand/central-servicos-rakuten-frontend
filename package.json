@@ -6,6 +6,7 @@
     "@chakra-ui/react": "^2.10.1",
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
+    "@tanstack/react-table": "^8.20.6",
     "axios": "^1.7.7",
     "cpf-cnpj-validator": "^1.0.3",
     "date-fns": "^4.1.0",
@@ -32,6 +33,7 @@
     "preview": "vite preview"
   },
   "devDependencies": {
+    "@faker-js/faker": "^9.3.0",
     "@vitejs/plugin-react": "^4.3.2",
     "vite": "^5.4.8"
   }
