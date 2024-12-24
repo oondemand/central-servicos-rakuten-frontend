@@ -18,3 +18,13 @@ export const validateToken = (token) => {
     })
     .then((response) => response.data);
 };
+
+export const esqueciMinhaSenha = async (email) => {
+  return await api.post("/auth/esqueci-minha-senha", { email });
+};
+
+export const criarNovaSenha = async (values) => {
+  const code = localStorage.getItem("code");
+  const { data } = await api.post("/auth/alterar-senha", { ...values, code });
+  return data;
+};

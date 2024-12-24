@@ -24,13 +24,13 @@ export const AuthProvider = ({ children }) => {
         if (token && usuarioData) {
           // Configura o token no Axios
           api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-          
-          // Opcional: Validar o token com o backend
-          // const response = await api.get("/auth/validar-token");
-          // setUsuario(response.data);
 
-          const parsedUsuario = JSON.parse(usuarioData);
-          setUsuario(parsedUsuario);
+          // Opcional: Validar o token com o backend
+          const response = await api.get("/auth/validar-token");
+          setUsuario(response.data);
+
+          // const parsedUsuario = JSON.parse(usuarioData);
+          // setUsuario(parsedUsuario);
           // console.log("Usuário autenticado:", parsedUsuario);
         }
       } catch (error) {

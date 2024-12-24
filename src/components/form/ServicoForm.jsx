@@ -21,10 +21,7 @@ import { FieldArray, useFormikContext } from "formik";
 import FormFieldTooltip from "../common/FormFildTooltip";
 import FormField from "../common/FormField";
 
-const ServicoForm = ({
-  setValeuArrayService,
-  onSomaTotalChange,
-}) => {
+const ServicoForm = ({ setValeuArrayService, onSomaTotalChange }) => {
   const [showErrorTooltip, setShowErrorTooltip] = useState(false);
   const { values, setFieldValue } = useFormikContext();
 
@@ -67,7 +64,7 @@ const ServicoForm = ({
         Serviços
       </Text>
       <FieldArray name="servicos">
-        {({ push, remove, form  }) => (
+        {({ push, remove, form }) => (
           <VStack align="stretch">
             <Table variant="simple" size="sm">
               <Thead>
@@ -76,7 +73,7 @@ const ServicoForm = ({
                   <Th>Valor Principal</Th>
                   <Th>Valor Bônus</Th>
                   <Th>Valor Ajuste Comercial</Th>
-                  <Th>Valor Hospedagem Anúncio</Th>
+                  <Th>Paid Placement</Th>
                   <Th>Valor Total</Th>
                   <Th></Th>
                 </Tr>
@@ -297,7 +294,6 @@ const ServicoForm = ({
                           }}
                         />
                       </Box>
-                      
                     </Td>
                     <Td></Td>
                   </Tr>
