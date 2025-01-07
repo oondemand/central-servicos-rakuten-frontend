@@ -2,90 +2,77 @@
 import React, { useState, useEffect } from "react";
 import { Box, Text, Spinner, Badge, useColorModeValue } from "@chakra-ui/react";
 import api from "../../services/api";
-import { formatDate } from "../../utils/formatDate";
 
 const CartaoContaPagarOmie = ({ ticket }) => {
   const [contaPagar, setContaPagar] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [retry, setRetry] = useState(0);
 
   useEffect(() => {
     const fetchContaPagar = async () => {
-      try {
-        const response = await api.get(`/contas-pagar/${ticket.contaPagarOmie}`);
-        setContaPagar(response.data);
-      } catch (err) {
-        console.log("Erro ao buscar conta a pagar:", err);
-        // console.error("Erro ao buscar conta a pagar:", err);
-        // setError("Erro ao buscar conta a pagar. Tentando novamente em 30 segundos...");
-        setTimeout(() => {
-          setRetry((prevRetry) => prevRetry + 1);
-        }, 30000);
-      } finally {
-        setLoading(false);
+      let tentativas = 1;
+      let maxTentativas = 3;
+
+      while (tentativas < maxTentativas) {
+        try {
+          const response = await api.get(
+            `/contas-pagar/${ticket.contaPagarOmie}`
+          );
+
+          setContaPagar(response.data);
+          setLoading(false);
+          return;
+        } catch (error) {
+          tentativas++;
+          console.log("Erro ao buscar conta a pagar:", error);
+          if (tentativas < maxTentativas) {
+            console.log("esperando");
+            await new Promise((resolve) => setTimeout(resolve, 30000));
+          }
+        }
       }
+
+      setError("Ouve um erro ao buscar conta a pagar.");
+      setLoading(false);
     };
 
-    if (ticket.contaPagarOmie) {
-      fetchContaPagar();
-    } else {
-      setLoading(false);
-    }
-  }, [ticket.contaPagarOmie, retry]);
+    ticket.contaPagarOmie ? fetchContaPagar() : setLoading(false);
+  }, [ticket.contaPagarOmie]);
 
   const bg = useColorModeValue("gray.200", "gray.600");
   const errorBg = useColorModeValue("red.100", "red.600");
   const warningBg = useColorModeValue("yellow.100", "yellow.600");
-  const successBg = useColorModeValue("green.100", "green.600");  
+  const successBg = useColorModeValue("green.100", "green.600");
 
   if (loading) {
     return (
-      <Box p={4} bg={bg} rounded="md" shadow="sm">
+      <Box p={4} bg={bg} my={2} rounded="md" shadow="sm">
         <Spinner />
       </Box>
     );
   }
 
-  if (error) {
-    return (
-      <Box p={4} bg={errorBg} rounded="md" shadow="sm">
-        <Text color="red.500">{error}</Text>
-      </Box>
-    );
-  }
-
+  // if (error) {
+  //   return (
+  //     <Box p={4} bg={errorBg} my={2} rounded="md" shadow="md">
+  //       <Text color="red.500">{error}</Text>
+  //     </Box>
+  //   );
+  // }
 
   // tickets sem serviço não geram conta a pagar (isso evita um bug)
-  if(ticket.servicos.length === 0){
-    // return (
-    //   <Box
-    //   rounded="lg"
-    //   shadow="md"
-    //   cursor="pointer"
-    //   bg={bg}
-    //   p={2}
-    //   my={2}
-    //   borderWidth="1px"
-    //   borderColor="brand.200"
-    //   color="brand.900"
-    // >
-    //   <Text fontWeight="bold">{ticket.titulo}</Text>
-    //   <Text>Status: <b>{ticket.status}</b></Text>
-    // </Box>
-    // );
-
+  if (ticket.servicos.length === 0) {
     return;
   }
 
-  if (!contaPagar) {
+  if (!contaPagar || error) {
     return (
-      <Box p={4} bg={warningBg} rounded="md" shadow="sm">
+      <Box p={4} bg={warningBg} my={2} rounded="md" shadow="sm">
+        <Text fontWeight="bold">{ticket.titulo}</Text>
         <Text>Carregando conta a pagar...</Text>
       </Box>
     );
   }
-
 
   return (
     <Box
