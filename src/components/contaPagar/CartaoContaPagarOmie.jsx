@@ -44,9 +44,7 @@ const CartaoContaPagarOmie = ({ ticket }) => {
     setLoading(true);
 
     try {
-      const response = await api.get(`/contas-pagar/${ticket.contaPagarOmie}`, {
-        timeout: 5000,
-      });
+      const response = await api.get(`/contas-pagar/${ticket.contaPagarOmie}`);
 
       setContaPagar(response.data);
       setLoading(false);
@@ -54,7 +52,7 @@ const CartaoContaPagarOmie = ({ ticket }) => {
       return;
     } catch (error) {
       console.log("Erro ao buscar conta a pagar:", error);
-      setError(error.response.data.erro);
+      setError(error?.response?.data?.erro || error);
     }
 
     setLoading(false);
@@ -79,7 +77,7 @@ const CartaoContaPagarOmie = ({ ticket }) => {
     0
   );
 
-  if (error === "PAYABLE ACCOUNT NOT FOUND") {
+  if (error === "CONTA A PAGAR NÃO ENCONTRADA NO OMIE") {
     return;
   }
 
@@ -133,15 +131,9 @@ const CartaoContaPagarOmie = ({ ticket }) => {
     <ContaPagarBox>
       <Text fontWeight="bold">{ticket.titulo}</Text>
       <Text>Documento: {contaPagar?.numero_documento || "..."}</Text>
-      {contaPagar?.valor_documento == valorTotalServicos ? (
-        <Text>Valor: R$ {contaPagar?.valor_documento?.toFixed(2)}</Text>
-      ) : (
-        <Flex gap="2">
-          Valor:<Text as="s">R$ {valorTotalServicos.toFixed(2)}</Text>
-          <Text>R$S {contaPagar?.valor_documento?.toFixed(2)}</Text>
-        </Flex>
-      )}
-      <Text>Vencimento: {contaPagar.data_vencimento}</Text>
+      <Text>Valor: R$ {valorTotalServicos.toFixed(2)}</Text>
+      <Text>R$ {contaPagar?.valor_documento?.toFixed(2)}</Text>
+      <Text>Vencimento: {contaPagar?.data_vencimento}</Text>
       <Text>Status: {contaPagar?.status_titulo}</Text>
     </ContaPagarBox>
   );
