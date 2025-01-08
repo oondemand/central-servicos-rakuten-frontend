@@ -131,8 +131,7 @@ const CartaoContaPagarOmie = ({ ticket }) => {
     <ContaPagarBox>
       <Text fontWeight="bold">{ticket.titulo}</Text>
       <Text>Documento: {contaPagar?.numero_documento || "..."}</Text>
-      <Text>Valor: R$ {valorTotalServicos.toFixed(2)}</Text>
-      <Text>R$ {contaPagar?.valor_documento?.toFixed(2)}</Text>
+      <Text>Valor R$ {contaPagar?.valor_documento?.toFixed(2)}</Text>
       <Text>Vencimento: {contaPagar?.data_vencimento}</Text>
       <Text>Status: {contaPagar?.status_titulo}</Text>
     </ContaPagarBox>
