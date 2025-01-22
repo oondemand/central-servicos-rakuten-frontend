@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: cst-rakuten-frontend
-  namespace: default
+  namespace: rakuten
 spec:
   replicas: 2
   selector:
@@ -15,13 +15,13 @@ spec:
     spec:
       containers:
         - name: cst-rakuten-frontend-container
-          image: registry.digitalocean.com/oondemand/cst-rakuten-frontend:${IMAGE_TAG}-prod
+          image: ghcr.io/oondemand/cst-rakuten-frontend:${IMAGE_TAG}-prod
           ports:
             - containerPort: 3000
           resources:
             requests:
               memory: "256Mi"
-              cpu: "0.1"
+              cpu: "0.5"
             limits:
-              memory: "2048Mi"
-              cpu: "2"
+              memory: "4096Mi"
+              cpu: "4"
