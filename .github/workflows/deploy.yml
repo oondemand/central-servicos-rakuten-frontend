@@ -53,7 +53,7 @@ jobs:
 
       - name: 🚀 Substituir variáveis no deployment.yml e aplicar no cluster
         run: |
-          envsubst < infra/kubernetes/deployment.yaml
+          envsubst < infra/kubernetes/deployment.yaml | kubectl apply -f -
 
         env:
           IMAGE_TAG: ${{ env.TAG }}
