@@ -44,7 +44,7 @@ const TicketActions = ({
 
     if (hasErrors) {
       if (errors.prestador) {
-        abrirPainelPrestador(); 
+        abrirPainelPrestador();
       }
       setShowTooltip(true);
       setTimeout(() => setShowTooltip(false), 3000);
@@ -70,8 +70,7 @@ const TicketActions = ({
 
       if (sucesso) {
         closeModal();
-        cancelar();
-        // toast.success(`Ticket ${acao}do com sucesso!`);
+        // cancelar();
       }
     } catch (error) {
       console.error(`Erro ao ${acao} ticket:`, error);
@@ -100,14 +99,14 @@ const TicketActions = ({
                 bg="green.success"
                 rightIcon={<FaCheck />}
               >
-                Aprovar 
+                Aprovar
               </Button>
               <Button
                 onClick={() => handleActionClick("reprovar")}
                 colorScheme="red"
                 rightIcon={<FaTimes />}
               >
-                Recusar 
+                Recusar
               </Button>
               <Button
                 onClick={() => handleActionClick("arquivar")}

@@ -1,6 +1,16 @@
 # Etapa 1: Construir o projeto
 FROM node:18-alpine AS build
 
+# Definindo a variável de ambientes com o valor do argumento
+ARG SERVICE_VERSION
+ARG VITE_API_URL
+
+# Definindo o argumento, que pode ser passado durante o build
+ENV SERVICE_VERSION=${SERVICE_VERSION}
+ENV VITE_API_URL=${VITE_API_URL}
+
+RUN echo "A versão da aplicação é: $SERVICE_VERSION e a URL da API é: $VITE_API_URL"
+
 # Define o diretório de trabalho dentro do container
 WORKDIR /app
 
