@@ -28,13 +28,46 @@
     "yup": "^1.4.0"
   },
   "scripts": {
+    "release": "release-it",
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview"
   },
   "devDependencies": {
     "@faker-js/faker": "^9.3.0",
+    "release-it": "^17.11.0",
+    "@release-it/conventional-changelog": "^9.0.4",
     "@vitejs/plugin-react": "^4.3.2",
     "vite": "^5.4.8"
+  },
+  "release-it": {
+    "git": {
+      "commitMessage": "chore: release v${version}"
+    },
+    "github": {
+      "release": true
+    },
+    "npm": {
+      "publish": false
+    },
+    "plugins": {
+      "@release-it/conventional-changelog": {
+        "infile": "CHANGELOG.md",
+        "preset": {
+          "name": "conventionalcommits",
+          "types": [
+            {
+              "type": "feat",
+              "section": "Features"
+            },
+            {
+              "type": "fix",
+              "section": "Bug Fixes"
+            },
+            {}
+          ]
+        }
+      }
+    }
   }
 }
