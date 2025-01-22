@@ -2,7 +2,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: cst-rakuten-frontend-ingress
-  namespace: default
+  namespace: rakuten
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-nginx
     kubernetes.io/ingress.class: nginx
@@ -12,10 +12,10 @@ spec:
   ingressClassName: nginx
   tls:
     - hosts:
-        - cst-rakuten.oondemand.com.br
+        - cst.rakuten.segeti.oondemand.com.br
       secretName: app-tls
   rules:
-    - host: cst-rakuten.oondemand.com.br
+    - host: cst.rakuten.segeti.oondemand.com.br
       http:
         paths:
           - path: /
