@@ -6,7 +6,8 @@ const Footer = () => {
   return (
     <Box p={4} textAlign="center" bg="gray.50" color="gray.800">
       <Text>
-        &copy; Central de Serviços OonDemand vs {process.env.SERVICE_VERSION}
+        &copy; Central de Serviços OonDemand vs{" "}
+        {import.meta.env.VITE_SERVICE_VERSION}
       </Text>
     </Box>
   );
