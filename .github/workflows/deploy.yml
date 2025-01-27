@@ -1,4 +1,4 @@
-name: Deploy to Kubernetes
+name: Deploy cst-front end to Kubernetes
 
 on:
   pull_request:
