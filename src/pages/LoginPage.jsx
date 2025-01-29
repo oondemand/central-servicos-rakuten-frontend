@@ -94,6 +94,9 @@ const Login = () => {
 
             <img src="/logo_rakuten.png" alt="RAKUTEN" />
           </Flex>
+          <Text color="white" fontSize="sm" fontWeight="semibold">
+            v {import.meta.env.VITE_SERVICE_VERSION}
+          </Text>
         </Box>
 
         <Flex
