@@ -1,4 +1,4 @@
-name: Deploy cst-frontend
+name: Deploy frontend
 
 on:
   pull_request:
