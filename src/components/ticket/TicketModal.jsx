@@ -138,7 +138,7 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
       prestador: prestadorInitValues,
       servicos: [],
       arquivos: [],
-      sciUnico: ""
+      sciUnico: "",
     };
 
     if (ticket) {
@@ -197,7 +197,6 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
         const documentoLimpo = values.prestador.documento
           ? values.prestador.documento.replace(/[^\d]/g, "")
           : "";
-
 
         const cepLimpo = values.prestador.endereco?.cep
           ? values.prestador.endereco.cep.replace(/[^\d]/g, "")
@@ -272,7 +271,7 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
       const sucessoTicket = await salvarTicket(ticketData);
 
       if (sucessoTicket.ticket?._id) {
-        closeModal();
+        // closeModal();
         // toast({
         //   title: "Ticket salvo com sucesso.",
         //   status: "success",
@@ -289,7 +288,9 @@ const TicketModal = ({ isOpen, closeModal, ticket = null }) => {
       toast({
         title: "Erro ao salvar ticket.",
         description:
-          error.response.data.detalhes || error.response.data.message || "Ocorreu um erro inesperado.",
+          error.response.data.detalhes ||
+          error.response.data.message ||
+          "Ocorreu um erro inesperado.",
         status: "error",
         duration: 5000,
         isClosable: true,
