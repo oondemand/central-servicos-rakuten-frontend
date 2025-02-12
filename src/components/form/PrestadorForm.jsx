@@ -69,14 +69,16 @@ const PrestadorForm = ({
   const [sidJaBuscado, setSidJaBuscado] = useState(false);
 
   const verificarDocumento = async (documentoValue) => {
-    const isCPFValido =
+      const isCPFValido =
       values?.prestador?.tipo === "pf" && isCPF(documentoValue);
     const isCNPJValido =
       values?.prestador?.tipo === "pj" && isCNPJ(documentoValue);
+
     const validationDocumentSchema = isCPFValido || isCNPJValido;
 
     setCpfValido(isCPFValido);
     setCnpjValido(isCNPJValido);
+
     setFieldError(
       "prestador.documento",
       validationDocumentSchema ? "" : "Documento inválido"
@@ -636,6 +638,7 @@ const PrestadorForm = ({
               options={[
                 { value: "pf", label: "Pessoa Física (CPF)" },
                 { value: "pj", label: "Pessoa Jurídica (CNPJ)" },
+                { value: "ext", label: "Exterior" },
               ]}
             />
             <FormField
