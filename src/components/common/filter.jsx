@@ -1,5 +1,5 @@
 import { Select } from "@chakra-ui/react";
-import { DebouncedInput } from "../registrosTable/debouncedInput";
+import { DebouncedInput } from "../common/debouncedInput";
 
 export function Filter({ column }) {
   const columnFilterValue = column.getFilterValue();
@@ -21,6 +21,7 @@ export function Filter({ column }) {
     </Select>
   ) : (
     <DebouncedInput
+      size="sm"
       onChange={(value) => column.setFilterValue(value)}
       placeholder={`Search...`}
       type="text"

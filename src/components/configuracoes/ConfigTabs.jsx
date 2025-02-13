@@ -14,23 +14,37 @@ import { UsuariosList } from "../usuariosList/index";
 import { RegistrosTable } from "../registrosTable";
 import { obterTodosRegistros } from "../../services/controleAlteracao";
 import { format } from "date-fns";
+import { listarTicketsArquivados } from "../../services/ticketService";
+import { TicketsArquivadoTable } from "../ticketsArquivadosTable";
+import { useTicket } from "../../contexts/TicketContext";
 
 const ConfigTabs = () => {
-  const [data, setData] = React.useState([]);
+  const { alterarStatusTicket } = useTicket();
+  const [data, setData] = React.useState({
+    registros: [],
+    ticketsArquivados: [],
+  });
+
   React.useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await obterTodosRegistros();
+        const { data: registros } = await obterTodosRegistros();
 
-        const refactoredData = response.data.map((e) => {
+        const refactoredData = registros?.map((e) => {
           return {
             ...e,
             dataHora: format(e.dataHora, "dd/MM/yyyy HH:mm"),
-            usuario: e.usuario.nome,
+            usuario: e.usuario?.nome || "Sistema",
           };
         });
 
-        setData(refactoredData);
+        const ticketsArquivados = await listarTicketsArquivados();
+
+        setData((prev) => ({
+          ...prev,
+          registros: refactoredData,
+          ticketsArquivados,
+        }));
       } catch (err) {
         console.log(err);
         console.log("Error");
@@ -39,11 +53,20 @@ const ConfigTabs = () => {
 
     fetchData();
   }, []);
+
+  const onRestoreTicket = async ({ id }) => {
+    await alterarStatusTicket(id, "revisao");
+
+    const tickets = data.ticketsArquivados.filter((item) => item._id !== id);
+    setData((prev) => ({ ...prev, ticketsArquivados: tickets }));
+  };
+
   return (
     <Box bg="white" boxShadow="md" rounded="md" p={4}>
       <Tabs variant="enclosed" colorScheme="purple">
         <TabList>
           <Tab>Usuários</Tab>
+          <Tab>Tickets arquivados</Tab>
           <Tab>Registros</Tab>
         </TabList>
 
@@ -52,7 +75,17 @@ const ConfigTabs = () => {
             <UsuariosList />
           </TabPanel>
           <TabPanel>
-            {data?.length > 0 && <RegistrosTable data={data} />}
+            {data.ticketsArquivados?.length > 0 && (
+              <TicketsArquivadoTable
+                data={data.ticketsArquivados}
+                onRestoreTicket={onRestoreTicket}
+              />
+            )}
+          </TabPanel>
+          <TabPanel>
+            {data.registros?.length > 0 && (
+              <RegistrosTable data={data.registros} />
+            )}
           </TabPanel>
         </TabPanels>
       </Tabs>

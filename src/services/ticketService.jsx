@@ -45,6 +45,18 @@ export const listarTickets = async (filtro) => {
   }
 };
 
+export const listarTicketsArquivados = async () => {
+  try {
+    const response = await api.get("tickets/arquivados");
+    console.log(response);
+
+    return response.data; // Retorna os dados da resposta
+  } catch (error) {
+    console.error("Erro ao listar tickets:", error);
+    throw error; // Repassa o erro para que o chamador possa tratá-lo
+  }
+};
+
 // Serviço para aprovar um ticket
 export const aprovarTicket = async (id) => {
   try {
@@ -118,14 +130,14 @@ export const listarArquivosDoTicket = async (filtro) => {
   }
 };
 
-// 
+//
 // export const downloadFileFromTicket = async (path) => {
 //   try {
 //     const response = await api.get(path, {
-//       responseType: 'blob' 
+//       responseType: 'blob'
 //     });
 
-//     return response.data; 
+//     return response.data;
 //   } catch (error) {
 //     console.error("Erro ao baixar imagem", error);
 //     throw error; // Repassa o erro para que o chamador possa tratá-lo
