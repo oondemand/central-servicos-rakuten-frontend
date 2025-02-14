@@ -28,6 +28,7 @@ const ConfigTabs = () => {
   React.useEffect(() => {
     const fetchData = async () => {
       try {
+        const ticketsArquivados = await listarTicketsArquivados();
         const { data: registros } = await obterTodosRegistros();
 
         const refactoredData = registros?.map((e) => {
@@ -38,13 +39,13 @@ const ConfigTabs = () => {
           };
         });
 
-        const ticketsArquivados = await listarTicketsArquivados();
-
-        setData((prev) => ({
-          ...prev,
-          registros: refactoredData,
-          ticketsArquivados,
-        }));
+        if (ticketsArquivados && refactoredData) {
+          setData((prev) => ({
+            ...prev,
+            registros: refactoredData,
+            ticketsArquivados,
+          }));
+        }
       } catch (err) {
         console.log(err);
         console.log("Error");
