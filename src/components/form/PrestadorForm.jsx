@@ -28,6 +28,7 @@ import {
   obterPrestadorPorEmail,
   obterPrestadorPorPis,
 } from "../../services/prestadorService";
+import { LISTA_PAISES_OMIE } from "../../constants";
 
 const PrestadorForm = ({
   onUpdatePrestadorInfo,
@@ -43,6 +44,8 @@ const PrestadorForm = ({
     setFieldError,
     handleChange,
   } = useFormikContext();
+
+  console.log("Values", values);
 
   const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -73,10 +76,12 @@ const PrestadorForm = ({
       values?.prestador?.tipo === "pf" && isCPF(documentoValue);
     const isCNPJValido =
       values?.prestador?.tipo === "pj" && isCNPJ(documentoValue);
+
     const validationDocumentSchema = isCPFValido || isCNPJValido;
 
     setCpfValido(isCPFValido);
     setCnpjValido(isCNPJValido);
+
     setFieldError(
       "prestador.documento",
       validationDocumentSchema ? "" : "Documento inválido"
@@ -148,6 +153,17 @@ const PrestadorForm = ({
   const handleChangeBanks = (selectedOption) => {
     setFieldValue(
       "prestador.dadosBancarios.banco",
+      selectedOption ? selectedOption.label : ""
+    );
+  };
+
+  const handleChangePais = (selectedOption) => {
+    setFieldValue(
+      "prestador.endereco.pais.cod",
+      selectedOption ? selectedOption.value : ""
+    );
+    setFieldValue(
+      "prestador.endereco.pais.nome",
       selectedOption ? selectedOption.label : ""
     );
   };
@@ -567,6 +583,11 @@ const PrestadorForm = ({
   // Determina se o prestador é Pessoa Física
   const isPessoaFisica = values?.prestador.tipo === "pf";
 
+  const paisesOptions = LISTA_PAISES_OMIE.map((e) => ({
+    value: e.cCodigo,
+    label: e.cDescricao,
+  }));
+
   return (
     <div>
       <h2>
@@ -636,6 +657,7 @@ const PrestadorForm = ({
               options={[
                 { value: "pf", label: "Pessoa Física (CPF)" },
                 { value: "pj", label: "Pessoa Jurídica (CNPJ)" },
+                { value: "ext", label: "Exterior" },
               ]}
             />
             <FormField
@@ -787,6 +809,53 @@ const PrestadorForm = ({
                     </option>
                   ))}
               </select>
+            </div>
+
+            <div
+              style={{
+                marginBottom: "2rem",
+                width: "1050px",
+                zIndex: "999999",
+              }}
+            >
+              <label
+                style={{
+                  fontWeight: "500",
+                  display: "block",
+                  marginBottom: "8px",
+                }}
+              >
+                País
+              </label>
+              <Select
+                defaultValue={values?.prestador?.endereco?.pais?.nome}
+                defaultInputValue={values?.prestador?.endereco?.pais?.nome}
+                options={paisesOptions}
+                value={paisesOptions.find(
+                  (item) =>
+                    item.value === values?.prestador?.endereco?.pais?.cod
+                )}
+                onChange={handleChangePais}
+                placeholder="Selecione ou digite o país"
+                isClearable
+                menuPortalTarget={document.body}
+                styles={{
+                  control: (base) => ({
+                    ...base,
+                    minHeight: "40px",
+                    borderRadius: "6px",
+                    borderColor: "#ccc",
+                    boxShadow: "none",
+                  }),
+                  menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                  menu: (base) => ({
+                    ...base,
+                    maxHeight: "auto",
+                    overflowY: "auto",
+                    zIndex: "999",
+                  }),
+                }}
+              />
             </div>
           </HStack>
 

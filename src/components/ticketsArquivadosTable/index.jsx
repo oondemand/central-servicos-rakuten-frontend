@@ -19,7 +19,9 @@ import {
   ModalBody,
   ModalCloseButton,
   useDisclosure,
+  IconButton,
   Tooltip,
+  Grid,
 } from "@chakra-ui/react";
 import {
   flexRender,
@@ -33,7 +35,8 @@ import { useState } from "react";
 import { Filter } from "../common/filter";
 import { DebouncedInput } from "../common/debouncedInput";
 import { obterTodosRegistros } from "../../services/controleAlteracao";
-import { DadosAtualizadosCard } from "./dadosAtualizadosCard";
+import { PlusSquareIcon } from "@chakra-ui/icons";
+import { ServicosCard } from "./servicosCard";
 
 const cellWithServicesTooltip = ({ ...props }) => {
   return (
@@ -45,69 +48,65 @@ const cellWithServicesTooltip = ({ ...props }) => {
 
 const columns = [
   {
-    accessorKey: "dataHora",
-    header: "Data",
+    accessorKey: "_id",
+    header: "ID",
     cell: cellWithServicesTooltip,
     enableColumnFilter: false,
-  },
-  {
-    accessorKey: "usuario",
-    header: "Usuario",
-    cell: cellWithServicesTooltip,
-    enableColumnFilter: false,
-  },
-  {
-    accessorKey: "tipoRegistroAlterado",
-    header: "Tipo de registro",
-    cell: cellWithServicesTooltip,
     enableSorting: false,
-    meta: {
-      filterVariant: "select",
-      filterOptions: [
-        { value: "usuario", label: "Usuario" },
-        { value: "ticket", label: "Ticket" },
-      ],
+  },
+  {
+    accessorKey: "titulo",
+    header: "Descrição",
+    enableColumnFilter: false,
+    cell: cellWithServicesTooltip,
+  },
+  {
+    accessorKey: "prestador.nome",
+    header: "Prestador",
+    enableColumnFilter: false,
+    cell: cellWithServicesTooltip,
+  },
+  {
+    accessorKey: "prestador.sid",
+    header: "SID",
+    enableColumnFilter: false,
+    cell: cellWithServicesTooltip,
+  },
+  {
+    accessorKey: "prestador.documento",
+    header: "Documento",
+    enableColumnFilter: false,
+    cell: cellWithServicesTooltip,
+  },
+  {
+    accessorKey: "action",
+    header: "Ações",
+    cell: (props) => {
+      return (
+        <Button
+          display="flex"
+          gap="2"
+          size="sm"
+          variant="solid"
+          colorScheme="blue"
+          onClick={() =>
+            props?.table?.options?.meta?.onRestoreTicket({
+              id: props.row.original?._id,
+            })
+          }
+        >
+          <PlusSquareIcon fontWeight="bold" fontSize="md" /> Restaurar
+        </Button>
+      );
     },
-  },
-  {
-    accessorKey: "idRegistroAlterado",
-    header: "Id",
-    cell: cellWithServicesTooltip,
-    enableColumnFilter: false,
-  },
-  {
-    accessorKey: "origem",
-    header: "Origem",
-    cell: cellWithServicesTooltip,
-    enableColumnFilter: false,
-  },
-  {
-    accessorKey: "acao",
-    header: "Ação",
-    cell: cellWithServicesTooltip,
     enableSorting: false,
-    meta: {
-      filterVariant: "select",
-      filterOptions: [
-        { value: "adicionar", label: "Adicionar" },
-        { value: "alterar", label: "Alterar" },
-        { value: "aprovar", label: "Aprovar" },
-        { value: "excluir", label: "Excluir" },
-        { value: "reprovar", label: "Reprovar" },
-        { value: "status", label: "Status" },
-      ],
-    },
+    enableColumnFilter: false,
   },
 ];
 
-// dadosAtualizados
-
-export const RegistrosTable = ({ data }) => {
+export const TicketsArquivadoTable = ({ data, onRestoreTicket }) => {
   const [columnFilters, setColumnFilters] = useState([]);
   const [globalFilter, setGlobalFilter] = useState("");
-
-  // const [selectedRow, setSelectedRow] = useState();
-  // const { isOpen, onOpen, onClose } = useDisclosure();
 
   const table = useReactTable({
     data,
@@ -121,13 +120,16 @@ export const RegistrosTable = ({ data }) => {
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
+    meta: {
+      onRestoreTicket,
+    },
   });
 
   return (
     <>
       <Box>
         <Heading as="h3" color="gray.950" fontSize="xl" mb={4}>
-          Registros gerais
+          Tickets Arquivados
         </Heading>
         <Flex gap="4" alignItems="center" mb="4">
           <DebouncedInput
@@ -185,22 +187,12 @@ export const RegistrosTable = ({ data }) => {
                 borderRadius="sm"
                 maxW="700px" // Largura máxima do tooltip
                 minW="700px" // Largura mínima garantida
-                label={
-                  <DadosAtualizadosCard
-                    content={row.original?.dadosAtualizados}
-                  />
-                }
+                label={<ServicosCard servicos={row.original?.servicos} />}
                 openDelay={500}
               >
-                <Tr
-                  // onClick={() => {
-                  //   onOpen();
-                  //   setSelectedRow(row.original);
-                  // }}
-                  key={row.id}
-                >
+                <Tr key={row.id}>
                   {row.getVisibleCells().map((cell) => (
-                    <Td fontSize="md" key={cell.id}>
+                    <Td py="2" fontSize="md" key={cell.id}>
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()
@@ -233,35 +225,6 @@ export const RegistrosTable = ({ data }) => {
             </Button>
           </ButtonGroup>
         </Box>
-
-        {/* <Modal size="4xl" isCentered isOpen={isOpen} onClose={onClose}>
-          <ModalContent>
-            <ModalHeader>
-              <Heading
-                w="full"
-                borderBottom="1px solid"
-                borderBottomColor="gray.200"
-                fontSize="md"
-                pb="4"
-              >
-                Dados Atualizados:
-              </Heading>
-            </ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <Box
-                maxH="md"
-                overflowY="auto"
-                fontSize="sm"
-                sx={{ scrollbarWidth: "thin" }}
-              >
-                <code>{selectedRow?.dadosAtualizados}</code>
-              </Box>
-            </ModalBody>
-
-            <ModalFooter />
-          </ModalContent>
-        </Modal> */}
       </Box>
     </>
   );
