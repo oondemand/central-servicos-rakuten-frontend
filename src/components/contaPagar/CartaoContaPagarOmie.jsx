@@ -128,6 +128,18 @@ const CartaoContaPagarOmie = ({ ticket }) => {
     );
   }
 
+  if (contaPagar) {
+    return (
+      <ContaPagarBox>
+        <Text fontWeight="bold">{ticket.titulo}</Text>
+        <Text>Documento: {contaPagar?.numero_documento || "..."}</Text>
+        <Text>Valor R$ {contaPagar?.valor_documento?.toFixed(2)}</Text>
+        <Text>Vencimento: {contaPagar?.data_vencimento}</Text>
+        <Text>Status: {contaPagar?.status_titulo}</Text>
+      </ContaPagarBox>
+    );
+  }
+
   return (
     <ContaPagarBox position="relative">
       <Text fontWeight="bold">{ticket.titulo}</Text>
@@ -143,22 +155,12 @@ const CartaoContaPagarOmie = ({ ticket }) => {
         right="3"
         size="xs"
         rounded="full"
-        bg="gray.200" 
+        bg="gray.200"
       >
         <RepeatIcon />
       </IconButton>
     </ContaPagarBox>
   );
-
-  // return (
-  //   <ContaPagarBox>
-  //     <Text fontWeight="bold">{ticket.titulo}</Text>
-  //     <Text>Documento: {contaPagar?.numero_documento || "..."}</Text>
-  //     <Text>Valor R$ {contaPagar?.valor_documento?.toFixed(2)}</Text>
-  //     <Text>Vencimento: {contaPagar?.data_vencimento}</Text>
-  //     <Text>Status: {contaPagar?.status_titulo}</Text>
-  //   </ContaPagarBox>
-  // );
 };
 
 export default CartaoContaPagarOmie;
