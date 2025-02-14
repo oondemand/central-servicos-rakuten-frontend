@@ -1,6 +1,6 @@
 {
   "name": "frontend",
-  "version": "1.2.5",
+  "version": "1.2.6",
   "dependencies": {
     "@chakra-ui/icons": "^2.1.1",
     "@chakra-ui/react": "^2.10.1",
