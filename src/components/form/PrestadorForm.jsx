@@ -657,7 +657,7 @@ const PrestadorForm = ({
               options={[
                 { value: "pf", label: "Pessoa Física (CPF)" },
                 { value: "pj", label: "Pessoa Jurídica (CNPJ)" },
-                { value: "ext", label: "Exterior" },
+                { value: "ext", label: "Estrangeiro" },
               ]}
             />
             <FormField
@@ -665,11 +665,6 @@ const PrestadorForm = ({
               name="prestador.documento"
               type="text"
               onChange={handleDocumentoChange}
-              // mask={
-              //   values?.prestador?.tipo === "pf"
-              //     ? "999.999.999-99"
-              //     : "99.999.999/9999-99"
-              // }
               style={{
                 borderColor:
                   (!cpfValido && values?.prestador?.tipo === "pf") ||
@@ -763,54 +758,62 @@ const PrestadorForm = ({
               name="prestador.endereco.complemento"
               type="text"
             />
+
             <FormField
               label="Cidade"
               name="prestador.endereco.cidade"
               type="text"
             />
-            {/* <FormField
+
+            {values?.prestador?.tipo === "ext" && (
+              <FormField
                 label="Estado"
                 name="prestador.endereco.estado"
                 type="text"
-              /> */}
+              />
+            )}
 
-            <div
-              style={{ width: "1040px", marginTop: "8px", fontWeight: "500" }}
-            >
-              <label htmlFor="prestador.endereco.estado">Estado</label>
-              <select
-                id="prestador.endereco.estado"
-                name="prestador.endereco.estado"
-                value={values?.prestador?.endereco?.estado}
-                onChange={(e) => {
-                  if (!isAutoUpdating) {
-                    setFieldValue("prestador.endereco.estado", e.target.value);
-                  }
-                }}
-                style={{
-                  height: "40px",
-                  maxHeight: "150px",
-                  overflowY: "auto",
-                  padding: "8px",
-                  borderRadius: "6px",
-                  width: "100%",
-                  border: "1px solid rgb(226, 232, 240)",
-                  backgroundColor: "#fff",
-                  fontSize: "16px",
-                  cursor: "pointer",
-                  outline: "none",
-                }}
+            {values?.prestador?.tipo !== "ext" && (
+              <div
+                style={{ width: "1040px", marginTop: "8px", fontWeight: "500" }}
               >
-                <option value="">Selecione um estado</option>
-                {estados &&
-                  estados.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-              </select>
-            </div>
-
+                <label htmlFor="prestador.endereco.estado">Estado</label>
+                <select
+                  id="prestador.endereco.estado"
+                  name="prestador.endereco.estado"
+                  value={values?.prestador?.endereco?.estado}
+                  onChange={(e) => {
+                    if (!isAutoUpdating) {
+                      setFieldValue(
+                        "prestador.endereco.estado",
+                        e.target.value
+                      );
+                    }
+                  }}
+                  style={{
+                    height: "40px",
+                    maxHeight: "150px",
+                    overflowY: "auto",
+                    padding: "8px",
+                    borderRadius: "6px",
+                    width: "100%",
+                    border: "1px solid rgb(226, 232, 240)",
+                    backgroundColor: "#fff",
+                    fontSize: "16px",
+                    cursor: "pointer",
+                    outline: "none",
+                  }}
+                >
+                  <option value="">Selecione um estado</option>
+                  {estados &&
+                    estados.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                </select>
+              </div>
+            )}
             <div
               style={{
                 marginBottom: "2rem",
