@@ -36,7 +36,7 @@ const ContaPagarBox = ({ children, ...rest }) => {
 };
 
 const CartaoContaPagarOmie = ({ ticket }) => {
-  const [contaPagar, setContaPagar] = useState(null);
+  const [contaPagar, setContaPagar] = useState(ticket?.contaPagarOmie ?? null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -44,7 +44,9 @@ const CartaoContaPagarOmie = ({ ticket }) => {
     setLoading(true);
 
     try {
-      const response = await api.get(`/contas-pagar/${ticket.contaPagarOmie}`);
+      const response = await api.get(
+        `/contas-pagar/${ticket?.contaPagarOmie?.codigo_lancamento_omie}`
+      );
 
       setContaPagar(response.data);
       setLoading(false);
@@ -128,14 +130,27 @@ const CartaoContaPagarOmie = ({ ticket }) => {
     );
   }
 
-  if (contaPagar) {
+  if (contaPagar || ticket?.contaPagarOmie) {
     return (
-      <ContaPagarBox>
+      <ContaPagarBox position="relative">
         <Text fontWeight="bold">{ticket.titulo}</Text>
         <Text>Documento: {contaPagar?.numero_documento || "..."}</Text>
         <Text>Valor R$ {contaPagar?.valor_documento?.toFixed(2)}</Text>
         <Text>Vencimento: {contaPagar?.data_vencimento}</Text>
-        <Text>Status: {contaPagar?.status_titulo}</Text>
+        <Text>Status: {contaPagar?.status_titulo?.toUpperCase()}</Text>
+        <IconButton
+          onClick={() => {
+            fetchContaPagar();
+          }}
+          position="absolute"
+          bottom="2"
+          right="3"
+          size="xs"
+          rounded="full"
+          bg="gray.200"
+        >
+          <RepeatIcon />
+        </IconButton>
       </ContaPagarBox>
     );
   }
