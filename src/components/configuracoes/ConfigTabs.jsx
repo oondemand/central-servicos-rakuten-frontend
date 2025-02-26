@@ -1,4 +1,3 @@
-// src/components/configuracoes/ConfigTabs.js
 import React from "react";
 import {
   Tabs,
@@ -17,6 +16,8 @@ import { format } from "date-fns";
 import { listarTicketsArquivados } from "../../services/ticketService";
 import { TicketsArquivadoTable } from "../ticketsArquivadosTable";
 import { useTicket } from "../../contexts/TicketContext";
+import { ListasTabs } from "./tabs/listas";
+import { UsuariosTabs } from "./tabs/usuarios";
 
 const ConfigTabs = () => {
   const { alterarStatusTicket } = useTicket();
@@ -67,14 +68,15 @@ const ConfigTabs = () => {
       <Tabs variant="enclosed" colorScheme="purple">
         <TabList>
           <Tab>Usuários</Tab>
+          <Tab>Listas</Tab>
           <Tab>Tickets arquivados</Tab>
           <Tab>Registros</Tab>
         </TabList>
 
         <TabPanels>
-          <TabPanel>
-            <UsuariosList />
-          </TabPanel>
+          <UsuariosTabs />
+          <ListasTabs />
+
           <TabPanel>
             <Heading as="h3" color="gray.950" fontSize="xl" mb={4}>
               Tickets Arquivados
