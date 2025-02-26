@@ -128,9 +128,6 @@ export const TicketsArquivadoTable = ({ data, onRestoreTicket }) => {
   return (
     <>
       <Box>
-        <Heading as="h3" color="gray.950" fontSize="xl" mb={4}>
-          Tickets Arquivados
-        </Heading>
         <Flex gap="4" alignItems="center" mb="4">
           <DebouncedInput
             value={globalFilter ?? ""}

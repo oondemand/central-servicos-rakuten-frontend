@@ -76,6 +76,9 @@ const ConfigTabs = () => {
             <UsuariosList />
           </TabPanel>
           <TabPanel>
+            <Heading as="h3" color="gray.950" fontSize="xl" mb={4}>
+              Tickets Arquivados
+            </Heading>
             {data.ticketsArquivados?.length > 0 && (
               <TicketsArquivadoTable
                 data={data.ticketsArquivados}
@@ -84,6 +87,9 @@ const ConfigTabs = () => {
             )}
           </TabPanel>
           <TabPanel>
+            <Heading as="h3" color="gray.950" fontSize="xl" mb={4}>
+              Registros gerais
+            </Heading>
             {data.registros?.length > 0 && (
               <RegistrosTable data={data.registros} />
             )}
