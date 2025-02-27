@@ -7,6 +7,11 @@ import {
   Flex,
   Box,
   useToast,
+  Accordion,
+  AccordionItem,
+  AccordionButton,
+  AccordionPanel,
+  AccordionIcon,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import api from "../../../services/api";
@@ -46,6 +51,8 @@ export const ListasTabs = () => {
   }, []);
 
   const onFormSubmit = async ({ values, id }) => {
+    console.log(values);
+
     try {
       await api.post(`listas/${id}`, values);
       getListas();
@@ -104,118 +111,165 @@ export const ListasTabs = () => {
         Listas
       </Heading>
 
-      {queryState?.data &&
-        queryState?.data?.map((lista) => (
-          <Box mt="6">
-            <Text fontSize="md" fontWeight="semibold">
-              {lista?.codigo.charAt(0).toUpperCase() + lista?.codigo.slice(1)}
-            </Text>
-            <Box maxH="300px" overflowY="auto" sx={{ scrollbarWidth: "thin" }}>
-              {lista?.valores &&
-                lista.valores.map((item) => {
-                  return (
-                    <Flex gap="8" mt="2" alignItems="flex-end">
-                      <Input
-                        w="sm"
-                        size="sm"
-                        name="chave"
-                        placeholder="chave"
-                        variant="flushed"
-                        color="gray.600"
-                        defaultValue={item?.chave}
-                        onBlur={async (ev) => {
-                          if (
-                            ev.target.value !== "" &&
-                            ev.target.defaultValue !== ev.target.value
-                          ) {
-                            await onUpdateItem({
-                              itemId: item._id,
-                              id: lista._id,
-                              key: ev.target.name,
-                              value: ev.target.value,
-                            });
-                          }
-                        }}
-                      />
-                      <Input
-                        w="sm"
-                        size="sm"
-                        name="valor"
-                        color="gray.600"
-                        placeholder="valor"
-                        variant="flushed"
-                        defaultValue={item?.valor}
-                        onBlur={async (ev) => {
-                          if (
-                            ev.target.value !== "" &&
-                            ev.target.defaultValue !== ev.target.value
-                          ) {
-                            await onUpdateItem({
-                              itemId: item._id,
-                              id: lista._id,
-                              key: ev.target.name,
-                              value: ev.target.value,
-                            });
-                          }
-                        }}
-                      />
-                      <Button
-                        onClick={async () => {
-                          await onDelete({ id: lista._id, itemId: item._id });
-                        }}
-                        variant="ghost"
-                        size="xs"
+      <Accordion defaultIndex={[]} allowToggle allowMultiple>
+        {queryState?.data &&
+          queryState?.data?.map((lista) => (
+            <AccordionItem>
+              {({ isExpanded, isDisabled }) => {
+                return (
+                  <>
+                    <Flex>
+                      <AccordionButton
+                        display="flex"
+                        justifyContent="space-between"
+                        px="4"
                       >
-                        <DeleteIcon />
-                      </Button>
+                        <Flex gap="6">
+                          <Text fontSize="md" fontWeight="semibold">
+                            {lista?.codigo.charAt(0).toUpperCase() +
+                              lista?.codigo.slice(1)}
+                          </Text>
+                          <Button
+                            size="xs"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              onFormSubmit({ id: lista._id, values: {} });
+                            }}
+                          >
+                            Adicionar
+                          </Button>
+                        </Flex>
+                        <AccordionIcon />
+                      </AccordionButton>
                     </Flex>
-                  );
-                })}
-            </Box>
-            <Formik
-              initialValues={{
-                chave: "",
-                valor: "",
+                    <AccordionPanel>
+                      <Box
+                        maxH="300px"
+                        overflowY="auto"
+                        sx={{ scrollbarWidth: "thin" }}
+                      >
+                        {lista?.valores &&
+                          lista.valores.map((item, i) => {
+                            return (
+                              <Flex
+                                key={item._id}
+                                gap="8"
+                                mt="2"
+                                alignItems="flex-end"
+                              >
+                                <Input
+                                  w="sm"
+                                  size="sm"
+                                  name="chave"
+                                  placeholder="chave"
+                                  variant="flushed"
+                                  color="gray.600"
+                                  defaultValue={item?.chave}
+                                  onBlur={async (ev) => {
+                                    if (
+                                      ev.target.value !== "" &&
+                                      ev.target.defaultValue !== ev.target.value
+                                    ) {
+                                      await onUpdateItem({
+                                        itemId: item._id,
+                                        id: lista._id,
+                                        key: ev.target.name,
+                                        value: ev.target.value,
+                                      });
+                                    }
+                                  }}
+                                />
+                                <Input
+                                  w="sm"
+                                  size="sm"
+                                  name="valor"
+                                  color="gray.600"
+                                  placeholder="valor"
+                                  variant="flushed"
+                                  defaultValue={item?.valor}
+                                  onBlur={async (ev) => {
+                                    if (
+                                      ev.target.value !== "" &&
+                                      ev.target.defaultValue !== ev.target.value
+                                    ) {
+                                      await onUpdateItem({
+                                        itemId: item._id,
+                                        id: lista._id,
+                                        key: ev.target.name,
+                                        value: ev.target.value,
+                                      });
+                                    }
+                                  }}
+                                />
+                                <Button
+                                  onClick={async () => {
+                                    await onDelete({
+                                      id: lista._id,
+                                      itemId: item._id,
+                                    });
+                                  }}
+                                  variant="ghost"
+                                  size="xs"
+                                >
+                                  <DeleteIcon />
+                                </Button>
+                              </Flex>
+                            );
+                          })}
+                      </Box>
+                      {/* <Formik
+                 initialValues={{
+                   chave: "",
+                   valor: "",
+                 }}
+                 onSubmit={(values, { resetForm }) => {
+                   onFormSubmit({ id: lista._id, values });
+                   resetForm();
+                 }}
+               >
+                 {(props) => (
+                   <form
+                     onReset={props.handleReset}
+                     onSubmit={props.handleSubmit}
+                   >
+                     <Flex gap="8" mt="2" alignItems="flex-end">
+                       <Input
+                         w="sm"
+                         size="sm"
+                         placeholder="chave"
+                         variant="flushed"
+                         name="chave"
+                         color="gray.600"
+                         onChange={props.handleChange}
+                         onBlur={props.handleBlur}
+                         value={props.values.chave}
+                       />
+                       <Input
+                         w="sm"
+                         size="sm"
+                         placeholder="valor"
+                         variant="flushed"
+                         name="valor"
+                         color="gray.600"
+                         onChange={props.handleChange}
+                         onBlur={props.handleBlur}
+                         value={props.values.valor}
+                       />
+                       <Button size="xs" type="submit">
+                         Adicionar
+                       </Button>
+                     </Flex>
+                   </form>
+                 )}
+               </Formik> */}
+                    </AccordionPanel>
+                  </>
+                );
               }}
-              onSubmit={(values, { resetForm }) => {
-                onFormSubmit({ id: lista._id, values });
-                resetForm();
-              }}
-            >
-              {(props) => (
-                <form onReset={props.handleReset} onSubmit={props.handleSubmit}>
-                  <Flex gap="8" mt="2" alignItems="flex-end">
-                    <Input
-                      w="sm"
-                      size="sm"
-                      placeholder="chave"
-                      variant="flushed"
-                      name="chave"
-                      color="gray.600"
-                      onChange={props.handleChange}
-                      onBlur={props.handleBlur}
-                      value={props.values.chave}
-                    />
-                    <Input
-                      w="sm"
-                      size="sm"
-                      placeholder="valor"
-                      variant="flushed"
-                      name="valor"
-                      color="gray.600"
-                      onChange={props.handleChange}
-                      onBlur={props.handleBlur}
-                      value={props.values.valor}
-                    />
-                    <Button size="xs" type="submit">
-                      Adicionar
-                    </Button>
-                  </Flex>
-                </form>
-              )}
-            </Formik>
-          </Box>
-        ))}
+            </AccordionItem>
+          ))}
+      </Accordion>
     </TabPanel>
   );
 };
