@@ -127,7 +127,7 @@ export const ListasTabs = () => {
                         <Flex gap="6">
                           <Text fontSize="md" fontWeight="semibold">
                             {lista?.codigo.charAt(0).toUpperCase() +
-                              lista?.codigo.slice(1)}
+                              lista?.codigo.slice(1).replace(/[-_]/g, " ")}
                           </Text>
                           <Button
                             size="xs"
