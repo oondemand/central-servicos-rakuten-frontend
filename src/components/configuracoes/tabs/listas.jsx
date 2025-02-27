@@ -15,7 +15,6 @@ import {
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import api from "../../../services/api";
-import { Formik } from "formik";
 
 import { DeleteIcon } from "@chakra-ui/icons";
 
@@ -51,8 +50,6 @@ export const ListasTabs = () => {
   }, []);
 
   const onFormSubmit = async ({ values, id }) => {
-    console.log(values);
-
     try {
       await api.post(`listas/${id}`, values);
       getListas();
@@ -218,51 +215,6 @@ export const ListasTabs = () => {
                             );
                           })}
                       </Box>
-                      {/* <Formik
-                 initialValues={{
-                   chave: "",
-                   valor: "",
-                 }}
-                 onSubmit={(values, { resetForm }) => {
-                   onFormSubmit({ id: lista._id, values });
-                   resetForm();
-                 }}
-               >
-                 {(props) => (
-                   <form
-                     onReset={props.handleReset}
-                     onSubmit={props.handleSubmit}
-                   >
-                     <Flex gap="8" mt="2" alignItems="flex-end">
-                       <Input
-                         w="sm"
-                         size="sm"
-                         placeholder="chave"
-                         variant="flushed"
-                         name="chave"
-                         color="gray.600"
-                         onChange={props.handleChange}
-                         onBlur={props.handleBlur}
-                         value={props.values.chave}
-                       />
-                       <Input
-                         w="sm"
-                         size="sm"
-                         placeholder="valor"
-                         variant="flushed"
-                         name="valor"
-                         color="gray.600"
-                         onChange={props.handleChange}
-                         onBlur={props.handleBlur}
-                         value={props.values.valor}
-                       />
-                       <Button size="xs" type="submit">
-                         Adicionar
-                       </Button>
-                     </Flex>
-                   </form>
-                 )}
-               </Formik> */}
                     </AccordionPanel>
                   </>
                 );
