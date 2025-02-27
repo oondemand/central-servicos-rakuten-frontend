@@ -189,13 +189,7 @@ export const RegistrosTable = ({ data }) => {
                 }
                 openDelay={500}
               >
-                <Tr
-                  // onClick={() => {
-                  //   onOpen();
-                  //   setSelectedRow(row.original);
-                  // }}
-                  key={row.id}
-                >
+                <Tr key={row.id}>
                   {row.getVisibleCells().map((cell) => (
                     <Td fontSize="md" key={cell.id}>
                       {flexRender(
@@ -230,35 +224,6 @@ export const RegistrosTable = ({ data }) => {
             </Button>
           </ButtonGroup>
         </Box>
-
-        {/* <Modal size="4xl" isCentered isOpen={isOpen} onClose={onClose}>
-          <ModalContent>
-            <ModalHeader>
-              <Heading
-                w="full"
-                borderBottom="1px solid"
-                borderBottomColor="gray.200"
-                fontSize="md"
-                pb="4"
-              >
-                Dados Atualizados:
-              </Heading>
-            </ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <Box
-                maxH="md"
-                overflowY="auto"
-                fontSize="sm"
-                sx={{ scrollbarWidth: "thin" }}
-              >
-                <code>{selectedRow?.dadosAtualizados}</code>
-              </Box>
-            </ModalBody>
-
-            <ModalFooter />
-          </ModalContent>
-        </Modal> */}
       </Box>
     </>
   );
