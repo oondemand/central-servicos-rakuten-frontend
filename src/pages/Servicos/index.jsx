@@ -1,4 +1,19 @@
-import { Box, Text, useToast, Flex, Spinner, Button } from "@chakra-ui/react";
+import {
+  Box,
+  Text,
+  useToast,
+  Flex,
+  Spinner,
+  Button,
+  useDisclosure,
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogContent,
+  AlertDialogOverlay,
+} from "@chakra-ui/react";
+
 import { DataGrid } from "../../components/common/DataGrid";
 
 import { useFilters } from "../../contexts/useFilters";
@@ -24,6 +39,11 @@ import { DefaultComponent } from "../../components/common/buildForm/filds/defaul
 import { BuildForm } from "../../components/common/buildForm/index";
 import { VisibilityControlDialog } from "../../components/common/visibilityControllerDialog";
 import { DebouncedInput } from "../../components/common/debouncedInput";
+import { SelectPrestadorField } from "../../components/common/buildForm/filds/selectPrestador";
+import { DateField } from "../../components/common/buildForm/filds/data";
+
+import { CurrencyInput } from "../../components/common/buildForm/filds/currency";
+import { ServicosDialogForm } from "../../components/common/servicosDialogForm";
 
 export function Servicos() {
   const toast = useToast();
@@ -191,17 +211,17 @@ export function Servicos() {
     {
       accessorKey: "prestador",
       label: "Prestador",
-      render: DefaultComponent,
+      render: SelectPrestadorField,
     },
     {
       accessorKey: "dataProvisaoContabil",
       label: "Data Provisão Contábil",
-      render: DefaultComponent,
+      render: DateField,
     },
     {
       accessorKey: "dataRegistro",
       label: "Data Registro",
-      render: DefaultComponent,
+      render: DateField,
     },
     {
       accessorKey: "competencia",
@@ -211,7 +231,7 @@ export function Servicos() {
     {
       accessorKey: "valor",
       label: "Valor",
-      render: DefaultComponent,
+      render: CurrencyInput,
     },
     {
       accessorKey: "tipoDocumentoFiscal",
@@ -224,65 +244,59 @@ export function Servicos() {
       render: DefaultComponent,
     },
     {
-      accessorKey: "status",
-      label: "Status",
-      render: DefaultComponent,
-    },
-
-    {
       accessorKey: "valores.grossValue",
       label: "Gross Value",
-      render: DefaultComponent,
+      render: CurrencyInput,
     },
     {
       accessorKey: "valores.bonus",
       label: "Bonus",
-      render: DefaultComponent,
+      render: CurrencyInput,
     },
     {
       accessorKey: "valores.ajusteComercial",
       label: "Ajuste Comercial",
-      render: DefaultComponent,
+      render: CurrencyInput,
     },
     {
       accessorKey: "valores.paidPlacement",
       label: "Paid Placement",
-      render: DefaultComponent,
+      render: CurrencyInput,
     },
     {
       accessorKey: "valores.revisionMonthProvision",
       label: "Revisão - Mês Provisão",
-      render: DefaultComponent,
+      render: CurrencyInput,
     },
     {
       accessorKey: "valores.revisionGrossValue",
       label: "Revisão - Gross Value",
-      render: DefaultComponent,
+      render: CurrencyInput,
     },
     {
       accessorKey: "valores.revisionProvisionBonus",
       label: "Revisão - Bonus",
-      render: DefaultComponent,
+      render: CurrencyInput,
     },
     {
       accessorKey: "valores.revisionComissaoPlataforma",
       label: "Revisão - Comissão Plataforma",
-      render: DefaultComponent,
+      render: CurrencyInput,
     },
     {
       accessorKey: "valores.revisionPaidPlacement",
       label: "Revisão - Paid Placement",
-      render: DefaultComponent,
+      render: CurrencyInput,
     },
     {
       accessorKey: "valores.totalServico",
       label: "Total Serviço",
-      render: DefaultComponent,
+      render: CurrencyInput,
     },
     {
       accessorKey: "valores.totalRevisao",
       label: "Total Revisão",
-      render: DefaultComponent,
+      render: CurrencyInput,
     },
   ];
 
@@ -328,7 +342,7 @@ export function Servicos() {
 
   return (
     <Box>
-      {/* <Flex justifyContent="space-between">
+      <Flex justifyContent="space-between">
         <Flex alignItems="center" gap="4">
           <DebouncedInput
             value={filters.searchTerm}
@@ -364,7 +378,7 @@ export function Servicos() {
           )}
         </Flex>
         <Flex alignItems="center">
-          <Button
+          {/* <Button
             onClick={() => {
               console.log("Clicou");
             }}
@@ -374,7 +388,8 @@ export function Servicos() {
             fontWeight="semibold"
           >
             Criar serviço
-          </Button>
+          </Button> */}
+          <ServicosDialogForm />
 
           <VisibilityControlDialog
             fields={columns.map((e) => ({
@@ -426,14 +441,7 @@ export function Servicos() {
             sortBy: stateToSortBy(updaterOrValue(sortingState)),
           }));
         }}
-      /> */}
-
-      {/* <BuildForm
-        fields={fields}
-        // visibleState={inputsVisibility}
-        data={[]}
-        onBlurFn={(values) => console.log(values)}
-      /> */}
+      />
     </Box>
   );
 }

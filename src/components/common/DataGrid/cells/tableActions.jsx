@@ -10,6 +10,7 @@ import {
   AlertDialogContent,
   AlertDialogOverlay,
 } from "@chakra-ui/react";
+import { ServicosForm } from "../../../../components/common/servicosForm";
 
 export const TableActions = ({ table, row }) => {
   const {
@@ -18,6 +19,9 @@ export const TableActions = ({ table, row }) => {
     onClose: onAlertClose,
   } = useDisclosure();
 
+  const cancelRefAlertRef = React.useRef();
+
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = React.useRef();
 
   const handleDeleteActions = async () => {
@@ -41,23 +45,23 @@ export const TableActions = ({ table, row }) => {
         >
           Excluir
         </Button>
-        <Button
+        {/* <Button
           size="2xs"
           fontSize="sm"
-          onClick={() => {}}
+          onClick={() => onOpen()}
           variant="outline"
           px="1"
           py="0.5"
         >
           Alterar
-        </Button>
+        </Button> */}
       </Flex>
 
       {isAlertOpen && (
         <AlertDialog
           isOpen={isAlertOpen}
           onClose={onAlertClose}
-          leastDestructiveRef={cancelRef}
+          leastDestructiveRef={cancelRefAlertRef}
           isCentered
         >
           <AlertDialogOverlay>
@@ -70,13 +74,34 @@ export const TableActions = ({ table, row }) => {
                 desfeita.
               </AlertDialogBody>
               <AlertDialogFooter>
-                <Button ref={cancelRef} onClick={onAlertClose}>
+                <Button ref={cancelRefAlertRef} onClick={onAlertClose}>
                   Cancelar
                 </Button>
                 <Button colorScheme="red" onClick={handleDeleteActions} ml={3}>
                   Excluir
                 </Button>
               </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialogOverlay>
+        </AlertDialog>
+      )}
+
+      {isOpen && (
+        <AlertDialog
+          isOpen={isOpen}
+          onClose={onClose}
+          leastDestructiveRef={cancelRef}
+          isCentered
+          size="2xl"
+        >
+          <AlertDialogOverlay>
+            <AlertDialogContent>
+              <AlertDialogHeader fontSize="lg" fontWeight="bold">
+                Detalhes do serviço
+              </AlertDialogHeader>
+              <AlertDialogBody>
+                <ServicosForm data={row.original} />
+              </AlertDialogBody>
             </AlertDialogContent>
           </AlertDialogOverlay>
         </AlertDialog>

@@ -4,7 +4,7 @@ import { withMask } from "use-mask-input";
 
 export const DateInput = ({ getValue, row, column, table, ...rest }) => {
   const initialValue = new Date(getValue()).toLocaleDateString();
-  const [value, setValue] = useState(initialValue || "");
+  const [value, setValue] = useState("");
 
   const onBlur = async () => {
     if (value !== initialValue) {

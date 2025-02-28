@@ -9,7 +9,7 @@ export const CompetenciaInput = ({ getValue, row, column, table, ...rest }) => {
     initialValue?.mes.toString().padStart(2, "0") +
     initialValue?.ano.toString();
 
-  const [value, setValue] = useState(formatValue || "");
+  const [value, setValue] = useState("");
 
   const onBlur = async () => {
     if (value.replace("/", "") !== formatValue) {

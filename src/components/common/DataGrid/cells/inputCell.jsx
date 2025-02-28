@@ -3,7 +3,7 @@ import { Input } from "@chakra-ui/react";
 
 export const InputCell = ({ getValue, row, column, table }) => {
   const initialValue = getValue();
-  const [value, setValue] = useState(initialValue || "");
+  const [value, setValue] = useState("");
 
   const onBlur = async () => {
     if (value !== initialValue) {

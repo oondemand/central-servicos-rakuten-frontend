@@ -11,10 +11,10 @@ export const CurrencyInputCell = ({
   ...props
 }) => {
   const initialValue = getValue();
-  const [value, setValue] = useState(initialValue || "");
+  const [value, setValue] = useState("");
 
   const onBlur = async () => {
-    if (value !== initialValue) {
+    if (parseBRLCurrencyToNumber(value) !== initialValue) {
       try {
         await table.options.meta?.updateData({
           prestadorId: row.original._id,

@@ -1,6 +1,13 @@
 import { NumericFormat } from "react-number-format";
+import { useEffect, useState } from "react";
 
 export const DisabledCurrencyInputCell = ({ getValue, row, column, table }) => {
+  const initialValue = getValue();
+  const [value, setValue] = useState("");
+
+  useEffect(() => {
+    setValue(initialValue ? initialValue : "");
+  }, [initialValue]);
   return (
     <NumericFormat
       thousandSeparator="."
@@ -16,7 +23,7 @@ export const DisabledCurrencyInputCell = ({ getValue, row, column, table }) => {
         width: "100%",
       }}
       disabled={true}
-      value={getValue()}
+      value={value}
     />
   );
 };
