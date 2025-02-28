@@ -1,16 +1,13 @@
-import React, { useEffect, useState } from "react";
-import { default as SelectReact } from "react-select";
+import React, { useState } from "react";
 import { SearchIcon, SettingsIcon } from "@chakra-ui/icons";
 import { Link, useNavigate } from "react-router-dom";
 import {
   Flex,
   Box,
   Input,
-  Select,
   IconButton,
   Avatar,
   InputGroup,
-  InputLeftElement,
   InputRightElement,
   Tooltip,
   Menu,
@@ -18,25 +15,18 @@ import {
   MenuList,
   MenuItem,
   Text,
+  Image,
 } from "@chakra-ui/react";
 
 import { useTicket } from "../../contexts/TicketContext";
-import { useBaseOmie } from "../../contexts/BaseOmieContext";
 import { useAuth } from "../../contexts/AuthContext"; // Importar o contexto de autenticação
 
 const Header = () => {
-  const [baseOmieSelecionado, setBaseOmieSelecionado] = useState(null);
-  // const { listaBases, baseOmie, selecionarBase } = useBaseOmie();
   const { filtrarTickets } = useTicket();
   const { logout } = useAuth(); // Desestruturar a função de logout
   const navigate = useNavigate();
 
   const [termoPesquisa, setTermoPesquisa] = useState("");
-  // const [baseOmieDropdown, setBaseOmieSelecionadaDropdown] = useState("");
-
-  // const handleBaseOmieChange = (e) => {
-  //   selecionarBase(e.target.value);
-  // };
 
   const handlePesquisaChange = (e) => {
     const termo = e.target.value;
@@ -45,7 +35,7 @@ const Header = () => {
   };
 
   const handleConfigClick = () => {
-    navigate("/auth/configuracoes");
+    navigate("/auth/configuracoes", { viewTransition: true });
   };
 
   const handleLogout = () => {
@@ -53,34 +43,36 @@ const Header = () => {
     navigate("/login");
   };
 
-  const handleBaseOmie = (selectedOption) => {
-    setBaseOmieSelecionado(selectedOption); // Atualiza o estado com a opção selecionada
-  };
-
-  // useEffect(() => {
-  //   if (listaBases.length > 0) {
-  //     selecionarBase(listaBases[0]._id);
-  //     setBaseOmieSelecionadaDropdown(listaBases[0]._id);
-  //   }
-  // }, [listaBases]);
-
   return (
     <Flex
       shadow="md"
-      px={6}
-      py={4}
+      px="6"
+      py="2.5"
       align="center"
       justify="space-between"
       bg="white"
       color="white"
-      boxShadow={"0px 20px 25px -5px rgba(0, 0, 0, 0.10), 0px 10px 10px -5px rgba(0, 0, 0, 0.04)"}
     >
-      <Flex align="center" gap={14}>
+      <Flex align="center" gap="20">
         <Link to="/auth/home">
           <Box as="span" fontSize="xl" fontWeight="bold" color="brand.500">
-            <img src="/logo_rakuten_purple.png" alt="RAKUTEN" />
+            <Image src="/logo_rakuten_purple.png" alt="RAKUTEN" h="35px" />
           </Box>
         </Link>
+
+        <Flex gap="8" color="brand.400" fontWeight="medium">
+          <Link to="/auth/servicos">
+            <Text>Serviços</Text>
+          </Link>
+
+          <Link to="/auth/servicos">
+            <Text>Prestadores</Text>
+          </Link>
+
+          <Link to="/auth/servicos">
+            <Text>Esteira</Text>
+          </Link>
+        </Flex>
       </Flex>
 
       <Flex align="center">
@@ -125,7 +117,6 @@ const Header = () => {
           </MenuButton>
           <MenuList bg="brand.50">
             <MenuItem onClick={handleLogout}>
-              <p></p>
               <Text color="black">Logout</Text>
             </MenuItem>
           </MenuList>

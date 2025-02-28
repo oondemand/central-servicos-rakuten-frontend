@@ -45,3 +45,8 @@ export const carregarServico = async (id) => {
     throw error; // Repassa o erro para que o chamador possa tratá-lo
   }
 };
+
+export const listarServicos = async ({ filters }) => {
+  const { data } = await api.get("/servicos", { params: filters });
+  return data;
+};

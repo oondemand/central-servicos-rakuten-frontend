@@ -1,7 +1,7 @@
 // src/utils/formatacoes.js
 export const formatarDocumento = (documento) => {
-  if (!documento) return '';
-  const cleaned = documento.replace(/\D/g, '');
+  if (!documento) return "";
+  const cleaned = documento.replace(/\D/g, "");
 
   if (cleaned.length === 13) {
     const match = cleaned.match(/^(\d{1})(\d{3})(\d{3})(\d{4})(\d{2})$/);
@@ -17,3 +17,17 @@ export const formatarDocumento = (documento) => {
 
   return documento;
 };
+
+export function parseBRLCurrencyToNumber(valorStr) {
+  const isNegative = valorStr.includes("-");
+
+  const valorLimpo = valorStr
+    .replace("R$", "")
+    .replace("-", "")
+    .replaceAll(/\./g, "")
+    .replace(",", ".")
+    .trim();
+
+  const numero = parseFloat(valorLimpo);
+  return isNegative ? -numero : numero;
+}

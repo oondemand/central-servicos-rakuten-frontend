@@ -7,6 +7,7 @@ export function DebouncedInput({
   onChange,
   debounce = 500,
   size = "md",
+  iconVisible = true,
   ...props
 }) {
   const [value, setValue] = useState(initialValue);
@@ -17,7 +18,9 @@ export function DebouncedInput({
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-      onChange(value.trim());
+      if (value !== initialValue) {
+        onChange(value?.trim());
+      }
     }, debounce);
 
     return () => clearTimeout(timeout);
@@ -25,14 +28,17 @@ export function DebouncedInput({
 
   return (
     <InputGroup maxW="md" size={size}>
-      <InputLeftElement pointerEvents="none">
-        <SearchIcon color="gray.300" />
-      </InputLeftElement>
+      {iconVisible && (
+        <InputLeftElement pointerEvents="none">
+          <SearchIcon color="gray.300" />
+        </InputLeftElement>
+      )}
       <Input
         maxW="md"
         {...props}
         value={value}
         onChange={(e) => setValue(e.target.value)}
+        borderColor="gray.200"
       />
     </InputGroup>
   );
