@@ -3,6 +3,7 @@ import SelectAsync from "react-select/async";
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { listarPrestadores } from "../../../../services/prestadorService";
+import api from "../../../../services/api";
 
 export const SelectPrestadorField = ({ ...props }) => {
   const [value, setValue] = useState("");
@@ -15,9 +16,9 @@ export const SelectPrestadorField = ({ ...props }) => {
   // });
 
   const loadOptions = async (props) => {
-    const data = await listarPrestadores();
+    const { data } = await api.get(`/prestadores?searchTerm=${props}`);
 
-    const options = data?.map((prestador) => ({
+    const options = data?.prestadores?.map((prestador) => ({
       label: `${prestador?.nome} - ${prestador?.sid} - ${prestador?.documento}`,
       value: prestador?._id,
     }));

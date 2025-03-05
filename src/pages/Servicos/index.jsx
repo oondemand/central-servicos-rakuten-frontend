@@ -12,6 +12,7 @@ import {
   AlertDialogHeader,
   AlertDialogContent,
   AlertDialogOverlay,
+  Input,
 } from "@chakra-ui/react";
 
 import { DataGrid } from "../../components/common/DataGrid";
@@ -44,6 +45,8 @@ import { DateField } from "../../components/common/buildForm/filds/data";
 
 import { CurrencyInput } from "../../components/common/buildForm/filds/currency";
 import { ServicosDialogForm } from "../../components/common/servicosDialogForm";
+import { Build } from "../../components/common/buildForm/build";
+import { z } from "zod";
 
 export function Servicos() {
   const toast = useToast();
@@ -211,93 +214,97 @@ export function Servicos() {
     {
       accessorKey: "prestador",
       label: "Prestador",
-      render: SelectPrestadorField,
-    },
-    {
-      accessorKey: "dataProvisaoContabil",
-      label: "Data Provisão Contábil",
-      render: DateField,
-    },
-    {
-      accessorKey: "dataRegistro",
-      label: "Data Registro",
-      render: DateField,
-    },
-    {
-      accessorKey: "competencia",
-      label: "Competência - Mês",
       render: DefaultComponent,
+      validation: z.string(),
+      colSpan: 2,
     },
-    {
-      accessorKey: "valor",
-      label: "Valor",
-      render: CurrencyInput,
-    },
-    {
-      accessorKey: "tipoDocumentoFiscal",
-      label: "Documento Fiscal",
-      render: DefaultComponent,
-    },
+    // {
+    //   accessorKey: "dataProvisaoContabil",
+    //   label: "Data Provisão Contábil",
+    //   render: DateField,
+    // },
+    // {
+    //   accessorKey: "dataRegistro",
+    //   label: "Data Registro",
+    //   render: DateField,
+    // },
+    // {
+    //   accessorKey: "competencia",
+    //   label: "Competência - Mês",
+    //   render: DefaultComponent,
+    // },
+    // {
+    //   accessorKey: "valor",
+    //   label: "Valor",
+    //   render: CurrencyInput,
+    // },
+    // {
+    //   accessorKey: "tipoDocumentoFiscal",
+    //   label: "Documento Fiscal",
+    //   render: DefaultComponent,
+    // },
     {
       accessorKey: "campanha",
       label: "Campanha",
       render: DefaultComponent,
+      validation: z.string().optional(),
     },
     {
       accessorKey: "valores.grossValue",
       label: "Gross Value",
-      render: CurrencyInput,
+      render: DefaultComponent,
+      validation: z.string().nonempty(),
     },
-    {
-      accessorKey: "valores.bonus",
-      label: "Bonus",
-      render: CurrencyInput,
-    },
-    {
-      accessorKey: "valores.ajusteComercial",
-      label: "Ajuste Comercial",
-      render: CurrencyInput,
-    },
-    {
-      accessorKey: "valores.paidPlacement",
-      label: "Paid Placement",
-      render: CurrencyInput,
-    },
-    {
-      accessorKey: "valores.revisionMonthProvision",
-      label: "Revisão - Mês Provisão",
-      render: CurrencyInput,
-    },
-    {
-      accessorKey: "valores.revisionGrossValue",
-      label: "Revisão - Gross Value",
-      render: CurrencyInput,
-    },
-    {
-      accessorKey: "valores.revisionProvisionBonus",
-      label: "Revisão - Bonus",
-      render: CurrencyInput,
-    },
-    {
-      accessorKey: "valores.revisionComissaoPlataforma",
-      label: "Revisão - Comissão Plataforma",
-      render: CurrencyInput,
-    },
-    {
-      accessorKey: "valores.revisionPaidPlacement",
-      label: "Revisão - Paid Placement",
-      render: CurrencyInput,
-    },
-    {
-      accessorKey: "valores.totalServico",
-      label: "Total Serviço",
-      render: CurrencyInput,
-    },
-    {
-      accessorKey: "valores.totalRevisao",
-      label: "Total Revisão",
-      render: CurrencyInput,
-    },
+    // {
+    //   accessorKey: "valores.bonus",
+    //   label: "Bonus",
+    //   render: CurrencyInput,
+    // },
+    // {
+    //   accessorKey: "valores.ajusteComercial",
+    //   label: "Ajuste Comercial",
+    //   render: CurrencyInput,
+    // },
+    // {
+    //   accessorKey: "valores.paidPlacement",
+    //   label: "Paid Placement",
+    //   render: CurrencyInput,
+    // },
+    // {
+    //   accessorKey: "valores.revisionMonthProvision",
+    //   label: "Revisão - Mês Provisão",
+    //   render: CurrencyInput,
+    // },
+    // {
+    //   accessorKey: "valores.revisionGrossValue",
+    //   label: "Revisão - Gross Value",
+    //   render: CurrencyInput,
+    // },
+    // {
+    //   accessorKey: "valores.revisionProvisionBonus",
+    //   label: "Revisão - Bonus",
+    //   render: CurrencyInput,
+    // },
+    // {
+    //   accessorKey: "valores.revisionComissaoPlataforma",
+    //   label: "Revisão - Comissão Plataforma",
+    //   render: CurrencyInput,
+    // },
+    // {
+    //   accessorKey: "valores.revisionPaidPlacement",
+    //   label: "Revisão - Paid Placement",
+    //   render: CurrencyInput,
+    // },
+    // {
+    //   accessorKey: "valores.totalServico",
+    //   label: "Total Serviço",
+    //   render: CurrencyInput,
+    // },
+    // {
+    //   accessorKey: "valores.totalRevisao",
+    //   label: "Total Revisão",
+    //   render: CurrencyInput,
+    // },
   ];
 
   const { data, error, isLoading, isFetching } = useQuery({
@@ -441,6 +448,18 @@ export function Servicos() {
             sortBy: stateToSortBy(updaterOrValue(sortingState)),
           }));
         }}
+      />
+
+      <Box mt="8" />
+
+      <Build
+        fields={fields}
+        data={{
+          prestador: "maikon alexandre",
+          campanha: "campanha",
+          valores: { grossValue: "50" },
+        }}
+        onSubmit={(values) => console.log("Submit", values)}
       />
     </Box>
   );
