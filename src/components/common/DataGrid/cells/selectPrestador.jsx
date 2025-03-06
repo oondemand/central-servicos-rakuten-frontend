@@ -37,6 +37,13 @@ export const SelectPrestadorCell = ({
   const abortControllerRef = useRef(null);
 
   const loadOptions = async (inputValue) => {
+    console.log("Input", inputValue);
+
+    if (!inputValue) {
+      console.log("Undefined", inputValue);
+
+      return [];
+    }
     // Cancela o timeout e a requisição anteriores
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
     if (abortControllerRef.current) abortControllerRef.current.abort();
