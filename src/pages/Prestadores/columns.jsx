@@ -4,7 +4,8 @@ import { CurrencyInputCell } from "../../components/common/DataGrid/cells/curren
 import { DateInput } from "../../components/common/DataGrid/cells/dateInput";
 import { TableActions } from "../../components/common/DataGrid/cells/tableActions";
 import { SelectLista } from "../../components/common/DataGrid/cells/selectLista";
-// import { CEPInputCell } from "../../components/common/DataGrid/cells/cepInput";
+import { SelectAutoCompleteCell } from "../../components/common/DataGrid/cells/selectAutoComplete";
+import { CpfCnpjCell } from "../../components/common/DataGrid/cells/cpfCnpj";
 
 export const createPrestadoresColumns = () => {
   const columns = [
@@ -18,12 +19,12 @@ export const createPrestadoresColumns = () => {
       accessorKey: "sciUnico",
       header: "SCI Único",
       cell: InputCell,
-      meta: { type: "number", pattern: "^\\d{5,}$" },
+      // meta: { type: "number", pattern: "^\\d{5,}$" },
     },
     {
-      accessorKey: "usuario",
-      header: "Usuário Associado",
-      cell: (props) => <SelectLista {...props} cod="usuarios" />,
+      accessorKey: "manager",
+      header: "Manager",
+      cell: (props) => <SelectLista {...props} cod="manager" />,
     },
     {
       accessorKey: "nome",
@@ -34,34 +35,36 @@ export const createPrestadoresColumns = () => {
       accessorKey: "sid",
       header: "SID",
       cell: InputCell,
-      meta: { pattern: "^\\d{7}$" },
     },
     {
       accessorKey: "tipo",
       header: "Tipo",
-      cell: (props) => <SelectLista {...props} cod="tipo-prestador" />,
+      cell: (props) => (
+        <SelectAutoCompleteCell
+          {...props}
+          options={[
+            { label: "Pessoa física", value: "pf" },
+            { label: "Pessoa jurídica", value: "pj" },
+            { label: "Exterior", value: "ext" },
+          ]}
+        />
+      ),
     },
     {
       accessorKey: "documento",
       header: "Documento",
-      cell: InputCell,
-      meta: {
-        dynamicPattern: (row) => {
-          if (row.tipo === "ext") return ".*";
-          return row.tipo === "pf" ? "^\\d{11}$" : "^\\d{14}$";
-        },
-      },
+      cell: (props) => <CpfCnpjCell {...props} />,
     },
     {
       accessorKey: "dadosBancarios.banco",
       header: "Banco",
-      cell: InputCell,
+      cell: (props) => <SelectLista {...props} cod="bancos" />,
     },
     {
       accessorKey: "dadosBancarios.agencia",
       header: "Agência",
       cell: InputCell,
-      meta: { type: "number" },
+      // meta: { type: "number" },
     },
     {
       accessorKey: "dadosBancarios.conta",
@@ -71,13 +74,20 @@ export const createPrestadoresColumns = () => {
     {
       accessorKey: "dadosBancarios.tipoConta",
       header: "Tipo de Conta",
-      cell: (props) => <SelectLista {...props} cod="tipo-conta-bancaria" />,
+      cell: (props) => (
+        <SelectAutoCompleteCell
+          {...props}
+          options={[
+            { label: "Poupança", value: "poupanca" },
+            { label: "Corrente", value: "corrente" },
+          ]}
+        />
+      ),
     },
     {
       accessorKey: "email",
       header: "E-mail",
       cell: InputCell,
-      meta: { type: "email" },
     },
     {
       accessorKey: "endereco.cep",
@@ -107,12 +117,12 @@ export const createPrestadoresColumns = () => {
     {
       accessorKey: "endereco.estado",
       header: "Estado",
-      cell: (props) => <SelectLista {...props} cod="estados-brasil" />,
+      cell: InputCell,
     },
     {
       accessorKey: "endereco.pais",
       header: "País",
-      cell: (props) => <SelectLista {...props} cod="paises" />,
+      cell: InputCell,
     },
     {
       accessorKey: "pessoaFisica.dataNascimento",
@@ -142,7 +152,19 @@ export const createPrestadoresColumns = () => {
     {
       accessorKey: "status",
       header: "Status",
-      cell: (props) => <SelectLista {...props} cod="status-prestador" />,
+      cell: (props) => (
+        <SelectAutoCompleteCell
+          {...props}
+          options={[
+            { label: "Ativo", value: "ativo" },
+            { label: "Em-analise", value: "em-analise" },
+            { label: "Pendente de revisão", value: "pendente-de-revisao" },
+            { label: "Inativo", value: "inativo" },
+            { label: "Arquivado", value: "arquivado" },
+            { label: "Aguardado codigo sci", value: "aguardando-codigo-sci" },
+          ]}
+        />
+      ),
     },
     {
       accessorKey: "dataExportacao",

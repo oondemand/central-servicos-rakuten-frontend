@@ -16,7 +16,7 @@ export const SelectAutoCompleteCell = ({
   const onBlur = async () => {
     if (value && value !== options.find((e) => e?.value === initialValue)) {
       console.log(
-        { data: { [column.columnDef.key]: value.value } },
+        { data: { [column.columnDef.accessorKey]: value.value } },
         options,
         initialValue
       );

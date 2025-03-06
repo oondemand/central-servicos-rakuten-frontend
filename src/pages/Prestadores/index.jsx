@@ -88,7 +88,7 @@ export default function Prestadores() {
     },
   });
 
-  const columns = useMemo(() => createPrestadoresColumns(), []);
+  const columns = createPrestadoresColumns();
 
   console.log(data);
 

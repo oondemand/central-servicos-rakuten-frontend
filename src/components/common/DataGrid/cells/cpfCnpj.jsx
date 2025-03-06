@@ -11,7 +11,9 @@ export const CpfCnpjCell = ({ getValue, row, column, table, ...rest }) => {
       try {
         await table.options.meta?.updateData({
           prestadorId: row.original._id,
-          data: { [column.columnDef.accessorKey]: value },
+          data: {
+            [column.columnDef.accessorKey]: value.replace(/[./-]/g, ""),
+          },
         });
       } catch (error) {
         console.log(error);
@@ -25,20 +27,18 @@ export const CpfCnpjCell = ({ getValue, row, column, table, ...rest }) => {
   }, [initialValue]);
 
   const rowMaskMap = {
-    PF: "999.999.999-99",
-    PJ: "99.999.999/999-99",
-    EXT: "",
+    pf: "999.999.999-99",
+    pj: "99.999.999/9999-99",
+    ext: null,
   };
 
   return (
     <Input
-      truncate
       variant="subtle"
       display="flex"
       fontSize="md"
       size="2xs"
       bg="white"
-      focusRingColor="brand.500"
       value={value}
       onChange={(e) => setValue(e.target.value)}
       onBlur={onBlur}

@@ -45,6 +45,8 @@ export const SelectLista = ({ getValue, row, column, table, cod, ...rest }) => {
       return item?.label == initialValue || item?.value == initialValue;
     });
 
+    console.log("Value", value);
+
     setValue(value);
   }, [initialValue, lista]);
   return (
