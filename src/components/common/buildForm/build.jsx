@@ -9,7 +9,10 @@ const getNestedValue = (obj, path) => {
 
 function buildNestedSchema(fields) {
   const schemaStructure = fields.reduce((acc, field) => {
-    const parts = field.accessorKey?.split(".");
+    // Se não existir accessorKey ou validation, ignora o campo
+    if (!field.accessorKey || !field.validation) return acc;
+
+    const parts = field.accessorKey.split(".");
     let currentLevel = acc;
 
     for (let i = 0; i < parts.length; i++) {
@@ -17,9 +20,12 @@ function buildNestedSchema(fields) {
       const isLast = i === parts.length - 1;
 
       if (isLast) {
+        // Apenas adiciona se validation existir
         currentLevel[part] = field.validation;
       } else {
-        currentLevel[part] = currentLevel[part] || {};
+        if (!currentLevel[part] || currentLevel[part] instanceof z.ZodType) {
+          currentLevel[part] = {};
+        }
         currentLevel = currentLevel[part];
       }
     }
@@ -27,15 +33,16 @@ function buildNestedSchema(fields) {
     return acc;
   }, {});
 
-  // Converter a estrutura para esquema Zod recursivamente
+  // Função recursiva para converter a estrutura em um schema Zod
   const createRecursiveSchema = (structure) => {
-    const entries = Object.entries(structure).map(([key, value]) => {
-      if (value instanceof z.ZodType) {
-        return [key, value];
-      } else {
+    const entries = Object.entries(structure)
+      .filter(([_, value]) => value !== undefined) // Remove valores indefinidos
+      .map(([key, value]) => {
+        if (value instanceof z.ZodType) {
+          return [key, value];
+        }
         return [key, createRecursiveSchema(value)];
-      }
-    });
+      });
 
     return z.object(Object.fromEntries(entries));
   };
@@ -48,6 +55,7 @@ export const Build = ({
   fields,
   onSubmit,
   data,
+  gap,
   gridColumns = 4,
   ...props
 }) => {
@@ -57,6 +65,7 @@ export const Build = ({
     mode: "onBlur",
     resolver: zodResolver(schema),
     shouldFocusError: false,
+
     defaultValues: {
       ...data,
     },
@@ -68,12 +77,10 @@ export const Build = ({
     handleSubmit,
   } = methods;
 
-  console.log(errors);
-
   return (
     <FormProvider {...methods}>
       <form onBlur={handleSubmit(onSubmit)}>
-        <Grid templateColumns={`repeat(${gridColumns}, 1fr)`} gap="4">
+        <Grid templateColumns={`repeat(${gridColumns}, 1fr)`} gap={gap}>
           {fields.map((field) => {
             if (visibleState && !visibleState[field.accessorKey]) return null;
             const { render, ...rest } = field;
@@ -85,10 +92,11 @@ export const Build = ({
               >
                 {field.render({
                   getInitialValue: () =>
-                    getNestedValue(props?.data, field.accessorKey),
-                  initialValue: getNestedValue(props?.data, field.accessorKey),
+                    getNestedValue(data, field.accessorKey),
+                  initialValue: getNestedValue(data, field.accessorKey),
                   field: register(field.accessorKey),
                   error: getNestedValue(errors, field.accessorKey)?.message,
+                  methods,
                   ...rest,
                   ...props,
                   ...methods,

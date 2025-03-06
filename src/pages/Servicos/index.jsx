@@ -1,19 +1,4 @@
-import {
-  Box,
-  Text,
-  useToast,
-  Flex,
-  Spinner,
-  Button,
-  useDisclosure,
-  AlertDialog,
-  AlertDialogBody,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogContent,
-  AlertDialogOverlay,
-  Input,
-} from "@chakra-ui/react";
+import { Box, Text, useToast, Flex, Spinner, Button } from "@chakra-ui/react";
 
 import { DataGrid } from "../../components/common/DataGrid";
 
@@ -36,17 +21,11 @@ import { SelectAutoCompleteCell } from "../../components/common/DataGrid/cells/s
 
 import { queryClient } from "../../App";
 import { TableActions } from "../../components/common/DataGrid/cells/tableActions";
-import { DefaultComponent } from "../../components/common/buildForm/filds/default";
-import { BuildForm } from "../../components/common/buildForm/index";
 import { VisibilityControlDialog } from "../../components/common/visibilityControllerDialog";
 import { DebouncedInput } from "../../components/common/debouncedInput";
-import { SelectPrestadorField } from "../../components/common/buildForm/filds/selectPrestador";
-import { DateField } from "../../components/common/buildForm/filds/data";
 
-import { CurrencyInput } from "../../components/common/buildForm/filds/currency";
-import { ServicosDialogForm } from "../../components/common/servicosDialogForm";
-import { Build } from "../../components/common/buildForm/build";
-import { z } from "zod";
+import { ServicosDialog } from "./dialog";
+import { SelectPrestadorCell } from "../../components/common/DataGrid/cells/selectPrestador";
 
 export function Servicos() {
   const toast = useToast();
@@ -85,230 +64,128 @@ export function Servicos() {
     {
       accessorKey: "prestador",
       header: "Prestador",
-      enableSorting: true,
+      enableSorting: false,
       cell: (props) => (
-        <Text noOfLines={1}>{`${props.getValue()?.sid ?? ""} - ${
-          props.getValue()?.documento ?? ""
-        } - ${props.getValue()?.nome ?? ""}`}</Text>
+        <Text noOfLines={1}>{`${props.getValue()?.nome ?? ""} - ${
+          props.getValue()?.sid ?? ""
+        } - ${props.getValue()?.documento ?? ""}`}</Text>
       ),
     },
     {
       accessorKey: "dataProvisaoContabil",
       header: "Data Provisão Contábil",
-      enableSorting: true,
+      enableSorting: false,
       cell: DateInput,
     },
     {
       accessorKey: "dataRegistro",
       header: "Data Registro",
-      enableSorting: true,
+      enableSorting: false,
       cell: DateInput,
     },
     {
       accessorKey: "competencia",
       header: "Competência - Mês",
-      enableSorting: true,
+      enableSorting: false,
       cell: CompetenciaInput,
-    },
-    {
-      accessorKey: "valor",
-      header: "Valor",
-      enableSorting: true,
-      cell: DisabledCurrencyInputCell,
     },
     {
       accessorKey: "tipoDocumentoFiscal",
       header: "Documento Fiscal",
-      enableSorting: true,
-      cell: (props) => <div>{props.getValue()}</div>,
+      enableSorting: false,
+      cell: InputCell,
     },
     {
       accessorKey: "campanha",
       header: "Campanha",
-      enableSorting: true,
-      cell: (props) => (
-        <SelectAutoCompleteCell
-          {...props}
-          options={[{ value: "campanha", label: "campanha" }]}
-        />
-      ),
+      enableSorting: false,
+      cell: InputCell,
     },
     {
       accessorKey: "status",
       header: "Status",
-      enableSorting: true,
-      cell: (props) => <div>{props.getValue()}</div>,
+      enableSorting: false,
+      cell: InputCell,
     },
 
     {
       accessorKey: "valores.grossValue",
       header: "Gross Value",
-      enableSorting: true,
+      enableSorting: false,
       cell: CurrencyInputCell,
     },
     {
       accessorKey: "valores.bonus",
       header: "Bonus",
-      enableSorting: true,
+      enableSorting: false,
       cell: CurrencyInputCell,
-      enableColumnFilter: true,
-      meta: { filterKey: "valores.bonus" },
+      // enableColumnFilter: true,
+      // meta: { filterKey: "valores.bonus" },
     },
     {
       accessorKey: "valores.ajusteComercial",
       header: "Ajuste Comercial",
-      enableSorting: true,
+      enableSorting: false,
       cell: CurrencyInputCell,
     },
     {
       accessorKey: "valores.paidPlacement",
       header: "Paid Placement",
-      enableSorting: true,
+      enableSorting: false,
       cell: CurrencyInputCell,
     },
     {
       accessorKey: "valores.revisionMonthProvision",
       header: "Revisão - Mês Provisão",
-      enableSorting: true,
+      enableSorting: false,
       cell: InputCell,
     },
     {
       accessorKey: "valores.revisionGrossValue",
       header: "Revisão - Gross Value",
-      enableSorting: true,
+      enableSorting: false,
       cell: CurrencyInputCell,
     },
     {
       accessorKey: "valores.revisionProvisionBonus",
       header: "Revisão - Bonus",
-      enableSorting: true,
+      enableSorting: false,
       cell: CurrencyInputCell,
     },
     {
       accessorKey: "valores.revisionComissaoPlataforma",
       header: "Revisão - Comissão Plataforma",
-      enableSorting: true,
+      enableSorting: false,
       cell: CurrencyInputCell,
     },
     {
       accessorKey: "valores.revisionPaidPlacement",
       header: "Revisão - Paid Placement",
-      enableSorting: true,
+      enableSorting: false,
       cell: CurrencyInputCell,
     },
     {
       accessorKey: "valores.totalServico",
       header: "Total Serviço",
-      enableSorting: true,
+      enableSorting: false,
       cell: DisabledCurrencyInputCell,
     },
     {
       accessorKey: "valores.totalRevisao",
       header: "Total Revisão",
-      enableSorting: true,
+      enableSorting: false,
+      cell: DisabledCurrencyInputCell,
+    },
+    {
+      accessorKey: "valor",
+      header: "Valor total",
+      enableSorting: false,
       cell: DisabledCurrencyInputCell,
     },
   ];
 
-  const fields = [
-    {
-      accessorKey: "prestador",
-      label: "Prestador",
-      render: DefaultComponent,
-      validation: z.string(),
-      colSpan: 2,
-    },
-    // {
-    //   accessorKey: "dataProvisaoContabil",
-    //   label: "Data Provisão Contábil",
-    //   render: DateField,
-    // },
-    // {
-    //   accessorKey: "dataRegistro",
-    //   label: "Data Registro",
-    //   render: DateField,
-    // },
-    // {
-    //   accessorKey: "competencia",
-    //   label: "Competência - Mês",
-    //   render: DefaultComponent,
-    // },
-    // {
-    //   accessorKey: "valor",
-    //   label: "Valor",
-    //   render: CurrencyInput,
-    // },
-    // {
-    //   accessorKey: "tipoDocumentoFiscal",
-    //   label: "Documento Fiscal",
-    //   render: DefaultComponent,
-    // },
-    {
-      accessorKey: "campanha",
-      label: "Campanha",
-      render: DefaultComponent,
-      validation: z.string().optional(),
-    },
-    {
-      accessorKey: "valores.grossValue",
-      label: "Gross Value",
-      render: DefaultComponent,
-      validation: z.string().nonempty(),
-    },
-    // {
-    //   accessorKey: "valores.bonus",
-    //   label: "Bonus",
-    //   render: CurrencyInput,
-    // },
-    // {
-    //   accessorKey: "valores.ajusteComercial",
-    //   label: "Ajuste Comercial",
-    //   render: CurrencyInput,
-    // },
-    // {
-    //   accessorKey: "valores.paidPlacement",
-    //   label: "Paid Placement",
-    //   render: CurrencyInput,
-    // },
-    // {
-    //   accessorKey: "valores.revisionMonthProvision",
-    //   label: "Revisão - Mês Provisão",
-    //   render: CurrencyInput,
-    // },
-    // {
-    //   accessorKey: "valores.revisionGrossValue",
-    //   label: "Revisão - Gross Value",
-    //   render: CurrencyInput,
-    // },
-    // {
-    //   accessorKey: "valores.revisionProvisionBonus",
-    //   label: "Revisão - Bonus",
-    //   render: CurrencyInput,
-    // },
-    // {
-    //   accessorKey: "valores.revisionComissaoPlataforma",
-    //   label: "Revisão - Comissão Plataforma",
-    //   render: CurrencyInput,
-    // },
-    // {
-    //   accessorKey: "valores.revisionPaidPlacement",
-    //   label: "Revisão - Paid Placement",
-    //   render: CurrencyInput,
-    // },
-    // {
-    //   accessorKey: "valores.totalServico",
-    //   label: "Total Serviço",
-    //   render: CurrencyInput,
-    // },
-    // {
-    //   accessorKey: "valores.totalRevisao",
-    //   label: "Total Revisão",
-    //   render: CurrencyInput,
-    // },
-  ];
-
   const { data, error, isLoading, isFetching } = useQuery({
-    queryKey: ["listar-prestadores", { filters }],
+    queryKey: ["listar-servicos", { filters }],
     queryFn: async () => await listarServicos({ filters }),
     placeholderData: keepPreviousData,
   });
@@ -385,18 +262,7 @@ export function Servicos() {
           )}
         </Flex>
         <Flex alignItems="center">
-          {/* <Button
-            onClick={() => {
-              console.log("Clicou");
-            }}
-            size="sm"
-            variant="subtle"
-            color="brand.500"
-            fontWeight="semibold"
-          >
-            Criar serviço
-          </Button> */}
-          <ServicosDialogForm />
+          <ServicosDialog />
 
           <VisibilityControlDialog
             fields={columns.map((e) => ({
@@ -448,18 +314,6 @@ export function Servicos() {
             sortBy: stateToSortBy(updaterOrValue(sortingState)),
           }));
         }}
-      />
-
-      <Box mt="8" />
-
-      <Build
-        fields={fields}
-        data={{
-          prestador: "maikon alexandre",
-          campanha: "campanha",
-          valores: { grossValue: "50" },
-        }}
-        onSubmit={(values) => console.log("Submit", values)}
       />
     </Box>
   );

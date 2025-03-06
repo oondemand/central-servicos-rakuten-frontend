@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Input } from "@chakra-ui/react";
 import { withMask } from "use-mask-input";
+import { parse } from "date-fns";
 
 export const DateInput = ({ getValue, row, column, table, ...rest }) => {
   const initialValue = new Date(getValue()).toLocaleDateString();
@@ -8,8 +9,7 @@ export const DateInput = ({ getValue, row, column, table, ...rest }) => {
 
   const onBlur = async () => {
     if (value !== initialValue) {
-      const [day, month, year] = value.split("/");
-      const newDate = new Date(year, month - 1, day);
+      const newDate = parse(value, "dd/MM/yyyy", new Date());
 
       try {
         await table.options.meta?.updateData({

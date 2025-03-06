@@ -1,7 +1,7 @@
 import { Input, Box, Text } from "@chakra-ui/react";
 import { useHookFormMask } from "use-mask-input";
 
-export const DateField = ({ ...props }) => {
+export const CompetenciaField = ({ ...props }) => {
   const registerWithMask = useHookFormMask(props.methods.register);
 
   return (
@@ -13,7 +13,7 @@ export const DateField = ({ ...props }) => {
         fontSize="md"
         mt="-3.5"
         variant="flushed"
-        {...registerWithMask(props.accessorKey, "99/99/9999")}
+        {...registerWithMask(props.accessorKey, "99/9999")}
       />
       <Text mt="0.5" fontSize="xs" color="red.400">
         {props.error}

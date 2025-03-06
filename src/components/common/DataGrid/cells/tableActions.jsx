@@ -10,7 +10,7 @@ import {
   AlertDialogContent,
   AlertDialogOverlay,
 } from "@chakra-ui/react";
-import { ServicosForm } from "../../../../components/common/servicosForm";
+// import { ServicosForm } from "../../../../components/common/servicosForm";
 
 export const TableActions = ({ table, row }) => {
   const {
@@ -21,8 +21,8 @@ export const TableActions = ({ table, row }) => {
 
   const cancelRefAlertRef = React.useRef();
 
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const cancelRef = React.useRef();
+  // const { isOpen, onOpen, onClose } = useDisclosure();
+  // const cancelRef = React.useRef();
 
   const handleDeleteActions = async () => {
     await table.options.meta?.deleteData({
@@ -86,7 +86,7 @@ export const TableActions = ({ table, row }) => {
         </AlertDialog>
       )}
 
-      {isOpen && (
+      {/* {isOpen && (
         <AlertDialog
           isOpen={isOpen}
           onClose={onClose}
@@ -105,7 +105,7 @@ export const TableActions = ({ table, row }) => {
             </AlertDialogContent>
           </AlertDialogOverlay>
         </AlertDialog>
-      )}
+      )} */}
     </>
   );
 };
