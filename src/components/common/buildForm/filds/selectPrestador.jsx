@@ -1,6 +1,6 @@
 import { Box, Text } from "@chakra-ui/react";
 import SelectAsync from "react-select/async";
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { listarPrestadores } from "../../../../services/prestadorService";
 import api from "../../../../services/api";
