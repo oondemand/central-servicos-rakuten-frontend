@@ -3,8 +3,6 @@ import { useEffect } from "react";
 import { NumericFormat } from "react-number-format";
 
 export const CurrencyInput = ({ ...props }) => {
-  console.log("Disabled", props.disabled, props?.initialValue);
-
   useEffect(() => {}, [props?.initialValue]);
   return (
     <Box>

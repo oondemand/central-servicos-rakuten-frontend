@@ -17,8 +17,6 @@ export const CidadeSelectAutoCompleteCell = ({
   const onBlur = async () => {
     if (value !== initialValue) {
       try {
-        console.log("VALUE", { [column.columnDef.accessorKey]: value.value });
-
         await table.options.meta?.updateData({
           prestadorId: row.original._id,
           data: { [column.columnDef.accessorKey]: value.value },

@@ -26,6 +26,7 @@ import { DebouncedInput } from "../../components/common/debouncedInput";
 
 import { ServicosDialog } from "./dialog";
 import { SelectPrestadorCell } from "../../components/common/DataGrid/cells/selectPrestador";
+import { SelectLista } from "../../components/common/DataGrid/cells/selectLista";
 
 export function Servicos() {
   const toast = useToast();
@@ -66,12 +67,6 @@ export function Servicos() {
       header: "Prestador",
       enableSorting: false,
       cell: SelectPrestadorCell,
-
-      // (props) => (
-      //   <Text noOfLines={1}>{`${props.getValue()?.nome ?? ""} - ${
-      //     props.getValue()?.sid ?? ""
-      //   } - ${props.getValue()?.documento ?? ""}`}</Text>
-      // ),
     },
     {
       accessorKey: "dataProvisaoContabil",
@@ -95,13 +90,13 @@ export function Servicos() {
       accessorKey: "tipoDocumentoFiscal",
       header: "Documento Fiscal",
       enableSorting: false,
-      cell: InputCell,
+      cell: (props) => <SelectLista {...props} cod={"tipo-documento-fiscal"} />,
     },
     {
       accessorKey: "campanha",
       header: "Campanha",
       enableSorting: false,
-      cell: InputCell,
+      cell: (props) => <SelectLista {...props} cod={"campanha"} />,
     },
     {
       accessorKey: "status",

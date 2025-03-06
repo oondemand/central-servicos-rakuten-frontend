@@ -9,6 +9,7 @@ import { preprocessEmptyToUndefined } from "../../utils/zodHelpers";
 import { parse, isValid } from "date-fns";
 import { SelectPrestadorField } from "../../components/common/buildForm/filds/selectPrestador";
 import { CompetenciaField } from "../../components/common/buildForm/filds/competencia";
+import { SelectLista } from "../../components/common/buildForm/filds/selectLista";
 
 const currencyValidation = preprocessEmptyToUndefined(
   z.coerce
@@ -45,8 +46,9 @@ export const servicosFields = () => {
     {
       accessorKey: "campanha",
       label: "Campanha",
-      render: DefaultComponent,
-      validation: z.string().optional(),
+      render: SelectLista,
+      cod: "campanha",
+      validation: z.object({ label: z.string(), value: z.string() }).optional(),
       colSpan: 2,
     },
     {
@@ -59,8 +61,9 @@ export const servicosFields = () => {
     {
       accessorKey: "tipoDocumentoFiscal",
       label: "Documento Fiscal",
-      render: DefaultComponent,
-      validation: z.string(),
+      cod: "tipo-documento-fiscal",
+      render: SelectLista,
+      validation: z.object({ label: z.string(), value: z.string() }).optional(),
       colSpan: 1,
     },
     {

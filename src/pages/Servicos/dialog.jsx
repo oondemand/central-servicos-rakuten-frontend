@@ -68,8 +68,6 @@ export const ServicosDialog = () => {
   });
 
   const onSubmit = async (values) => {
-    console.log(values);
-
     const competencia = values?.competencia.split("/");
     const mes = Number(competencia?.[0]) || null;
     const ano = Number(competencia?.[1]) || null;
@@ -77,13 +75,13 @@ export const ServicosDialog = () => {
     const body = {
       ...values,
       prestador: values.prestador.value,
+      campanha: values?.campanha?.value,
+      tipoDocumentoFiscal: values?.tipoDocumentoFiscal?.value,
       competencia: {
         mes,
         ano,
       },
     };
-
-    console.log(body);
 
     if (!data) {
       return await createServicoMutation({ body });
