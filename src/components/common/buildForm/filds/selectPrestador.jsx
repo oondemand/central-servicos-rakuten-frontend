@@ -14,15 +14,53 @@ export const SelectPrestadorField = ({ ...props }) => {
   //   enabled: false,
   // });
 
-  const loadOptions = async (props) => {
-    const { data } = await api.get(`/prestadores?searchTerm=${props}`);
+  // const loadOptions = async (props) => {
+  //   const { data } = await api.get(`/prestadores?searchTerm=${props}`);
 
-    const options = data?.prestadores?.map((prestador) => ({
-      label: `${prestador?.nome} - ${prestador?.sid} - ${prestador?.documento}`,
-      value: prestador?._id,
-    }));
+  //   const options = data?.prestadores?.map((prestador) => ({
+  //     label: `${prestador?.nome} - ${prestador?.sid} - ${prestador?.documento}`,
+  //     value: prestador?._id,
+  //   }));
 
-    return options;
+  //   return options;
+  // };
+
+  const timeoutRef = useRef(null);
+  const abortControllerRef = useRef(null);
+
+  const loadOptions = async (inputValue) => {
+    // Cancela o timeout e a requisição anteriores
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    if (abortControllerRef.current) abortControllerRef.current.abort();
+
+    // Cria um novo AbortController para a próxima requisição
+    abortControllerRef.current = new AbortController();
+
+    return new Promise((resolve) => {
+      timeoutRef.current = setTimeout(async () => {
+        try {
+          const { data } = await api.get(
+            `/prestadores?searchTerm=${inputValue}`,
+            {
+              signal: abortControllerRef.current.signal,
+            }
+          );
+
+          const options = data?.prestadores?.map((prestador) => ({
+            label: `${prestador.nome} - ${prestador.sid} - ${prestador.documento}`,
+            value: prestador._id,
+          }));
+
+          resolve(options || []);
+        } catch (error) {
+          if (error.name !== "AbortError") {
+            console.error("Erro ao buscar prestadores:", error);
+          }
+
+          resolve([]);
+        }
+      }, 1000); // Tempo de debounce ajustável aqui
+    });
   };
 
   return (

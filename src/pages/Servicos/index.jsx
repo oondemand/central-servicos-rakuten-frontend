@@ -65,11 +65,13 @@ export function Servicos() {
       accessorKey: "prestador",
       header: "Prestador",
       enableSorting: false,
-      cell: (props) => (
-        <Text noOfLines={1}>{`${props.getValue()?.nome ?? ""} - ${
-          props.getValue()?.sid ?? ""
-        } - ${props.getValue()?.documento ?? ""}`}</Text>
-      ),
+      cell: SelectPrestadorCell,
+
+      // (props) => (
+      //   <Text noOfLines={1}>{`${props.getValue()?.nome ?? ""} - ${
+      //     props.getValue()?.sid ?? ""
+      //   } - ${props.getValue()?.documento ?? ""}`}</Text>
+      // ),
     },
     {
       accessorKey: "dataProvisaoContabil",

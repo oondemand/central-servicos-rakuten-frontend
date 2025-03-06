@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { listarPrestadores } from "../../../../services/prestadorService";
 import api from "../../../../services/api";
 import { Controller } from "react-hook-form";
+import { useRef } from "react";
 
 export const SelectPrestadorCell = ({
   getValue,
@@ -14,70 +15,98 @@ export const SelectPrestadorCell = ({
   options,
   ...props
 }) => {
-  // const { data, refetch } = useQuery({
-  //   queryKey: ["prestadores", { searchTerm }],
-  //   staleTime: 1000 * 60 * 10, // 10 minutos
-  //   queryFn: listarPrestadores,
-  //   enabled: false,
-  // });
-
   const initialValue = getValue();
   const [value, setValue] = useState("");
 
-  const loadOptions = async (props) => {
-    console.log("PROPS", props);
+  // const loadOptions = async (props) => {
+  //   console.log("PROPS", props);
 
-    const { data } = await api.get(`/prestadores?searchTerm=${props}`);
+  //   const { data } = await api.get(`/prestadores?searchTerm=${props}`);
 
-    console.log(data);
+  //   console.log(data);
 
-    const options = data?.prestadores?.map((prestador) => ({
-      label: `${prestador?.nome} - ${prestador?.sid} - ${prestador?.documento}`,
-      value: prestador?._id,
-    }));
+  //   const options = data?.prestadores?.map((prestador) => ({
+  //     label: `${prestador?.nome} - ${prestador?.sid} - ${prestador?.documento}`,
+  //     value: prestador?._id,
+  //   }));
 
-    return options;
+  //   return options;
+  // };
+
+  const timeoutRef = useRef(null);
+  const abortControllerRef = useRef(null);
+
+  const loadOptions = async (inputValue) => {
+    // Cancela o timeout e a requisição anteriores
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    if (abortControllerRef.current) abortControllerRef.current.abort();
+
+    // Cria um novo AbortController para a próxima requisição
+    abortControllerRef.current = new AbortController();
+
+    return new Promise((resolve) => {
+      timeoutRef.current = setTimeout(async () => {
+        try {
+          const { data } = await api.get(
+            `/prestadores?searchTerm=${inputValue}`,
+            {
+              signal: abortControllerRef.current.signal,
+            }
+          );
+
+          const options = data?.prestadores?.map((prestador) => ({
+            label: `${prestador.nome} - ${prestador.sid} - ${prestador.documento}`,
+            value: prestador._id,
+          }));
+
+          resolve(options || []);
+        } catch (error) {
+          if (error.name !== "AbortError") {
+            console.error("Erro ao buscar prestadores:", error);
+          }
+
+          resolve([]);
+        }
+      }, 1000); // Tempo de debounce ajustável aqui
+    });
   };
 
   const onBlur = async () => {
-    console.log("Value", value);
-
-    // if (value && value !== options.find((e) => e?.value === initialValue)) {
-    //   console.log(
-    //     { data: { [column.columnDef.key]: value.value } },
-    //     options,
-    //     initialValue
-    //   );
-    //   try {
-    //     await table.options.meta?.updateData({
-    //       prestadorId: row.original._id,
-    //       data: { [column.columnDef.accessorKey]: value.value },
-    //     });
-    //   } catch (error) {
-    //     console.log(error);
-    //     setValue(initialValue);
-    //   }
-    // }
+    if (value.value && value.value !== initialValue.value) {
+      console.log(
+        { data: { [column.columnDef.accessorKey]: value.value } },
+        options,
+        initialValue
+      );
+      try {
+        await table.options.meta?.updateData({
+          prestadorId: row.original._id,
+          data: { [column.columnDef.accessorKey]: value.value },
+        });
+      } catch (error) {
+        console.log(error);
+        setValue({
+          label: `${initialValue?.nome} - ${initialValue?.sid} - ${initialValue?.documento}`,
+          value: initialValue?._id,
+        });
+      }
+    }
   };
 
   useEffect(() => {
-    // setValue({
-    //   label: `${initialValue?.nome} - ${initialValue?.sid} - ${initialValue?.documento}`,
-    //   value: initialValue?._id,
-    // });
+    setValue({
+      label: `${initialValue?.nome} - ${initialValue?.sid} - ${initialValue?.documento}`,
+      value: initialValue?._id,
+    });
   }, [initialValue]);
 
   return (
     <SelectAsync
       // defaultInputValue={value}
       onBlur={onBlur}
-      // value={value ?? ""}
+      value={value ?? ""}
       onChange={setValue}
-      onInputChange={(e) => {
-        console.log(e);
-      }}
       cacheOptions
-      isClearable
       loadOptions={loadOptions}
       defaultOptions
       variant="subtle"
@@ -110,7 +139,7 @@ export const SelectPrestadorCell = ({
           height: "30px",
           padding: 0,
           margin: 0,
-          zIndex: 500,
+          // zIndex: 500,
         }),
 
         menu: (base) => ({
@@ -124,7 +153,7 @@ export const SelectPrestadorCell = ({
           ...base,
           scrollbarWidth: "thin",
           backgroundColor: "white",
-          // zIndex: 1000,
+          zIndex: 1000,
         }),
         placeholder: (base) => ({
           ...base,
