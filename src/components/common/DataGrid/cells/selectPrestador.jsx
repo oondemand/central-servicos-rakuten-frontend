@@ -72,12 +72,7 @@ export const SelectPrestadorCell = ({
   };
 
   const onBlur = async () => {
-    if (value.value && value.value !== initialValue.value) {
-      console.log(
-        { data: { [column.columnDef.accessorKey]: value.value } },
-        options,
-        initialValue
-      );
+    if (value.value && value.value !== initialValue._id) {
       try {
         await table.options.meta?.updateData({
           prestadorId: row.original._id,
