@@ -6,8 +6,8 @@ export const CompetenciaInput = ({ getValue, row, column, table, ...rest }) => {
   const initialValue = getValue();
 
   const formatValue =
-    initialValue?.mes.toString().padStart(2, "0") +
-    initialValue?.ano.toString();
+    initialValue?.mes?.toString().padStart(2, "0") +
+    initialValue?.ano?.toString();
 
   const [value, setValue] = useState("");
 
