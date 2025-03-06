@@ -14,13 +14,13 @@ import { useMemo, useRef, useState } from "react";
 
 import { useMutation } from "@tanstack/react-query";
 import { queryClient } from "../../App";
-import { servicosFields } from "./fields";
+import { prestadoresFields } from "./fields";
 import { Build } from "../../components/common/buildForm/build";
 import api from "../../services/api";
 import { VisibilityControlDialog } from "../../components/common/visibilityControllerDialog";
 import { useVisibleInputForm } from "../../contexts/useVisibleInputForms";
 
-export const ServicosDialog = () => {
+export const PrestadoresDialog = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = useRef();
 
@@ -28,40 +28,40 @@ export const ServicosDialog = () => {
 
   const [data, setData] = useState(null);
   const { inputsVisibility, setInputsVisibility } = useVisibleInputForm({
-    key: "SERVICOS",
+    key: "PRESTADORES",
   });
 
-  const { mutateAsync: updateServicoMutation } = useMutation({
+  const { mutateAsync: updatePrestadorMutation } = useMutation({
     mutationFn: async ({ id, body }) =>
-      await api.patch(`servicos/${data._id}`, body),
+      await api.patch(`prestadores/${data._id}`, body),
     onSuccess(data) {
-      setData((prev) => data.data.servico);
+      setData((prev) => data.data.prestador);
       // toast({
-      //   title: "Servico atualizado com sucesso",
+      //   title: "Prestador atualizado com sucesso",
       //   status: "success",
       // });
     },
     onError: (error) => {
       toast({
-        title: "Ouve um erro ao atualizar o serviço",
+        title: "Ouve um erro ao atualizar o prestador",
         status: "error",
       });
     },
   });
 
-  const { mutateAsync: createServicoMutation } = useMutation({
-    mutationFn: async ({ body }) => await api.post(`servicos`, body),
+  const { mutateAsync: createPrestadorMutation } = useMutation({
+    mutationFn: async ({ body }) => await api.post(`prestadores`, body),
     onSuccess(data) {
-      setData((prev) => data.data.servico);
+      setData((prev) => data.data.prestador);
 
       toast({
-        title: "Serviço criado com sucesso",
+        title: "Prestador criado com sucesso",
         status: "success",
       });
     },
     onError: (error) => {
       toast({
-        title: "Ouve um erro ao criar um serviço",
+        title: "Ouve um erro ao criar um prestador",
         status: "error",
       });
     },
@@ -84,16 +84,16 @@ export const ServicosDialog = () => {
     };
 
     if (!data) {
-      return await createServicoMutation({ body });
+      return await createPrestadorMutation({ body });
     }
 
-    return await updateServicoMutation({ id: data._id, body });
+    return await updatePrestadorMutation({ id: data._id, body });
   };
 
-  const fields = useMemo(() => servicosFields(), []);
+  const fields = useMemo(() => prestadoresFields(), []);
 
   function onCloseModal() {
-    queryClient.refetchQueries(["listar-servicos"]);
+    queryClient.refetchQueries(["listar-prestadores"]);
     setData();
     onClose();
   }
@@ -109,7 +109,7 @@ export const ServicosDialog = () => {
         color="brand.500"
         fontWeight="semibold"
       >
-        Criar serviço
+        Criar prestador
       </Button>
 
       {isOpen && (
@@ -129,7 +129,7 @@ export const ServicosDialog = () => {
                 fontSize="lg"
                 fontWeight="bold"
               >
-                Criar serviço
+                Criar prestador
                 <VisibilityControlDialog
                   fields={fields}
                   setVisibilityState={setInputsVisibility}

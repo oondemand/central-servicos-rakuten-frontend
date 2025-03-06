@@ -48,9 +48,9 @@ export const carregarPrestador = async (id) => {
 };
 
 // Serviço para listar todos os prestadores com ou sem filtro
-export const listarPrestadores = async (filtro) => {
+export const listarPrestadores = async ({ filters }) => {
   try {
-    const response = await api.get("prestadores", { params: filtro });
+    const response = await api.get("prestadores", { params: filters });
     return response.data; // Retorna os dados da resposta
   } catch (error) {
     console.error("Erro ao listar prestadores:", error);
@@ -84,10 +84,10 @@ export const obterPrestadorPorDocumento = async (documento) => {
 export const obterPrestadorPorEmail = async (email) => {
   try {
     const response = await api.get(`/prestadores/email/${email}`);
-    return response.data; 
+    return response.data;
   } catch (error) {
     if (error.response && error.response.status === 404) {
-      return null; 
+      return null;
     }
     throw error;
   }

@@ -7,7 +7,7 @@ import { useColumnVisibility } from "../../contexts/useColumnVisibility";
 import { useColumnSizing } from "../../contexts/useColumnSizing";
 import { sortByToState, stateToSortBy } from "../../utils/sorting";
 
-import { listarServicos } from "../../services/servicoService";
+import { listarPrestadores } from "../../services/prestadorService";
 
 import { useQuery, keepPreviousData, useMutation } from "@tanstack/react-query";
 
@@ -15,20 +15,20 @@ import { queryClient } from "../../App";
 import { VisibilityControlDialog } from "../../components/common/visibilityControllerDialog";
 import { DebouncedInput } from "../../components/common/debouncedInput";
 
-import { ServicosDialog } from "./dialog";
-import { createColumns } from "./columns";
+import { PrestadoresDialog } from "./dialog";
+import { createPrestadoresColumns } from "./columns";
 import { useMemo } from "react";
 import api from "../../services/api";
 
-export default function Servicos() {
+export default function Prestadores() {
   const toast = useToast();
 
   const { filters, resetFilters, setFilters } = useFilters({
-    key: "SERVICOS",
+    key: "PRESTADORES",
   });
 
   const { columnVisibility, setColumnVisibility } = useColumnVisibility({
-    key: "SERVICOS",
+    key: "PRESTADORES",
   });
 
   const {
@@ -37,7 +37,7 @@ export default function Servicos() {
     setColumnSizing,
     setColumnSizingInfo,
   } = useColumnSizing({
-    key: "SERVICOS",
+    key: "PRESTADORES",
   });
 
   const sortingState = sortByToState(filters.sortBy);
@@ -48,46 +48,49 @@ export default function Servicos() {
   };
 
   const { data, error, isLoading, isFetching } = useQuery({
-    queryKey: ["listar-servicos", { filters }],
-    queryFn: async () => await listarServicos({ filters }),
+    queryKey: ["listar-prestadores", { filters }],
+    queryFn: async () => await listarPrestadores({ filters }),
     placeholderData: keepPreviousData,
   });
 
-  const { mutateAsync: updateServicoMutation } = useMutation({
-    mutationFn: async ({ id, data }) => await api.patch(`servicos/${id}`, data),
+  const { mutateAsync: updatePrestadorMutation } = useMutation({
+    mutationFn: async ({ id, data }) =>
+      await api.patch(`prestadores/${id}`, data),
     onSuccess() {
-      queryClient.refetchQueries(["listar-servicos", { filters }]);
+      queryClient.refetchQueries(["listar-prestadores", { filters }]);
       toast({
-        title: "Serviço atualizado com sucesso",
+        title: "Prestador atualizado com sucesso",
         status: "success",
       });
     },
     onError: (error) => {
       toast({
-        title: "Ouve um erro ao atualizar o serviço",
+        title: "Ouve um erro ao atualizar o prestador",
         status: "error",
       });
     },
   });
 
-  const { mutateAsync: deleteServicoMutation } = useMutation({
-    mutationFn: async ({ id }) => await api.delete(`servicos/${id}`),
+  const { mutateAsync: deletePrestadorMutation } = useMutation({
+    mutationFn: async ({ id }) => await api.delete(`prestadores/${id}`),
     onSuccess() {
-      queryClient.refetchQueries(["listar-servicos", { filters }]);
+      queryClient.refetchQueries(["listar-prestadores", { filters }]);
       toast({
-        title: "Serviço excluído com sucesso",
+        title: "Prestador excluído com sucesso",
         status: "success",
       });
     },
     onError: (error) => {
       toast({
-        title: "Ouve um erro ao excluir serviço",
+        title: "Ouve um erro ao excluir prestador",
         status: "error",
       });
     },
   });
 
-  const columns = useMemo(() => createColumns(), []);
+  const columns = useMemo(() => createPrestadoresColumns(), []);
+
+  console.log(data);
 
   return (
     <Box>
@@ -127,7 +130,7 @@ export default function Servicos() {
           )}
         </Flex>
         <Flex alignItems="center">
-          <ServicosDialog />
+          <PrestadoresDialog />
 
           <VisibilityControlDialog
             fields={columns.map((e) => ({
@@ -146,7 +149,7 @@ export default function Servicos() {
         sorting={sortingState}
         columns={columns}
         pagination={paginationState}
-        data={data?.servicos || []}
+        data={data?.prestadores || []}
         columnVisibility={columnVisibility}
         setColumnVisibility={setColumnVisibility}
         columnSizing={columnSizing}
@@ -154,13 +157,13 @@ export default function Servicos() {
         setColumnSizing={setColumnSizing}
         setColumnSizingInfo={setColumnSizingInfo}
         onUpdateData={async (values) => {
-          await updateServicoMutation({
+          await updatePrestadorMutation({
             id: values.prestadorId,
             data: values.data,
           });
         }}
         onDeleteData={async (values) => {
-          await deleteServicoMutation({
+          await deletePrestadorMutation({
             id: values.id,
           });
         }}

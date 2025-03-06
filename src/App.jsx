@@ -6,9 +6,10 @@ import PrivateRoute from "./components/PrivateRoute";
 import Layout from "./components/Layout/Layout";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ToastContainer } from "react-toastify";
-import { Servicos } from "./pages/Servicos";
 import "react-toastify/dist/ReactToastify.css";
 
+const Servicos = lazy(() => import("./pages/Servicos"));
+const Prestadores = lazy(() => import("./pages/Prestadores"));
 const LoginPage = lazy(() => import("./pages/LoginPage"));
 const HomePage = lazy(() => import("./pages/HomePage"));
 const ConfigPage = lazy(() => import("./pages/ConfigPage"));
@@ -36,6 +37,7 @@ function App() {
                   <Route path="home" element={<HomePage />} />
                   <Route path="configuracoes" element={<ConfigPage />} />
                   <Route path="servicos" element={<Servicos />} />
+                  <Route path="prestadores" element={<Prestadores />} />
                 </Route>
               </Route>
               <Route path="/" element={<Navigate to="/login" replace />} />

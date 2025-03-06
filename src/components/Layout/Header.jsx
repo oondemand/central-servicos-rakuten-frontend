@@ -65,11 +65,11 @@ const Header = () => {
             <Text>Serviços</Text>
           </Link>
 
-          <Link to="/auth/servicos">
+          <Link to="/auth/prestadores">
             <Text>Prestadores</Text>
           </Link>
 
-          <Link to="/auth/servicos">
+          <Link to="/auth">
             <Text>Esteira</Text>
           </Link>
         </Flex>

@@ -82,11 +82,12 @@ export const Build = ({
       <form onBlur={handleSubmit(onSubmit)}>
         <Grid templateColumns={`repeat(${gridColumns}, 1fr)`} gap={gap}>
           {fields.map((field) => {
-            if (visibleState && !visibleState[field.accessorKey]) return null;
             const { render, ...rest } = field;
+            const isVisible = visibleState && !visibleState[field.accessorKey];
 
             return (
               <GridItem
+                display={!isVisible ? "block" : "none"}
                 key={field.accessorKey}
                 colSpan={field?.colSpan ? field.colSpan : 1}
               >

@@ -77,7 +77,7 @@ export const SelectPrestadorCell = ({
   };
 
   const onBlur = async () => {
-    if (value.value && value.value !== initialValue._id) {
+    if (value.value && value.value !== initialValue?._id) {
       try {
         await table.options.meta?.updateData({
           prestadorId: row.original._id,
