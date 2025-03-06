@@ -19,13 +19,11 @@ export const SelectLista = ({ getValue, row, column, table, cod, ...rest }) => {
   const [value, setValue] = useState("");
 
   const onBlur = async () => {
-    if (
-      value &&
-      value?.value !==
-        options.find(
-          (item) => item?.label == initialValue || item?.value == initialValue
-        ).value
-    ) {
+    const item = options.find(
+      (item) => item?.label == initialValue || item?.value == initialValue
+    );
+
+    if (value && value?.value !== (item?.value || item?.label)) {
       try {
         await table.options.meta?.updateData({
           prestadorId: row.original._id,
