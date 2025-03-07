@@ -105,6 +105,7 @@ export const PrestadoresDialog = () => {
         variant="subtle"
         color="brand.500"
         fontWeight="semibold"
+        _hover={{ backgroundColor: "brand.50" }}
       >
         Criar prestador
       </Button>

@@ -12,6 +12,7 @@ import {
   AlertDialogContent,
   AlertDialogOverlay,
   AlertDialogCloseButton,
+  IconButton,
 } from "@chakra-ui/react";
 
 import { useRef } from "react";
@@ -27,9 +28,15 @@ export const VisibilityControlDialog = ({
 
   return (
     <>
-      <Button colorScheme="gray" variant="ghost" onClick={onOpen}>
+      <IconButton
+        size="sm"
+        variant="subtle"
+        colorScheme="gray"
+        _hover={{ backgroundColor: "brand.50" }}
+        onClick={onOpen}
+      >
         <SettingsIcon />
-      </Button>
+      </IconButton>
 
       {isOpen && (
         <AlertDialog

@@ -67,6 +67,10 @@ export const SelectLista = ({ getValue, row, column, table, cod, ...rest }) => {
           height: "24px",
           fontSize: "15px",
         }),
+        menuPortal: (base) => ({
+          ...base,
+          zIndex: 9999,
+        }),
 
         control: (base) => ({
           display: "flex",

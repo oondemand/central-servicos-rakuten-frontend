@@ -108,6 +108,7 @@ export const ServicosDialog = () => {
         variant="subtle"
         color="brand.500"
         fontWeight="semibold"
+        _hover={{ backgroundColor: "brand.50" }}
       >
         Criar serviço
       </Button>

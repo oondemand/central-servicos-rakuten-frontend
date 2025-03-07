@@ -40,19 +40,6 @@ export const exportarPrestadores = async () => {
   }
 };
 
-export const importarPrestadores = async (prestadores) => {
-  try {
-    const response = await api.post(
-      "acoes-etapas/importar-prestadores",
-      prestadores
-    );
-    return response.data; // Retorna os dados da resposta
-  } catch (error) {
-    console.error("Erro ao importar prestadores:", error);
-    throw error; // Repassa o erro para que o chamador possa tratá-lo
-  }
-};
-
 export const importarRPAs = async (files) => {
   try {
     const formData = new FormData();
@@ -71,4 +58,38 @@ export const importarRPAs = async (files) => {
     console.error("Erro ao importar RPAs:", error);
     throw error; // Repassa o erro para que o chamador possa tratá-lo
   }
+};
+
+export const importarPrestadores = async ({ files }) => {
+  const formData = new FormData();
+  for (const file of files) {
+    formData.append("file", file);
+  }
+
+  const response = await api.post(
+    "acoes-etapas/importar-prestadores",
+    formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }
+  );
+
+  return response;
+};
+
+export const importarServicos = async ({ files }) => {
+  const formData = new FormData();
+  for (const file of files) {
+    formData.append("file", file);
+  }
+
+  const response = await api.post("acoes-etapas/importar-servicos", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+
+  return response;
 };

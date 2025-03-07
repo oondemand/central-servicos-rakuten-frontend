@@ -100,7 +100,7 @@ export const DataGrid = ({
       <Box>
         <Box
           overflowX="auto"
-          overflowY="hidden"
+          position="relative"
           sx={{ scrollbarWidth: "thin" }}
           pb="2"
         >

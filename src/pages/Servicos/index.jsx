@@ -19,6 +19,10 @@ import { ServicosDialog } from "./dialog";
 import { createColumns } from "./columns";
 import { useMemo } from "react";
 import api from "../../services/api";
+import { ExportDataButton } from "../../components/common/DataGrid/exportData";
+
+import { importarServicos } from "../../services/acoesEtapaService";
+import { DropzoneDialog } from "../../components/common/DropzoneDialog";
 
 export default function Servicos() {
   const toast = useToast();
@@ -87,6 +91,24 @@ export default function Servicos() {
     },
   });
 
+  const { mutateAsync: importServicosMutation } = useMutation({
+    mutationFn: async ({ files }) => await importarServicos({ files }),
+    onSuccess() {
+      queryClient.refetchQueries(["listar-servicos", { filters }]);
+      toast({
+        title: "Arquivo enviado",
+        description: "Aguardando processamento.",
+        status: "info",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Ouve um erro ao enviar arquivo!",
+        status: "error",
+      });
+    },
+  });
+
   const columns = useMemo(() => createColumns(), []);
 
   return (
@@ -129,6 +151,22 @@ export default function Servicos() {
         <Flex alignItems="center">
           <ServicosDialog />
 
+          <DropzoneDialog
+            onHandleSendFile={async ({ files }) =>
+              await importServicosMutation({ files })
+            }
+          />
+
+          <ExportDataButton
+            columns={columns}
+            data={data?.servicos.map((item) => ({
+              ...item,
+              prestador: `${item?.prestador?.nome || ""} - ${
+                item?.prestador?.sid || ""
+              } - ${item?.prestador?.documento || ""}`,
+            }))}
+          />
+
           <VisibilityControlDialog
             fields={columns.map((e) => ({
               label: e.header,
@@ -140,6 +178,8 @@ export default function Servicos() {
           />
         </Flex>
       </Flex>
+
+      <Box p="0.5" />
 
       <DataGrid
         filters={filters}

@@ -9,6 +9,8 @@ import { sortByToState, stateToSortBy } from "../../utils/sorting";
 
 import { listarPrestadores } from "../../services/prestadorService";
 
+import { importarPrestadores } from "../../services/acoesEtapaService";
+
 import { useQuery, keepPreviousData, useMutation } from "@tanstack/react-query";
 
 import { queryClient } from "../../App";
@@ -19,6 +21,8 @@ import { PrestadoresDialog } from "./dialog";
 import { createPrestadoresColumns } from "./columns";
 import { useMemo } from "react";
 import api from "../../services/api";
+import { ExportDataButton } from "../../components/common/DataGrid/exportData";
+import { DropzoneDialog } from "../../components/common/DropzoneDialog";
 
 export default function Prestadores() {
   const toast = useToast();
@@ -88,9 +92,25 @@ export default function Prestadores() {
     },
   });
 
-  const columns = createPrestadoresColumns();
+  const { mutateAsync: importPrestadoresMutation } = useMutation({
+    mutationFn: async ({ files }) => await importarPrestadores({ files }),
+    onSuccess() {
+      queryClient.refetchQueries(["listar-prestadores", { filters }]);
+      toast({
+        title: "Arquivo enviado",
+        description: "Aguardando processamento.",
+        status: "info",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Ouve um erro ao enviar arquivo!",
+        status: "error",
+      });
+    },
+  });
 
-  console.log(data);
+  const columns = createPrestadoresColumns();
 
   return (
     <Box>
@@ -132,6 +152,14 @@ export default function Prestadores() {
         <Flex alignItems="center">
           <PrestadoresDialog />
 
+          <DropzoneDialog
+            onHandleSendFile={async ({ files }) =>
+              await importPrestadoresMutation({ files })
+            }
+          />
+
+          <ExportDataButton columns={columns} data={data?.prestadores} />
+
           <VisibilityControlDialog
             fields={columns.map((e) => ({
               label: e.header,
@@ -143,6 +171,8 @@ export default function Prestadores() {
           />
         </Flex>
       </Flex>
+
+      <Box p="0.5" />
 
       <DataGrid
         filters={filters}
