@@ -68,20 +68,17 @@ export const PrestadoresDialog = () => {
   });
 
   const onSubmit = async (values) => {
-    const competencia = values?.competencia.split("/");
-    const mes = Number(competencia?.[0]) || null;
-    const ano = Number(competencia?.[1]) || null;
-
     const body = {
       ...values,
-      prestador: values.prestador.value,
-      campanha: values?.campanha?.value,
-      tipoDocumentoFiscal: values?.tipoDocumentoFiscal?.value,
-      competencia: {
-        mes,
-        ano,
+
+      dadosBancarios: {
+        tipoConta: values?.dadosBancarios?.tipoConta?.value,
+        banco: values?.dadosBancarios?.banco?.value,
+        ...values.dadosBancarios,
       },
     };
+
+    console.log("BODY", body);
 
     if (!data) {
       return await createPrestadorMutation({ body });
