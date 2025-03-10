@@ -4,7 +4,7 @@ metadata:
   name: cst-rakuten-frontend
   namespace: rakuten
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: cst-rakuten-frontend
