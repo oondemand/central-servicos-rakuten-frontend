@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.3.0 (2025-03-10)
+
+### Features
+
+* add GitHub Actions workflow for frontend deployment; configure Kubernetes deployment and ingress for homolog environment ([4851c7f](https://github.com/oondemand/cst-rakuten-frontend/commit/4851c7f51f36b68271f0d621ea294a82540b1591))
+
 ## 1.2.10 (2025-02-20)
 
 ## 1.2.9 (2025-02-14)
