@@ -1,0 +1,56 @@
+name: Deploy frontend
+
+on:
+  push:
+    branches:
+      - homolog
+
+jobs:
+  build_and_publish:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write # Permissão para o workflow criar tags
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Config git
+        run: |
+          git config user.name "${GITHUB_ACTOR}"
+          git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+
+      - name: Instalar dependências
+        run: npm install
+
+      - name: Criar release com release-it
+        run: npm run release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Obter tag da release
+        id: extract_tag
+        run: |
+          TAG=$(git describe --tags --abbrev=0)
+          echo "TAG=$TAG" >> $GITHUB_ENV
+
+      - name: Construir e publicar imagem
+        run: |
+          docker login --username ${{ secrets.DOCKER_USERNAME }} --password ${{ secrets.GH_PAT }} ghcr.io
+          docker build -f ./infra/docker/Dockerfile.prod --build-arg VITE_SERVICE_VERSION=${{ env.TAG }} --build-arg VITE_API_URL=${{ secrets.VITE_API_URL_HOMOLOG }} --tag ghcr.io/oondemand/cst-rakuten-frontend:${{ env.TAG }}-homolog .
+          docker push ghcr.io/oondemand/cst-rakuten-frontend:${{ env.TAG }}-homolog
+
+      - name: Criar kubeconfig
+        run: |
+          mkdir -p "${HOME}/.kube"
+          curl -s -H "Authorization: Bearer ${{secrets.DO_ACCESS_TOKEN_HOMOLOG}}" "${{secrets.DO_CLUSTER_AUTHENTICATION_URL_HOMOLOG}}" > "$HOME/.kube/config"
+
+      - name: Usar contexto do cluster
+        run: |
+          kubectl config use-context ${{ secrets.CLUSTER_HOMOLOG }}
+
+      - name: 🚀 Substituir variáveis no deployment-homolog.yml e aplicar no cluster
+        run: |
+          envsubst < infra/kubernetes/deployment-homolog.yaml | kubectl apply -f -
+
+        env:
+          IMAGE_TAG: ${{ env.TAG }}
